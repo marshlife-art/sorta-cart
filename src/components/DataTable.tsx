@@ -49,14 +49,12 @@ function DataTable() {
           {
             title: 'category',
             field: 'category',
-            type: 'string',
-            defaultGroupOrder: 0
+            type: 'string'
           },
           {
             title: 'sub category',
             field: 'sub_category',
-            type: 'string',
-            defaultGroupOrder: 1
+            type: 'string'
           },
           { title: 'upc', field: 'upc_code', type: 'string' },
           { title: 'unf', field: 'unf', type: 'string' }
@@ -124,8 +122,7 @@ function DataTable() {
           maxBodyHeight: 'calc(100vh - 121px)',
           pageSize: 50,
           pageSizeOptions: [50, 100, 500],
-          debounceInterval: 750,
-          grouping: true
+          debounceInterval: 750
         }}
         actions={[
           {
