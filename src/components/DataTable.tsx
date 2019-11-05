@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import MaterialTable from 'material-table'
+import MaterialTable, { MTableFilterRow } from 'material-table'
 import ImportDialog from './ImportDialog'
 
 const PROPERTY_MAP: { [index: string]: string } = {
@@ -10,7 +10,7 @@ const PROPERTY_MAP: { [index: string]: string } = {
   g: 'Gluten free',
   k: 'Kosher',
   l: 'Low sodium/no salt',
-  m: 'Non-GMO Project Verified ',
+  m: 'Non-GMO Project Verified',
   og: 'Organic',
   r: 'Refined sugar',
   v: 'Vegan',
@@ -34,10 +34,34 @@ function renderCodes(codes: string) {
 function DataTable() {
   const [importDialogOpen, setImportDialogOpen] = useState(false)
 
+  const [categoryLookup, setCategoryLookup] = useState<object>(() => {
+    fetch('http://localhost:3000/categories')
+      .then(response => response.json())
+      .then(result => setCategoryLookup(result))
+  })
+
+  const [subCategoryLookup, setSubCategoryLookup] = useState<object>(() => {
+    fetch('http://localhost:3000/sub_categories')
+      .then(response => response.json())
+      .then(result => setSubCategoryLookup(result))
+  })
+
   return (
     <>
       <MaterialTable
         columns={[
+          {
+            title: 'category',
+            field: 'category',
+            type: 'string',
+            lookup: categoryLookup
+          },
+          {
+            title: 'sub category',
+            field: 'sub_category',
+            type: 'string',
+            lookup: subCategoryLookup
+          },
           { title: 'name', field: 'name', type: 'string' },
           { title: 'description', field: 'description', type: 'string' },
           {
@@ -55,16 +79,6 @@ function DataTable() {
             type: 'string',
             lookup: PROPERTY_MAP,
             render: row => renderCodes(row.codes)
-          },
-          {
-            title: 'category',
-            field: 'category',
-            type: 'string'
-          },
-          {
-            title: 'sub category',
-            field: 'sub_category',
-            type: 'string'
           }
           // { title: 'upc', field: 'upc_code', type: 'string' },
           // { title: 'unf', field: 'unf', type: 'string' }
