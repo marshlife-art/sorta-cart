@@ -15,3 +15,7 @@ code {
 .MuiPopover-paper {
   min-width: 380px !important;
 }
+
+.MuiTableSortLabel-icon {
+  overflow: visible !important;
+}

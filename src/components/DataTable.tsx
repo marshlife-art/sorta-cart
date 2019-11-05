@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import MaterialTable, { MTableFilterRow } from 'material-table'
 import ImportDialog from './ImportDialog'
 
@@ -33,6 +33,27 @@ function renderCodes(codes: string) {
 
 function DataTable() {
   const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [searchExpanded, setSearchExpanded] = useState(false)
+
+  const searchAction = {
+    icon: searchExpanded ? 'zoom_out' : 'search',
+    tooltip: searchExpanded ? 'Close Search' : 'Search',
+    isFreeAction: true,
+    onClick: () => setSearchExpanded(!searchExpanded)
+  }
+
+  const addAction = {
+    icon: 'add',
+    tooltip: 'Add Data',
+    isFreeAction: true,
+    onClick: () => setImportDialogOpen(!importDialogOpen)
+  }
+
+  const [actions, setActions] = useState([searchAction, addAction])
+
+  useEffect(() => {
+    setActions([searchAction, addAction])
+  }, [searchExpanded])
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
     fetch('http://localhost:3000/categories')
@@ -54,30 +75,55 @@ function DataTable() {
             title: 'category',
             field: 'category',
             type: 'string',
-            lookup: categoryLookup
+            lookup: categoryLookup,
+            filterPlaceholder: 'filter'
           },
           {
             title: 'sub category',
             field: 'sub_category',
             type: 'string',
-            lookup: subCategoryLookup
+            lookup: subCategoryLookup,
+            filterPlaceholder: 'filter'
           },
-          { title: 'name', field: 'name', type: 'string' },
-          { title: 'description', field: 'description', type: 'string' },
+          { title: 'name', field: 'name', type: 'string', filtering: false },
+          {
+            title: 'description',
+            field: 'description',
+            type: 'string',
+            filtering: false
+          },
           {
             title: 'pk',
             field: 'pk',
-            type: 'numeric'
+            type: 'numeric',
+            filtering: false
           },
-          { title: 'size', field: 'size', type: 'string' },
-          { title: 'unit_type', field: 'unit_type', type: 'string' },
-          { title: 'price', field: 'ws_price', type: 'currency' },
-          { title: 'unit_price', field: 'u_price', type: 'currency' },
+          { title: 'size', field: 'size', type: 'string', filtering: false },
+          {
+            title: 'unit_type',
+            field: 'unit_type',
+            type: 'string',
+            lookup: { CS: 'Case', EA: 'Each' },
+            filterPlaceholder: 'filter'
+          },
+          {
+            title: 'price',
+            field: 'ws_price',
+            type: 'currency',
+            filtering: false
+          },
+          {
+            title: 'unit_price',
+            field: 'u_price',
+            type: 'currency',
+            filtering: false
+          },
           {
             title: 'codes',
             field: 'codes',
             type: 'string',
             lookup: PROPERTY_MAP,
+            filterPlaceholder: 'filter',
             render: row => renderCodes(row.codes)
           }
           // { title: 'upc', field: 'upc_code', type: 'string' },
@@ -121,22 +167,10 @@ function DataTable() {
           pageSize: 50,
           pageSizeOptions: [50, 100, 500],
           debounceInterval: 750,
-          filtering: true
+          filtering: true,
+          search: searchExpanded
         }}
-        actions={[
-          {
-            icon: 'add',
-            tooltip: 'Add Data',
-            isFreeAction: true,
-            onClick: () => setImportDialogOpen(!importDialogOpen)
-          }
-          // {
-          //   icon: 'cart',
-          //   tooltip: 'Cart',
-          //   isFreeAction: true,
-          //   onClick: () => console.log('#TODO cart!')
-          // }
-        ]}
+        actions={actions}
       />
       <ImportDialog open={importDialogOpen} setOpen={setImportDialogOpen} />
     </>
