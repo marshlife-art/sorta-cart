@@ -106,7 +106,7 @@ function DataTable() {
           },
           { title: 'size', field: 'size', type: 'string', filtering: false },
           {
-            title: 'unit_type',
+            title: 'unit type',
             field: 'unit_type',
             type: 'string',
             lookup: { CS: 'Case', EA: 'Each' },
@@ -119,13 +119,13 @@ function DataTable() {
             filtering: false
           },
           {
-            title: 'unit_price',
+            title: 'unit price',
             field: 'u_price',
             type: 'currency',
             filtering: false
           },
           {
-            title: 'codes',
+            title: 'properties',
             field: 'codes',
             type: 'string',
             lookup: PROPERTY_MAP,
