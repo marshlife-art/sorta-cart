@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import MaterialTable, { MTableFilterRow } from 'material-table'
 import ImportDialog from './ImportDialog'
+import { Chip } from '@material-ui/core'
 
 const PROPERTY_MAP: { [index: string]: string } = {
   a: 'Artificial ingredients',
@@ -27,8 +28,13 @@ const PROPERTY_MAP: { [index: string]: string } = {
 function renderCodes(codes: string) {
   return codes
     .split(', ')
-    .map(code => (PROPERTY_MAP[code] ? PROPERTY_MAP[code] : ''))
-    .join(', ')
+    .map(code =>
+      PROPERTY_MAP[code] ? (
+        <Chip label={PROPERTY_MAP[code]} style={{ margin: 5 }} size="small" />
+      ) : (
+        ''
+      )
+    )
 }
 
 function DataTable() {
