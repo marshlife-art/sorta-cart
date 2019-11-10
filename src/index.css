@@ -19,3 +19,7 @@ code {
 .MuiTableSortLabel-icon {
   overflow: visible !important;
 }
+
+.MuiTableCell-root {
+  padding: 6px !important;
+}
