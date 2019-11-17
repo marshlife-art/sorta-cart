@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import MaterialTable, { MTableFilterRow } from 'material-table'
-import ImportDialog from './ImportDialog'
 import { Chip } from '@material-ui/core'
+import Badge from '@material-ui/core/Badge'
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
+import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart'
+import RemoveShoppingCartIcon from '@material-ui/icons/RemoveShoppingCart'
+import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip'
+
+import ImportDialog from './ImportDialog'
+import CartDrawer from './CartDrawer'
 
 const PROPERTY_MAP: { [index: string]: string } = {
   a: 'Artificial ingredients',
@@ -15,7 +23,7 @@ const PROPERTY_MAP: { [index: string]: string } = {
   og: 'Organic',
   r: 'Refined sugar',
   v: 'Vegan',
-  w: 'Yeast free',
+  w: 'Wheat free',
   ft: 'Fair Trade',
   n: 'Natural',
   s: 'Specialty Only',
@@ -28,9 +36,14 @@ const PROPERTY_MAP: { [index: string]: string } = {
 function renderCodes(codes: string) {
   return codes
     .split(', ')
-    .map(code =>
+    .map((code, idx) =>
       PROPERTY_MAP[code] ? (
-        <Chip label={PROPERTY_MAP[code]} style={{ margin: 5 }} size="small" />
+        <Chip
+          label={PROPERTY_MAP[code]}
+          style={{ margin: 5 }}
+          size="small"
+          key={`pprop${idx}`}
+        />
       ) : (
         ''
       )
@@ -40,6 +53,8 @@ function renderCodes(codes: string) {
 function DataTable() {
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [searchExpanded, setSearchExpanded] = useState(false)
+
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
 
   const searchAction = {
     icon: searchExpanded ? 'zoom_out' : 'search',
@@ -55,10 +70,20 @@ function DataTable() {
     onClick: () => setImportDialogOpen(!importDialogOpen)
   }
 
-  const [actions, setActions] = useState([searchAction, addAction])
+  const cartAction = {
+    icon: () => (
+      <Badge badgeContent={9} max={99} color="primary">
+        <ShoppingCartIcon />
+      </Badge>
+    ),
+    tooltip: 'Cart',
+    isFreeAction: true,
+    onClick: () => setCartDrawerOpen(!cartDrawerOpen)
+  }
+  const [actions, setActions] = useState([searchAction, addAction, cartAction])
 
   useEffect(() => {
-    setActions([searchAction, addAction])
+    setActions([searchAction, addAction, cartAction])
   }, [searchExpanded])
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
@@ -131,6 +156,28 @@ function DataTable() {
             lookup: PROPERTY_MAP,
             filterPlaceholder: 'filter',
             render: row => renderCodes(row.codes)
+          },
+          {
+            title: undefined,
+            field: undefined,
+            type: 'string',
+            render: row => {
+              const inCart = true
+              const label = inCart
+                ? 'add to shopping cart'
+                : 'remove from shopping cart'
+              return (
+                <Tooltip aria-label={label} title={label}>
+                  <IconButton color="primary">
+                    {inCart ? (
+                      <AddShoppingCartIcon />
+                    ) : (
+                      <RemoveShoppingCartIcon />
+                    )}
+                  </IconButton>
+                </Tooltip>
+              )
+            }
           }
           // { title: 'upc', field: 'upc_code', type: 'string' },
           // { title: 'unf', field: 'unf', type: 'string' }
@@ -179,6 +226,7 @@ function DataTable() {
         actions={actions}
       />
       <ImportDialog open={importDialogOpen} setOpen={setImportDialogOpen} />
+      <CartDrawer open={cartDrawerOpen} setOpen={setCartDrawerOpen} />
     </>
   )
 }
