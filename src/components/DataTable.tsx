@@ -168,7 +168,10 @@ function DataTable() {
                 : 'remove from shopping cart'
               return (
                 <Tooltip aria-label={label} title={label}>
-                  <IconButton color="primary">
+                  <IconButton
+                    color="primary"
+                    onClick={() => console.log('add to cart row:', row)}
+                  >
                     {inCart ? (
                       <AddShoppingCartIcon />
                     ) : (
