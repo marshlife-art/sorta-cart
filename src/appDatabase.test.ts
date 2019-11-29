@@ -31,5 +31,5 @@ it('can add an item', async () => {
       alert('error: ' + e.stack || e)
     })
 
-  expect(cart).toBeTruthy()
+  expect(cart).toHaveLength(1)
 })
