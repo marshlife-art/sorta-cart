@@ -1,32 +1,32 @@
 import Dexie from 'dexie'
 
-export interface IProduct {
+export interface ICart {
   id?: number
+  unf: string
+  upc_code: string
+  category: string
+  sub_category: string
   name: string
   description: string
   pk: number
   size: string
   unit_type: string
-  price: string
-  unit_price: string
-  properties: string
-  category: string
-  search: string
-  upc: string
-  sku: string
+  ws_price: string
+  u_price: string
+  codes: string
+  quantity: number
+  selected_unit: string
+  total: number
 }
 
-// UNF,UPC Code,Long Name,Advertising Description,PK,Size,Unit Type,M,W/S Price,U Price,Category Description,a,r,c,l,d,f,g,v,w,y,k,ft,m,og,s,n
-
 export class AppDatabase extends Dexie {
-  products: Dexie.Table<IProduct, number>
+  cart: Dexie.Table<ICart, number>
 
   constructor() {
     super('SortaCartDatabase')
     this.version(1).stores({
-      products:
-        '++id,name,description,pk,size,unit_type,price,unit_price,properties,category,search,upc,sku'
+      cart: '++id,name'
     })
-    this.products = this.table('products')
+    this.cart = this.table('cart')
   }
 }

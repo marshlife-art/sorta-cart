@@ -5,14 +5,9 @@
   "dependencies": {
     "@material-ui/core": "^4.4.2",
     "@material-ui/icons": "^4.4.1",
-    "@types/jest": "24.0.18",
-    "@types/node": "12.7.5",
-    "@types/react": "16.9.2",
-    "@types/react-dom": "16.9.0",
     "dexie": "^2.0.4",
     "material-table": "^1.50.0",
     "papaparse": "^5.1.0",
-    "pouchdb": "^7.1.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-scripts": "3.1.2",
@@ -40,7 +35,13 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "24.0.18",
+    "@types/node": "12.7.5",
     "@types/papaparse": "^5.0.1",
-    "@types/pouchdb": "^6.4.0"
+    "@types/pouchdb": "^6.4.0",
+    "@types/react": "16.9.2",
+    "@types/react-dom": "16.9.0",
+    "fake-indexeddb": "^3.0.0",
+    "jest": "^24.9.0"
   }
 }

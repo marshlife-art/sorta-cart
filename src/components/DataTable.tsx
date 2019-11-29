@@ -8,7 +8,6 @@ import RemoveShoppingCartIcon from '@material-ui/icons/RemoveShoppingCart'
 import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
 
-import ImportDialog from './ImportDialog'
 import CartDrawer from './CartDrawer'
 
 const PROPERTY_MAP: { [index: string]: string } = {
@@ -51,7 +50,6 @@ function renderCodes(codes: string) {
 }
 
 function DataTable() {
-  const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [searchExpanded, setSearchExpanded] = useState(false)
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
@@ -61,13 +59,6 @@ function DataTable() {
     tooltip: searchExpanded ? 'Close Search' : 'Search',
     isFreeAction: true,
     onClick: () => setSearchExpanded(!searchExpanded)
-  }
-
-  const addAction = {
-    icon: 'add',
-    tooltip: 'Add Data',
-    isFreeAction: true,
-    onClick: () => setImportDialogOpen(!importDialogOpen)
   }
 
   const cartAction = {
@@ -80,10 +71,10 @@ function DataTable() {
     isFreeAction: true,
     onClick: () => setCartDrawerOpen(!cartDrawerOpen)
   }
-  const [actions, setActions] = useState([searchAction, addAction, cartAction])
+  const [actions, setActions] = useState([searchAction, cartAction])
 
   useEffect(() => {
-    setActions([searchAction, addAction, cartAction])
+    setActions([searchAction, cartAction])
   }, [searchExpanded])
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
@@ -228,7 +219,6 @@ function DataTable() {
         }}
         actions={actions}
       />
-      <ImportDialog open={importDialogOpen} setOpen={setImportDialogOpen} />
       <CartDrawer open={cartDrawerOpen} setOpen={setCartDrawerOpen} />
     </>
   )
