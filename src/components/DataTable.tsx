@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import MaterialTable from 'material-table'
+import MaterialTable, { Action } from 'material-table'
 import { Chip } from '@material-ui/core'
 import Badge from '@material-ui/core/Badge'
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
@@ -74,10 +74,14 @@ function DataTable() {
     isFreeAction: true,
     onClick: () => setCartDrawerOpen(!cartDrawerOpen)
   }
-  const [actions, setActions] = useState([searchAction, cartAction])
+  const [actions, setActions] = useState<Action<any>[]>([searchAction])
 
   useEffect(() => {
-    setActions([searchAction, cartAction])
+    if (itemCount > 0) {
+      setActions([searchAction, cartAction])
+    } else {
+      setActions([searchAction])
+    }
   }, [searchExpanded, itemCount])
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {

@@ -6,9 +6,11 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
+import TableFooter from '@material-ui/core/TableFooter'
 import Paper from '@material-ui/core/Paper'
+import Button from '@material-ui/core/Button'
 
-import { useCartService } from '../services/useCartService'
+import { useCartService, emptyCart } from '../services/useCartService'
 import { LineItem } from '../types/Product'
 
 interface CartDrawerProps {
@@ -22,7 +24,8 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: '100%',
-      overflowX: 'auto'
+      overflowX: 'auto',
+      height: '100%'
     },
     table: {
       maxWidth: '95vw'
@@ -50,7 +53,12 @@ function subtotal(items: LineItem[]) {
     .reduce((sum, i) => sum + i, 0)
 }
 
-function SpanningTable(props: { line_items: LineItem[] }) {
+function CartTable(props: {
+  line_items: LineItem[]
+  emptyCartAndCloseDrawer: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => void
+}) {
   const classes = useStyles()
   const invoiceSubtotal = subtotal(props.line_items)
   const invoiceTaxes = TAX_RATE * invoiceSubtotal
@@ -101,6 +109,24 @@ function SpanningTable(props: { line_items: LineItem[] }) {
             </TableCell>
           </TableRow>
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={3} align="left">
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={props.emptyCartAndCloseDrawer}
+              >
+                Empty Cart
+              </Button>
+            </TableCell>
+            <TableCell colSpan={3} align="right">
+              <Button variant="contained" color="primary">
+                Checkout
+              </Button>
+            </TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
     </Paper>
   )
@@ -111,12 +137,25 @@ function CartDrawer(props: CartDrawerProps) {
 
   const cartResult = useCartService()
 
+  const emptyCartAndCloseDrawer = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    if (window.confirm('Are you sure?')) {
+      emptyCart()
+      setOpen(false)
+    }
+  }
+
   return (
     <Drawer anchor="right" open={open} onClose={() => setOpen(!open)}>
       {cartResult.status !== 'loaded' && 'Loading...'}
-      {cartResult.status === 'loaded' && (
-        <SpanningTable line_items={cartResult.payload.line_items} />
-      )}
+      {cartResult.status === 'loaded' &&
+        cartResult.payload.line_items.length > 0 && (
+          <CartTable
+            line_items={cartResult.payload.line_items}
+            emptyCartAndCloseDrawer={emptyCartAndCloseDrawer}
+          />
+        )}
     </Drawer>
   )
 }

@@ -65,10 +65,12 @@ const useCartItemCount = () => {
 const addToCart = (product: Product) => {
   let line_item: LineItem = {
     ...product,
+    product_id: product.id,
     quantity: 1,
     total: parseFloat(product.ws_price),
     selected_unit: 'CS'
   }
+  delete line_item.id // delete id field that moved to product_id so indexDB will auto-increment and so cart items will order correctly.
 
   db.cart
     .add(line_item)

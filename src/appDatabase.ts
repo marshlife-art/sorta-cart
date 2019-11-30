@@ -9,11 +9,8 @@ export class AppDatabase extends Dexie {
   constructor() {
     super('SortaCartDatabase')
     this.version(1).stores({
-      cart: '++id,name'
+      cart: '++id,&product_id'
     })
     this.cart = this.table('cart')
-    // this.open().catch(function(err) {
-    //   console.warn('Failed to open db: ' + (err.stack || err))
-    // })
   }
 }
