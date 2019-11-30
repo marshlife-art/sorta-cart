@@ -1,38 +1,103 @@
 import { useEffect, useState } from 'react'
-import { AppDatabase, ICart } from '../appDatabase'
 
-// demo
+import { AppDatabase } from '../appDatabase'
+import { Service } from '../types/Service'
+import { Cart } from '../types/Cart'
+import { LineItem, Product } from '../types/Product'
+
 const db = new AppDatabase()
-const demoCart: ICart = {
-  id: 3,
-  unf: '011254-0',
-  upc_code: '0-74333-45848-7',
-  category: 'BULK FOOD',
-  sub_category: 'BULK FLOURS-SWEETNRS-BAKING SU',
-  name: 'ARROWHEAD MILLS',
-  description: 'Organic Flour; Unbleached White',
-  pk: 25,
-  size: '#',
-  unit_type: 'CS',
-  ws_price: '32.85',
-  u_price: '1.31',
-  codes: 'f, k, 2, n',
-  selected_unit: 'CS',
-  quantity: 1,
-  total: 32.85
+
+const useCartService = () => {
+  const [result, setResult] = useState<Service<Cart>>({
+    status: 'loading'
+  })
+
+  db.cart
+    .toArray()
+    .then(line_items =>
+      setResult({ status: 'loaded', payload: { line_items: line_items } })
+    )
+    .catch(e => {
+      console.warn('[useCartService] caught error:', e)
+      setResult({ status: 'error', error: e })
+    })
+
+  useEffect(() => {
+    db.on('changes', changes => {
+      changes.find(change => change.table === 'cart') &&
+        db.cart
+          .toArray()
+          .then(line_items =>
+            setResult({ status: 'loaded', payload: { line_items: line_items } })
+          )
+          .catch(e => {
+            console.warn('[useCartService] caught error:', e)
+            setResult({ status: 'error', error: e })
+          })
+    })
+  }, [])
+
+  return result
 }
 
-db.cart
-  .add(demoCart)
-  .then(() => {
-    return db.cart
-      .where('name')
-      .startsWith('foo')
-      .toArray()
+const getCartItemCount = () => {
+  return db.cart.count().catch(e => {
+    console.warn('[useCartItemCount] caught error:', e)
+    return 0
   })
-  .then(fooz => {
-    alert('foo productz: ' + JSON.stringify(fooz))
+}
+
+const useCartItemCount = () => {
+  const [itemCount, setItemCount] = useState(0)
+
+  getCartItemCount().then(count => setItemCount(count))
+
+  useEffect(() => {
+    db.on('changes', changes => {
+      changes.find(change => change.table === 'cart') &&
+        getCartItemCount().then(count => setItemCount(count))
+    })
+  }, [])
+
+  return itemCount
+}
+
+const addToCart = (product: Product) => {
+  let line_item: LineItem = {
+    ...product,
+    quantity: 1,
+    total: parseFloat(product.ws_price),
+    selected_unit: 'CS'
+  }
+
+  db.cart
+    .add(line_item)
+    .catch(error => console.warn('[addToCart] caught error:', error))
+}
+
+const removeItemFromCart = (index: number) => {
+  db.cart
+    .delete(index)
+    .catch(error => console.warn('[removeItemFromCart] caught error:', error))
+}
+
+const emptyCart = () => {
+  db.cart.clear().catch(function(err) {
+    console.warn('[emptyCart] caught error:', err)
   })
-  .catch(e => {
-    alert('error: ' + e.stack || e)
-  })
+}
+
+const updateLineItem = (idx: number, line_item: LineItem) => {
+  db.cart
+    .update(idx, line_item)
+    .catch(error => console.warn('[updateLineItem] caught error:', error))
+}
+
+export {
+  useCartService,
+  useCartItemCount,
+  addToCart,
+  removeItemFromCart,
+  emptyCart,
+  updateLineItem
+}

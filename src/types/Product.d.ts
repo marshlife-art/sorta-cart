@@ -1,40 +1,23 @@
-export interface ProductMap {
-  name: number[]
-  description: number[]
-  pk: number[]
-  size: number[]
-  unit_type: number[]
-  price: number[]
-  unit_price: number[]
-  property: number[]
-  category: number[]
-  search: number[]
+export interface Product {
+  id: number
+  unf?: string
+  upc_code: string
+  category: string
+  sub_category: string
+  name: string
+  description: string
+  pk: number
+  size: string
+  unit_type: string
+  ws_price: string
+  u_price?: string
+  codes?: string
 }
 
-export type ProductMapPartial = Partial<ProductMap>
-
-export interface ProductMeta {
-  data_length: number
-  catz: { name: string; count: number }[]
-  date_added: number // Date
-  header: string[]
+interface LineItemProps {
+  quantity: number
+  selected_unit: string
+  total: number
 }
 
-export type ProductPropMapFn = (
-  row: string[],
-  productMap?: ProductMap
-) => string[]
-
-export type ProductMapFn = (
-  key: keyof ProductMap,
-  row: string[],
-  productMap?: ProductMap
-) => string
-
-export interface ProductDoc {
-  _id: string
-  _rev?: string
-  data?: string[][]
-  product_map?: ProductMap
-  meta?: ProductMeta
-}
+export type LineItem = Product & LineItemProps

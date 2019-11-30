@@ -1,26 +1,10 @@
 import Dexie from 'dexie'
+import 'dexie-observable'
 
-export interface ICart {
-  id?: number
-  unf: string
-  upc_code: string
-  category: string
-  sub_category: string
-  name: string
-  description: string
-  pk: number
-  size: string
-  unit_type: string
-  ws_price: string
-  u_price: string
-  codes: string
-  quantity: number
-  selected_unit: string
-  total: number
-}
+import { LineItem } from './types/Product'
 
 export class AppDatabase extends Dexie {
-  cart: Dexie.Table<ICart, number>
+  cart: Dexie.Table<LineItem, number>
 
   constructor() {
     super('SortaCartDatabase')
@@ -28,5 +12,8 @@ export class AppDatabase extends Dexie {
       cart: '++id,name'
     })
     this.cart = this.table('cart')
+    // this.open().catch(function(err) {
+    //   console.warn('Failed to open db: ' + (err.stack || err))
+    // })
   }
 }

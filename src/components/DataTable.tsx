@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import MaterialTable, { MTableFilterRow } from 'material-table'
+import MaterialTable from 'material-table'
 import { Chip } from '@material-ui/core'
 import Badge from '@material-ui/core/Badge'
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
@@ -9,6 +9,7 @@ import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
 
 import CartDrawer from './CartDrawer'
+import { useCartItemCount, addToCart } from '../services/useCartService'
 
 const PROPERTY_MAP: { [index: string]: string } = {
   a: 'Artificial ingredients',
@@ -50,6 +51,8 @@ function renderCodes(codes: string) {
 }
 
 function DataTable() {
+  const itemCount = useCartItemCount()
+
   const [searchExpanded, setSearchExpanded] = useState(false)
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
@@ -63,7 +66,7 @@ function DataTable() {
 
   const cartAction = {
     icon: () => (
-      <Badge badgeContent={9} max={99} color="primary">
+      <Badge badgeContent={itemCount} max={99} color="primary">
         <ShoppingCartIcon />
       </Badge>
     ),
@@ -75,7 +78,7 @@ function DataTable() {
 
   useEffect(() => {
     setActions([searchAction, cartAction])
-  }, [searchExpanded])
+  }, [searchExpanded, itemCount])
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
     fetch('http://localhost:3000/categories')
@@ -159,10 +162,7 @@ function DataTable() {
                 : 'remove from shopping cart'
               return (
                 <Tooltip aria-label={label} title={label}>
-                  <IconButton
-                    color="primary"
-                    onClick={() => console.log('add to cart row:', row)}
-                  >
+                  <IconButton color="primary" onClick={() => addToCart(row)}>
                     {inCart ? (
                       <AddShoppingCartIcon />
                     ) : (
@@ -172,9 +172,10 @@ function DataTable() {
                 </Tooltip>
               )
             }
-          }
-          // { title: 'upc', field: 'upc_code', type: 'string' },
-          // { title: 'unf', field: 'unf', type: 'string' }
+          },
+          { title: 'upc', field: 'upc_code', type: 'string', hidden: true },
+          // { title: 'unf', field: 'unf', type: 'string' },
+          { title: 'id', field: 'id', type: 'string', hidden: true }
         ]}
         data={query =>
           new Promise((resolve, reject) => {
