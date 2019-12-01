@@ -9,8 +9,18 @@ import TableRow from '@material-ui/core/TableRow'
 import TableFooter from '@material-ui/core/TableFooter'
 import Paper from '@material-ui/core/Paper'
 import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import IconButton from '@material-ui/core/IconButton'
+import DeleteIcon from '@material-ui/icons/Delete'
 
-import { useCartService, emptyCart } from '../services/useCartService'
+import {
+  useCartService,
+  emptyCart,
+  updateLineItem,
+  removeItemFromCart
+} from '../services/useCartService'
 import { LineItem } from '../types/Product'
 
 interface CartDrawerProps {
@@ -28,14 +38,20 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '100%'
     },
     table: {
-      maxWidth: '95vw'
-      // padding: theme.spacing(6)
-      // minWidth: 700
+      maxWidth: '95vw',
+      padding: theme.spacing(1),
+      borderCollapse: 'separate',
+      '& td': {
+        border: 'none'
+      }
+    },
+    qtyinput: {
+      width: '50px'
     }
   })
 )
 
-function ccyFormat(num: number | string) {
+function usdFormat(num: number | string) {
   if (typeof num === 'string') {
     return `$${parseFloat(num).toFixed(2)}`
   } else {
@@ -43,14 +59,14 @@ function ccyFormat(num: number | string) {
   }
 }
 
-// function priceRow(quantity: number, price: number) {
-//   return quantity * price
-// }
-
 function subtotal(items: LineItem[]) {
-  return items
-    .map(({ ws_price }) => parseFloat(ws_price))
-    .reduce((sum, i) => sum + i, 0)
+  return items.map(({ total }) => total).reduce((sum, i) => sum + i, 0)
+}
+
+function liTotal(line_item: LineItem): number {
+  return line_item.selected_unit === 'EA' && line_item.u_price
+    ? line_item.quantity * parseFloat(line_item.u_price)
+    : line_item.quantity * parseFloat(line_item.ws_price)
 }
 
 function CartTable(props: {
@@ -60,52 +76,114 @@ function CartTable(props: {
   ) => void
 }) {
   const classes = useStyles()
+
   const invoiceSubtotal = subtotal(props.line_items)
   const invoiceTaxes = TAX_RATE * invoiceSubtotal
   const invoiceTotal = invoiceTaxes + invoiceSubtotal
+
+  const handleUnitChange = (line_item: LineItem, unit: string) => {
+    line_item.selected_unit = unit
+    line_item.total = liTotal(line_item)
+    updateLineItem(line_item)
+  }
+
+  const handleQtyChange = (line_item: LineItem, quantity: number) => {
+    line_item.quantity = quantity > 0 ? quantity : 1
+    line_item.total = liTotal(line_item)
+    updateLineItem(line_item)
+  }
+
+  const removeLineItem = (id: number) => {
+    removeItemFromCart(id)
+  }
 
   return (
     <Paper className={classes.root}>
       <Table className={classes.table} aria-label="cart">
         <TableHead>
           <TableRow>
+            <TableCell align="center"></TableCell>
             <TableCell>Description</TableCell>
-            <TableCell align="right">Qty.</TableCell>
-            <TableCell align="right">Unit</TableCell>
-            <TableCell align="right">Price</TableCell>
-            <TableCell align="right">Total</TableCell>
+            <TableCell align="center">Price</TableCell>
+            <TableCell align="center">Unit</TableCell>
+            <TableCell align="center">Qty.</TableCell>
+            <TableCell align="center">Total</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {props.line_items.map((line_item, idx) => (
             <TableRow key={`li${idx}`}>
+              <TableCell align="center">
+                <IconButton
+                  aria-label="delete"
+                  size="medium"
+                  onClick={(event: any) => removeLineItem(line_item.id)}
+                >
+                  <DeleteIcon fontSize="inherit" />
+                </IconButton>
+              </TableCell>
               <TableCell>
                 {line_item.name} {line_item.description}
               </TableCell>
-              <TableCell align="right">{line_item.quantity}</TableCell>
-              <TableCell align="right">{line_item.selected_unit}</TableCell>
               <TableCell align="right">
-                {ccyFormat(line_item.ws_price)}
+                {line_item.selected_unit === 'EA' && line_item.u_price
+                  ? usdFormat(line_item.u_price)
+                  : usdFormat(line_item.ws_price)}
               </TableCell>
-              <TableCell align="right">{ccyFormat(line_item.total)}</TableCell>
+              <TableCell align="center">
+                {line_item.u_price &&
+                line_item.u_price !== line_item.ws_price ? (
+                  <Select
+                    value={line_item.selected_unit}
+                    onChange={(event: any) =>
+                      handleUnitChange(line_item, event.target.value)
+                    }
+                    margin="dense"
+                  >
+                    <MenuItem value="CS">Case</MenuItem>
+                    <MenuItem value="EA">Each</MenuItem>
+                  </Select>
+                ) : (
+                  'Case'
+                )}
+              </TableCell>
+              <TableCell align="right">
+                <TextField
+                  className={classes.qtyinput}
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  margin="dense"
+                  fullWidth
+                  value={line_item.quantity}
+                  onChange={(event: any) =>
+                    handleQtyChange(line_item, event.target.value)
+                  }
+                  inputProps={{ min: '1', step: '1' }}
+                />
+              </TableCell>
+              <TableCell align="right">{usdFormat(line_item.total)}</TableCell>
             </TableRow>
           ))}
           <TableRow>
-            <TableCell rowSpan={3} />
-            <TableCell colSpan={3}>Subtotal</TableCell>
-            <TableCell align="right">{ccyFormat(invoiceSubtotal)}</TableCell>
+            <TableCell rowSpan={3} colSpan={3} />
+            <TableCell>Subtotal</TableCell>
+            <TableCell align="right" colSpan={2}>
+              {usdFormat(invoiceSubtotal)}
+            </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell colSpan={2}>Tax</TableCell>
+            <TableCell>Tax</TableCell>
             <TableCell align="right">{`${(TAX_RATE * 100).toFixed(
               0
             )} %`}</TableCell>
-            <TableCell align="right">{ccyFormat(invoiceTaxes)}</TableCell>
+            <TableCell align="right">{usdFormat(invoiceTaxes)}</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell colSpan={3}>Total</TableCell>
-            <TableCell align="right">
-              <b>{ccyFormat(invoiceTotal)}</b>
+            <TableCell>Total</TableCell>
+            <TableCell align="right" colSpan={2}>
+              <b>{usdFormat(invoiceTotal)}</b>
             </TableCell>
           </TableRow>
         </TableBody>
@@ -134,7 +212,6 @@ function CartTable(props: {
 
 function CartDrawer(props: CartDrawerProps) {
   const { open, setOpen } = props
-
   const cartResult = useCartService()
 
   const emptyCartAndCloseDrawer = (

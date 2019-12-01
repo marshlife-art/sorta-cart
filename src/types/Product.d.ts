@@ -15,7 +15,6 @@ export interface Product {
 }
 
 interface LineItemProps {
-  id?: number
   product_id: number
   quantity: number
   selected_unit: string

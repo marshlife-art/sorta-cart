@@ -11,25 +11,25 @@ const useCartService = () => {
   const [result, setResult] = useState<Service<Cart>>({
     status: 'loading'
   })
-
-  db.cart
-    .toArray()
-    .then(line_items =>
-      setResult({ status: 'loaded', payload: { line_items: line_items } })
-    )
-    .catch(e => {
-      console.warn('[useCartService] caught error:', e)
-      setResult({ status: 'error', error: e })
-    })
-
   useEffect(() => {
+    db.cart
+      .toArray()
+      .then(line_items =>
+        setResult({ status: 'loaded', payload: { line_items: line_items } })
+      )
+      .catch(e => {
+        console.warn('[useCartService] caught error:', e)
+        setResult({ status: 'error', error: e })
+      })
+
     db.on('changes', changes => {
       changes.find(change => change.table === 'cart') &&
         db.cart
           .toArray()
-          .then(line_items =>
+          .then(line_items => {
+            console.log('[useCartService] db changes!! ')
             setResult({ status: 'loaded', payload: { line_items: line_items } })
-          )
+          })
           .catch(e => {
             console.warn('[useCartService] caught error:', e)
             setResult({ status: 'error', error: e })
@@ -50,9 +50,9 @@ const getCartItemCount = () => {
 const useCartItemCount = () => {
   const [itemCount, setItemCount] = useState(0)
 
-  getCartItemCount().then(count => setItemCount(count))
-
   useEffect(() => {
+    getCartItemCount().then(count => setItemCount(count))
+
     db.on('changes', changes => {
       changes.find(change => change.table === 'cart') &&
         getCartItemCount().then(count => setItemCount(count))
@@ -89,9 +89,9 @@ const emptyCart = () => {
   })
 }
 
-const updateLineItem = (idx: number, line_item: LineItem) => {
+const updateLineItem = (line_item: LineItem) => {
   db.cart
-    .update(idx, line_item)
+    .update(line_item.id, line_item)
     .catch(error => console.warn('[updateLineItem] caught error:', error))
 }
 

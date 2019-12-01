@@ -77,12 +77,12 @@ function DataTable() {
   const [actions, setActions] = useState<Action<any>[]>([searchAction])
 
   useEffect(() => {
-    if (itemCount > 0) {
+    if (itemCount) {
       setActions([searchAction, cartAction])
     } else {
       setActions([searchAction])
     }
-  }, [searchExpanded, itemCount])
+  }, [searchExpanded, itemCount]) // note: adding 'cartAction' and 'searchAction' to dep array is not pleasant :/
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
     fetch('http://localhost:3000/categories')
@@ -184,20 +184,6 @@ function DataTable() {
         data={query =>
           new Promise((resolve, reject) => {
             console.log('query:', query)
-            // let url = 'http://localhost:3000/products'
-            // url += '?limit=' + query.pageSize
-            // url += '&page=' + query.page
-            // // #TODO: use query params lib
-            // if (query.orderBy && query.orderBy.field) {
-            //   url += '&orderBy=' + query.orderBy.field
-            // }
-            // if (query.orderDirection) {
-            //   url += '&orderDirection=' + query.orderDirection
-            // }
-            // if (query.search) {
-            //   url += '&q=' + query.search
-            // }
-
             fetch('http://localhost:3000/products', {
               method: 'post',
               headers: {
