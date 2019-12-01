@@ -69,6 +69,13 @@ function liTotal(line_item: LineItem): number {
     : line_item.quantity * parseFloat(line_item.ws_price)
 }
 
+function liPkSize(line_item: LineItem): string {
+  const pksize = []
+  line_item.pk && line_item.pk !== 1 && pksize.push(line_item.pk)
+  line_item.size && pksize.push(line_item.size)
+  return pksize.join(' / ')
+}
+
 function CartTable(props: {
   line_items: LineItem[]
   emptyCartAndCloseDrawer: (
@@ -126,9 +133,12 @@ function CartTable(props: {
                 {line_item.name} {line_item.description}
               </TableCell>
               <TableCell align="right">
-                {line_item.selected_unit === 'EA' && line_item.u_price
-                  ? usdFormat(line_item.u_price)
-                  : usdFormat(line_item.ws_price)}
+                <div>
+                  {line_item.selected_unit === 'EA' && line_item.u_price
+                    ? usdFormat(line_item.u_price)
+                    : usdFormat(line_item.ws_price)}
+                </div>
+                <div>{liPkSize(line_item)}</div>
               </TableCell>
               <TableCell align="center">
                 {line_item.u_price &&
@@ -143,8 +153,10 @@ function CartTable(props: {
                     <MenuItem value="CS">Case</MenuItem>
                     <MenuItem value="EA">Each</MenuItem>
                   </Select>
-                ) : (
+                ) : line_item.unit_type === 'CS' ? (
                   'Case'
+                ) : (
+                  'Each'
                 )}
               </TableCell>
               <TableCell align="right">
@@ -169,13 +181,14 @@ function CartTable(props: {
           <TableRow>
             <TableCell rowSpan={3} colSpan={3} />
             <TableCell>Subtotal</TableCell>
-            <TableCell align="right" colSpan={2}>
-              {usdFormat(invoiceSubtotal)}
+            <TableCell align="center">
+              {props.line_items && props.line_items.length}
             </TableCell>
+            <TableCell align="right">{usdFormat(invoiceSubtotal)}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Tax</TableCell>
-            <TableCell align="right">{`${(TAX_RATE * 100).toFixed(
+            <TableCell align="center">{`${(TAX_RATE * 100).toFixed(
               0
             )} %`}</TableCell>
             <TableCell align="right">{usdFormat(invoiceTaxes)}</TableCell>
