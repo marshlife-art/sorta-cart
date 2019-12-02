@@ -13,7 +13,7 @@ import TextField from '@material-ui/core/TextField'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
-import DeleteIcon from '@material-ui/icons/Delete'
+import ClearIcon from '@material-ui/icons/Clear'
 
 import {
   useCartService,
@@ -123,10 +123,10 @@ function CartTable(props: {
               <TableCell align="center">
                 <IconButton
                   aria-label="delete"
-                  size="medium"
+                  size="small"
                   onClick={(event: any) => removeLineItem(line_item.id)}
                 >
-                  <DeleteIcon fontSize="inherit" />
+                  <ClearIcon fontSize="inherit" />
                 </IconButton>
               </TableCell>
               <TableCell>

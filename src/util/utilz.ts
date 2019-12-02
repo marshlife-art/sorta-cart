@@ -30,3 +30,8 @@ export function dateMinSec(): string {
 //     return ''
 //   }
 // }
+
+export const API_HOST: string =
+  process.env.NODE_ENV === 'production'
+    ? 'https://api.marshcoop.org'
+    : 'http://localhost:3000'

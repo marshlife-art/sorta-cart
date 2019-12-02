@@ -10,6 +10,7 @@ import Tooltip from '@material-ui/core/Tooltip'
 
 import CartDrawer from './CartDrawer'
 import { useCartItemCount, addToCart } from '../services/useCartService'
+import { API_HOST } from '../util/utilz'
 
 const PROPERTY_MAP: { [index: string]: string } = {
   a: 'Artificial ingredients',
@@ -85,13 +86,13 @@ function DataTable() {
   }, [searchExpanded, itemCount]) // note: adding 'cartAction' and 'searchAction' to dep array is not pleasant :/
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
-    fetch('http://localhost:3000/categories')
+    fetch(`${API_HOST}/categories`)
       .then(response => response.json())
       .then(result => setCategoryLookup(result))
   })
 
   const [subCategoryLookup, setSubCategoryLookup] = useState<object>(() => {
-    fetch('http://localhost:3000/sub_categories')
+    fetch(`${API_HOST}/sub_categories`)
       .then(response => response.json())
       .then(result => setSubCategoryLookup(result))
   })
@@ -184,7 +185,7 @@ function DataTable() {
         data={query =>
           new Promise((resolve, reject) => {
             console.log('query:', query)
-            fetch('http://localhost:3000/products', {
+            fetch(`${API_HOST}/products`, {
               method: 'post',
               headers: {
                 'Content-Type': 'application/json'
