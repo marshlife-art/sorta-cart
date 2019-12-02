@@ -83,6 +83,7 @@ function DataTable() {
     } else {
       setActions([searchAction])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchExpanded, itemCount]) // note: adding 'cartAction' and 'searchAction' to dep array is not pleasant :/
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {

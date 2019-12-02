@@ -5,6 +5,7 @@ const db = new AppDatabase()
 
 const lineItem: LineItem = {
   id: 3,
+  product_id: 666,
   unf: '011254-0',
   upc_code: '0-74333-45848-7',
   category: 'BULK FOOD',
@@ -24,7 +25,8 @@ const lineItem: LineItem = {
 
 const lineItems: LineItem[] = [
   {
-    id: 1801,
+    id: 0,
+    product_id: 1801,
     unf: '173529-9',
     upc_code: '0-70734-52968-9',
     category: 'GROCERY',
@@ -42,7 +44,8 @@ const lineItems: LineItem[] = [
     total: 4.0
   },
   {
-    id: 1813,
+    id: 1,
+    product_id: 1813,
     unf: '',
     upc_code: '',
     category: 'MARSH',
