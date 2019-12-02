@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.17897384.chunk.css",
-    "main.js": "/static/js/main.da427006.chunk.js",
-    "main.js.map": "/static/js/main.da427006.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.dd4294af.js",
-    "runtime-main.js.map": "/static/js/runtime-main.dd4294af.js.map",
-    "static/js/2.60d76b88.chunk.js": "/static/js/2.60d76b88.chunk.js",
-    "static/js/2.60d76b88.chunk.js.map": "/static/js/2.60d76b88.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.a1a1e18f3e5f991cd570f7e543cc9ce6.js": "/precache-manifest.a1a1e18f3e5f991cd570f7e543cc9ce6.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/main.17897384.chunk.css.map": "/static/css/main.17897384.chunk.css.map"
+    "main.css": "/sorta-cart/static/css/main.17897384.chunk.css",
+    "main.js": "/sorta-cart/static/js/main.a2faefd4.chunk.js",
+    "main.js.map": "/sorta-cart/static/js/main.a2faefd4.chunk.js.map",
+    "runtime-main.js": "/sorta-cart/static/js/runtime-main.7e502212.js",
+    "runtime-main.js.map": "/sorta-cart/static/js/runtime-main.7e502212.js.map",
+    "static/js/2.60d76b88.chunk.js": "/sorta-cart/static/js/2.60d76b88.chunk.js",
+    "static/js/2.60d76b88.chunk.js.map": "/sorta-cart/static/js/2.60d76b88.chunk.js.map",
+    "index.html": "/sorta-cart/index.html",
+    "precache-manifest.07c6e40347e3c4bf24a4bae31b299f89.js": "/sorta-cart/precache-manifest.07c6e40347e3c4bf24a4bae31b299f89.js",
+    "service-worker.js": "/sorta-cart/service-worker.js",
+    "static/css/main.17897384.chunk.css.map": "/sorta-cart/static/css/main.17897384.chunk.css.map"
   }
 }
