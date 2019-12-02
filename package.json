@@ -2,6 +2,7 @@
   "name": "sorta-cart",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://marshlife-art.github.io/sorta-cart/",
   "dependencies": {
     "@material-ui/core": "^4.4.2",
     "@material-ui/icons": "^4.4.1",
@@ -18,7 +19,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -43,6 +46,7 @@
     "@types/react": "16.9.2",
     "@types/react-dom": "16.9.0",
     "fake-indexeddb": "^3.0.0",
+    "gh-pages": "^2.1.1",
     "jest": "^24.9.0"
   }
 }
