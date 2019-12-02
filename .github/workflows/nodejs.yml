@@ -24,6 +24,6 @@ jobs:
           CI: true
       - name: DEPLOY
         run: |
-        git config --global user.email edward@edwardsharp.net
-        git config --global user.name edwardsharp
-        npm run deploy
+          git config --global user.email edward@edwardsharp.net
+          git config --global user.name edwardsharp
+          npm run deploy
