@@ -18,7 +18,7 @@ const useCartService = () => {
         setResult({ status: 'loaded', payload: { line_items: line_items } })
       )
       .catch(e => {
-        console.warn('[useCartService] caught error:', e)
+        // console.warn('[useCartService] caught error:', e)
         setResult({ status: 'error', error: e })
       })
 
@@ -31,7 +31,7 @@ const useCartService = () => {
             setResult({ status: 'loaded', payload: { line_items: line_items } })
           })
           .catch(e => {
-            console.warn('[useCartService] caught error:', e)
+            // console.warn('[useCartService] caught error:', e)
             setResult({ status: 'error', error: e })
           })
     })
