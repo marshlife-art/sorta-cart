@@ -198,6 +198,10 @@ function DataTable() {
                 console.log('result', result)
                 resolve(result)
               })
+              .catch(err => {
+                console.warn('onoz, caught err:', err)
+                return resolve({ data: [], page: 0, totalCount: 0 })
+              })
           })
         }
         title="sorta-cart"
@@ -208,7 +212,8 @@ function DataTable() {
           pageSizeOptions: [50, 100, 500],
           debounceInterval: 750,
           filtering: true,
-          search: searchExpanded
+          search: searchExpanded,
+          emptyRowsWhenPaging: false
         }}
         actions={actions}
       />
