@@ -207,7 +207,7 @@ function DataTable() {
         title="sorta-cart"
         options={{
           headerStyle: { position: 'sticky', top: 0 },
-          maxBodyHeight: 'calc(100vh - 121px)',
+          maxBodyHeight: 'calc(100vh - 133px)',
           pageSize: 50,
           pageSizeOptions: [50, 100, 500],
           debounceInterval: 750,
