@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 
 import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
 
 import { RootState } from './redux'
 import { App } from './App'
@@ -17,7 +18,7 @@ const initialState: RootState = {
     }
   }
 }
-const mockStore = configureMockStore()
+const mockStore = configureMockStore([thunk])
 const store = mockStore(initialState)
 
 it('renders without crashing', () => {
