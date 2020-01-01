@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, createRef } from 'react'
 import MaterialTable, { Action } from 'material-table'
 import { Chip } from '@material-ui/core'
 import Badge from '@material-ui/core/Badge'
+import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip'
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart'
 import RemoveShoppingCartIcon from '@material-ui/icons/RemoveShoppingCart'
-import IconButton from '@material-ui/core/IconButton'
-import Tooltip from '@material-ui/core/Tooltip'
+import TagFacesIcon from '@material-ui/icons/TagFaces'
 
+import UserMenu from './UserMenu'
 import CartDrawer from './CartDrawer'
 import { useCartItemCount, addToCart } from '../services/useCartService'
 import { API_HOST } from '../util/utilz'
@@ -52,17 +54,22 @@ function renderCodes(codes: string) {
 }
 
 function DataTable() {
+  let tableRef = createRef<any>()
+
+  // useEffect(() => {
+  //   // tableRef.current && tableRef.current.onQueryChange()
+  //   // console.log('tableRef.current', tableRef && tableRef.current)
+  // }, [tableRef])
   const itemCount = useCartItemCount()
 
-  const [searchExpanded, setSearchExpanded] = useState(false)
-
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
+  const [
+    userMenuAnchorEl,
+    setUserMenuAnchorEl
+  ] = React.useState<null | HTMLElement>(null)
 
-  const searchAction = {
-    icon: searchExpanded ? 'zoom_out' : 'search',
-    tooltip: searchExpanded ? 'Close Search' : 'Search',
-    isFreeAction: true,
-    onClick: () => setSearchExpanded(!searchExpanded)
+  const handleUserMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setUserMenuAnchorEl(event.currentTarget)
   }
 
   const cartAction = {
@@ -75,39 +82,51 @@ function DataTable() {
     isFreeAction: true,
     onClick: () => setCartDrawerOpen(!cartDrawerOpen)
   }
-  const [actions, setActions] = useState<Action<any>[]>([searchAction])
+
+  const userAction = {
+    icon: () => <TagFacesIcon />,
+    tooltip: 'User',
+    isFreeAction: true,
+    onClick: handleUserMenuClick
+  }
+
+  const [actions, setActions] = useState<Action<any>[]>([userAction])
 
   useEffect(() => {
     if (itemCount) {
-      setActions([searchAction, cartAction])
+      setActions([cartAction, userAction])
     } else {
-      setActions([searchAction])
+      setActions([userAction])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchExpanded, itemCount]) // note: adding 'cartAction' and 'searchAction' to dep array is not pleasant :/
+  }, [itemCount]) // note: adding 'cartAction' and 'userAction' to dep array is not pleasant :/
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
     fetch(`${API_HOST}/categories`)
       .then(response => response.json())
       .then(result => setCategoryLookup(result))
+      .catch(console.warn)
   })
 
   const [subCategoryLookup, setSubCategoryLookup] = useState<object>(() => {
     fetch(`${API_HOST}/sub_categories`)
       .then(response => response.json())
       .then(result => setSubCategoryLookup(result))
+      .catch(console.warn)
   })
 
   return (
     <>
       <MaterialTable
+        tableRef={tableRef}
         columns={[
           {
             title: 'category',
             field: 'category',
             type: 'string',
             lookup: categoryLookup,
-            filterPlaceholder: 'filter'
+            filterPlaceholder: 'filter',
+            defaultFilter: ['MARSH', 'BULK FOOD']
           },
           {
             title: 'sub category',
@@ -153,7 +172,9 @@ function DataTable() {
             title: 'unit price',
             field: 'u_price',
             type: 'currency',
-            filtering: false
+            filtering: false,
+            render: row =>
+              row.ws_price !== row.u_price ? `$${row.u_price}` : ''
           },
           {
             title: 'properties',
@@ -210,20 +231,22 @@ function DataTable() {
               })
           })
         }
-        title="MARSH COOP"
+        title={<div>MARSH COOP</div>}
         options={{
           headerStyle: { position: 'sticky', top: 0 },
+          filterCellStyle: { maxWidth: '132px' },
           maxBodyHeight: 'calc(100vh - 133px)',
           pageSize: 50,
           pageSizeOptions: [50, 100, 500],
           debounceInterval: 750,
           filtering: true,
-          search: searchExpanded,
+          search: true,
           emptyRowsWhenPaging: false
         }}
         actions={actions}
       />
       <CartDrawer open={cartDrawerOpen} setOpen={setCartDrawerOpen} />
+      <UserMenu anchorEl={userMenuAnchorEl} setAnchorEl={setUserMenuAnchorEl} />
     </>
   )
 }
