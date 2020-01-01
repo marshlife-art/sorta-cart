@@ -116,12 +116,18 @@ function DataTable() {
             lookup: subCategoryLookup,
             filterPlaceholder: 'filter'
           },
-          { title: 'name', field: 'name', type: 'string', filtering: false },
           {
             title: 'description',
             field: 'description',
             type: 'string',
-            filtering: false
+            filtering: false,
+            render: row => {
+              if (row.name) {
+                return `${row.name} -- ${row.description}`
+              } else {
+                return row.description
+              }
+            }
           },
           {
             title: 'pk',
@@ -204,7 +210,7 @@ function DataTable() {
               })
           })
         }
-        title="sorta-cart"
+        title="MARSH COOP"
         options={{
           headerStyle: { position: 'sticky', top: 0 },
           maxBodyHeight: 'calc(100vh - 133px)',
