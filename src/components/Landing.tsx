@@ -43,7 +43,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     catBtn: {
       overflow: 'hidden',
-      overflowWrap: 'break-word'
+      overflowWrap: 'break-word',
+      hyphens: 'auto'
     }
   })
 )
@@ -107,13 +108,18 @@ function Landing(props: RouteComponentProps) {
       <NavBar />
       <Paper className={classes.root}>
         <div className={classes.crumbz}>
-          <Typography
-            variant="h4"
+          <Button
+            variant="text"
+            size="large"
             onClick={() => setSelectedCat('')}
-            className={selectedCat && classes.catHover}
           >
-            CATEGORIES
-          </Typography>
+            <Typography
+              variant="h4"
+              className={selectedCat && classes.catHover}
+            >
+              CATEGORIES
+            </Typography>
+          </Button>
           {selectedCat && (
             <>
               <Fade in>
