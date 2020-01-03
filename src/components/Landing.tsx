@@ -14,13 +14,12 @@ import { API_HOST } from '../constants'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
+    gridRoot: {
       width: '100%',
       overflowX: 'auto',
       minHeight: 'calc(100vh - 64px)',
       padding: theme.spacing(2),
-      display: 'flex',
-      flexDirection: 'column'
+      display: 'flex'
     },
     crumbz: {
       display: 'flex',
@@ -28,13 +27,14 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       flexGrow: 1
     },
-    gridRoot: {
-      flexGrow: 1,
-      padding: theme.spacing(2)
-    },
     gridBtn: {
       width: '100%',
-      height: '100%'
+      height: '100%',
+      background: theme.palette.background.paper,
+      '&:hover': {
+        textDecoration: 'underline',
+        cursor: 'pointer'
+      }
     },
     catHover: {
       '&:hover': {
@@ -133,110 +133,105 @@ function Landing(props: RouteComponentProps) {
           </div>
         )}
       </NavBar>
-      <Paper className={classes.root}>
-        <Grid
-          container
-          spacing={4}
-          justify="center"
-          className={classes.gridRoot}
-        >
-          {categories &&
-            !selectedCat &&
-            categories.map((i, idx) => (
-              <Zoom
-                in
-                style={{ transitionDelay: `${idx * 50}ms` }}
-                key={`lb${idx}`}
-              >
-                <Grid item xs={6} sm={4} md={3} lg={2}>
-                  <Button
-                    className={classes.gridBtn}
-                    variant="outlined"
-                    size="large"
-                    key={`lb${idx}`}
-                    onClick={() => setSelectedCat(i)}
-                  >
-                    <Typography variant="h5" className={classes.catBtn}>
-                      {i}
-                    </Typography>
-                  </Button>
-                </Grid>
-              </Zoom>
-            ))}
-
-          {categories.length > 0 && !selectedCat && (
+      {/* <Paper className={classes.root}> */}
+      <Grid container spacing={4} justify="center" className={classes.gridRoot}>
+        {categories &&
+          !selectedCat &&
+          categories.map((i, idx) => (
             <Zoom
               in
-              style={{
-                transitionDelay: `${categories.length * 50}ms`
-              }}
+              style={{ transitionDelay: `${idx * 50}ms` }}
+              key={`lb${idx}`}
             >
               <Grid item xs={6} sm={4} md={3} lg={2}>
                 <Button
                   className={classes.gridBtn}
                   variant="outlined"
                   size="large"
-                  onClick={() => props.history.push('/products')}
+                  key={`lb${idx}`}
+                  onClick={() => setSelectedCat(i)}
                 >
                   <Typography variant="h5" className={classes.catBtn}>
-                    See Everything
+                    {i}
                   </Typography>
                 </Button>
               </Grid>
             </Zoom>
-          )}
+          ))}
 
-          {subCategories &&
-            selectedCat &&
-            subCategories.map((subCat, idx) => (
-              <Zoom
-                in
-                style={{ transitionDelay: `${idx * 50}ms` }}
-                key={`lb${idx}`}
+        {categories.length > 0 && !selectedCat && (
+          <Zoom
+            in
+            style={{
+              transitionDelay: `${categories.length * 50}ms`
+            }}
+          >
+            <Grid item xs={6} sm={4} md={3} lg={3}>
+              <Button
+                className={classes.gridBtn}
+                variant="outlined"
+                size="large"
+                onClick={() => props.history.push('/products')}
               >
-                <Grid item xs={6} sm={4} md={3}>
-                  <Button
-                    className={classes.gridBtn}
-                    variant="outlined"
-                    size="large"
-                    key={`lb${idx}`}
-                    onClick={() =>
-                      props.history.push(
-                        `/products/${selectedCat}/${subCat.name}`
-                      )
-                    }
-                  >
-                    <Typography variant="h5" className={classes.catBtn}>
-                      {subCat.label}
-                    </Typography>
-                  </Button>
-                </Grid>
-              </Zoom>
-            ))}
+                <Typography variant="h5" className={classes.catBtn}>
+                  See Everything
+                </Typography>
+              </Button>
+            </Grid>
+          </Zoom>
+        )}
 
-          {subCategories.length > 0 && selectedCat && (
+        {subCategories &&
+          selectedCat &&
+          subCategories.map((subCat, idx) => (
             <Zoom
               in
-              style={{
-                transitionDelay: `${subCategories.length * 50}ms`
-              }}
+              style={{ transitionDelay: `${idx * 50}ms` }}
+              key={`lb${idx}`}
             >
-              <Grid item xs={6} sm={4} md={3} lg={2}>
+              <Grid item xs={6} sm={4} md={3}>
                 <Button
                   className={classes.gridBtn}
                   variant="outlined"
                   size="large"
-                  onClick={() => props.history.push(`/products/${selectedCat}`)}
+                  key={`lb${idx}`}
+                  onClick={() =>
+                    props.history.push(
+                      `/products/${selectedCat}/${subCat.name}`
+                    )
+                  }
                 >
                   <Typography variant="h5" className={classes.catBtn}>
-                    See Everything
+                    {subCat.label}
                   </Typography>
                 </Button>
               </Grid>
             </Zoom>
-          )}
-        </Grid>
-      </Paper>
+          ))}
+
+        {subCategories.length > 0 && selectedCat && (
+          <Zoom
+            in
+            style={{
+              transitionDelay: `${subCategories.length * 50}ms`
+            }}
+          >
+            <Grid item xs={6} sm={4} md={3}>
+              <Button
+                className={classes.gridBtn}
+                variant="outlined"
+                size="large"
+                onClick={() => props.history.push(`/products/${selectedCat}`)}
+              >
+                <Typography variant="h5" className={classes.catBtn}>
+                  See Everything
+                </Typography>
+              </Button>
+            </Grid>
+          </Zoom>
+        )}
+      </Grid>
+      {/* </Paper> */}
     </>
   )
 }

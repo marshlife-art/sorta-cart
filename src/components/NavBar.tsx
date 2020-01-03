@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: 'none'
     },
     toolbar: {
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: theme.palette.background.default,
       color: theme.palette.text.primary
     },
     menuButton: {
