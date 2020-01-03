@@ -25,7 +25,8 @@ const useStyles = makeStyles((theme: Theme) =>
     crumbz: {
       display: 'flex',
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
+      flexGrow: 1
     },
     gridRoot: {
       flexGrow: 1,
@@ -105,35 +106,34 @@ function Landing(props: RouteComponentProps) {
 
   return (
     <>
-      <NavBar />
-      <Paper className={classes.root}>
-        <div className={classes.crumbz}>
-          <Button
-            variant="text"
-            size="large"
-            onClick={() => setSelectedCat('')}
-          >
-            <Typography
-              variant="h4"
-              className={selectedCat && classes.catHover}
-            >
-              CATEGORIES
-            </Typography>
-          </Button>
-          {selectedCat && (
-            <>
-              <Fade in>
-                <ChevronRightIcon fontSize="large" />
-              </Fade>
-              <Fade in style={{ transitionDelay: '50ms' }}>
-                <Typography variant="h4">
-                  {selectedCat.toUpperCase()}
+      <NavBar>
+        {selectedCat && (
+          <div className={classes.crumbz}>
+            <Fade in>
+              <Button
+                variant="text"
+                size="large"
+                onClick={() => setSelectedCat('')}
+              >
+                <Typography
+                  variant="h6"
+                  className={selectedCat && classes.catHover}
+                >
+                  CATEGORIES
                 </Typography>
-              </Fade>
-            </>
-          )}
-        </div>
+              </Button>
+            </Fade>
 
+            <Fade in style={{ transitionDelay: '50ms' }}>
+              <ChevronRightIcon fontSize="large" />
+            </Fade>
+            <Fade in style={{ transitionDelay: '100ms' }}>
+              <Typography variant="h6">{selectedCat.toUpperCase()}</Typography>
+            </Fade>
+          </div>
+        )}
+      </NavBar>
+      <Paper className={classes.root}>
         <Grid
           container
           spacing={4}

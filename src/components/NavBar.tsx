@@ -17,7 +17,12 @@ import CartDrawer from './CartDrawer'
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      flexGrow: 1
+      flexGrow: 1,
+      boxShadow: 'none'
+    },
+    toolbar: {
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.text.primary
     },
     menuButton: {
       marginLeft: theme.spacing(2)
@@ -69,7 +74,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function NavBar() {
+export default function NavBar(props: { children?: React.ReactNode }) {
   const classes = useStyles()
   const itemCount = useCartItemCount()
 
@@ -84,10 +89,13 @@ export default function NavBar() {
 
   return (
     <AppBar position="static" className={classes.root}>
-      <Toolbar>
+      <Toolbar className={classes.toolbar}>
         <Typography className={classes.title} variant="h6" noWrap>
           MARSH COOP
         </Typography>
+
+        {props.children}
+
         {/* <div className={classes.search}>
           <div className={classes.searchIcon}>
             <SearchIcon />
