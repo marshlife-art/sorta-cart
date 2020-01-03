@@ -143,7 +143,7 @@ function Landing(props: RouteComponentProps) {
               style={{ transitionDelay: `${idx * 50}ms` }}
               key={`lb${idx}`}
             >
-              <Grid item xs={6} sm={4} md={3} lg={2}>
+              <Grid item xs={12} sm={4} md={3} lg={2}>
                 <Button
                   className={classes.gridBtn}
                   variant="outlined"
@@ -166,7 +166,7 @@ function Landing(props: RouteComponentProps) {
               transitionDelay: `${categories.length * 50}ms`
             }}
           >
-            <Grid item xs={6} sm={4} md={3} lg={3}>
+            <Grid item xs={12} sm={4} md={3} lg={3}>
               <Button
                 className={classes.gridBtn}
                 variant="outlined"
@@ -189,7 +189,7 @@ function Landing(props: RouteComponentProps) {
               style={{ transitionDelay: `${idx * 50}ms` }}
               key={`lb${idx}`}
             >
-              <Grid item xs={6} sm={4} md={3}>
+              <Grid item xs={12} sm={4} md={3}>
                 <Button
                   className={classes.gridBtn}
                   variant="outlined"
@@ -216,7 +216,7 @@ function Landing(props: RouteComponentProps) {
               transitionDelay: `${subCategories.length * 50}ms`
             }}
           >
-            <Grid item xs={6} sm={4} md={3}>
+            <Grid item xs={12} sm={4} md={3}>
               <Button
                 className={classes.gridBtn}
                 variant="outlined"
