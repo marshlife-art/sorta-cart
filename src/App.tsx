@@ -1,4 +1,5 @@
 import React from 'react'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ThemeProvider } from '@material-ui/core/styles'
@@ -8,6 +9,7 @@ import { RootState } from './redux'
 import { PreferencesServiceProps } from './redux/preferences/reducers'
 
 import DataTable from './components/DataTable'
+import Landing from './components/Landing'
 
 export function App(props: PreferencesServiceProps) {
   const { preferencesService } = props
@@ -22,7 +24,14 @@ export function App(props: PreferencesServiceProps) {
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
       {/* #TODO: add router */}
-      <DataTable />
+      <Router>
+        <Switch>
+          <Route path="/products" exact component={DataTable} />
+          <Route path="/products/:cat/" exact component={DataTable} />
+          <Route path="/products/:cat/:subcat" component={DataTable} />
+          <Route path="/" component={Landing} />
+        </Switch>
+      </Router>
     </ThemeProvider>
   )
 }

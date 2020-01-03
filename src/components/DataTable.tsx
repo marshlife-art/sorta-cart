@@ -1,4 +1,5 @@
 import React, { useState, useEffect, createRef } from 'react'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import MaterialTable, { Action } from 'material-table'
 import { Chip } from '@material-ui/core'
 import Badge from '@material-ui/core/Badge'
@@ -53,7 +54,9 @@ function renderCodes(codes: string) {
     )
 }
 
-function DataTable() {
+function DataTable(
+  props: RouteComponentProps<{ cat?: string; subcat?: string }>
+) {
   let tableRef = createRef<any>()
 
   // useEffect(() => {
@@ -115,6 +118,13 @@ function DataTable() {
       .catch(console.warn)
   })
 
+  const catDefaultFilter = props.match &&
+    props.match.params &&
+    props.match.params.cat && [props.match.params.cat]
+  const subCatDefaultFilter = props.match &&
+    props.match.params &&
+    props.match.params.subcat && [props.match.params.subcat]
+
   return (
     <>
       <MaterialTable
@@ -126,14 +136,19 @@ function DataTable() {
             type: 'string',
             lookup: categoryLookup,
             filterPlaceholder: 'filter',
-            defaultFilter: ['MARSH', 'BULK FOOD']
+            defaultFilter: catDefaultFilter
           },
           {
             title: 'sub category',
             field: 'sub_category',
             type: 'string',
             lookup: subCategoryLookup,
-            filterPlaceholder: 'filter'
+            editComponent: arg => {
+              console.log('editComponent arg:', arg)
+              return <>subcat</>
+            },
+            filterPlaceholder: 'filter',
+            defaultFilter: subCatDefaultFilter
           },
           {
             title: 'description',
@@ -231,7 +246,7 @@ function DataTable() {
               })
           })
         }
-        title={<div>MARSH COOP</div>}
+        title="MARSH COOP"
         options={{
           headerStyle: { position: 'sticky', top: 0 },
           filterCellStyle: { maxWidth: '132px' },
@@ -251,4 +266,4 @@ function DataTable() {
   )
 }
 
-export default DataTable
+export default withRouter(DataTable)

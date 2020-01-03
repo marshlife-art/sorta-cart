@@ -85,6 +85,7 @@ function UserMenu(
     if (
       preferencesService &&
       preferencesService.preferences &&
+      useDarkTheme !== null &&
       (preferencesService.preferences.dark_mode === 'true' ? true : false) !==
         useDarkTheme
     ) {
