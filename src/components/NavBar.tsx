@@ -28,11 +28,11 @@ const useStyles = makeStyles((theme: Theme) =>
       marginLeft: theme.spacing(2)
     },
     title: {
-      flexGrow: 1,
-      display: 'none',
-      [theme.breakpoints.up('sm')]: {
-        display: 'block'
-      }
+      flexGrow: 1
+      // display: 'none',
+      // [theme.breakpoints.up('sm')]: {
+      //   display: 'block'
+      // }
     },
     search: {
       position: 'relative',
