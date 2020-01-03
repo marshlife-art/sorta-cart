@@ -24,7 +24,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     crumbz: {
       display: 'flex',
-      flexDirection: 'row'
+      flexDirection: 'row',
+      alignItems: 'center'
     },
     gridRoot: {
       flexGrow: 1,
@@ -114,12 +115,16 @@ function Landing(props: RouteComponentProps) {
             CATEGORIES
           </Typography>
           {selectedCat && (
-            <Fade in>
-              <Typography variant="h4">
+            <>
+              <Fade in>
                 <ChevronRightIcon fontSize="large" />
-                {selectedCat.toUpperCase()}
-              </Typography>
-            </Fade>
+              </Fade>
+              <Fade in style={{ transitionDelay: '50ms' }}>
+                <Typography variant="h4">
+                  {selectedCat.toUpperCase()}
+                </Typography>
+              </Fade>
+            </>
           )}
         </div>
 

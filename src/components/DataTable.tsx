@@ -210,7 +210,7 @@ function DataTable(
                 : 'remove from shopping cart'
               return (
                 <Tooltip aria-label={label} title={label}>
-                  <IconButton color="primary" onClick={() => addToCart(row)}>
+                  <IconButton color="secondary" onClick={() => addToCart(row)}>
                     {inCart ? (
                       <AddShoppingCartIcon />
                     ) : (
