@@ -88,7 +88,7 @@ export default function NavBar() {
         <Typography className={classes.title} variant="h6" noWrap>
           MARSH COOP
         </Typography>
-        <div className={classes.search}>
+        {/* <div className={classes.search}>
           <div className={classes.searchIcon}>
             <SearchIcon />
           </div>
@@ -100,7 +100,7 @@ export default function NavBar() {
             }}
             inputProps={{ 'aria-label': 'search' }}
           />
-        </div>
+        </div> */}
 
         {itemCount > 0 && (
           <IconButton
