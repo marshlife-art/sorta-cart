@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "4b292c30602902d7b7c553ad4dcaae67",
+    "revision": "4d736e00df891d9f5a7f72fddad951f3",
     "url": "/sorta-cart/index.html"
   },
   {
-    "revision": "daa854da5f2fa6231ef1",
+    "revision": "78c88d4749f55818269f",
     "url": "/sorta-cart/static/css/main.2eb47a37.chunk.css"
   },
   {
-    "revision": "cc47be46e39db6d0c2ed",
-    "url": "/sorta-cart/static/js/2.9b12fe92.chunk.js"
+    "revision": "6031c572ef9710bb4dd0",
+    "url": "/sorta-cart/static/js/2.76add6fd.chunk.js"
   },
   {
     "revision": "0581a36eae53c4eaa4d51a0783bb359f",
-    "url": "/sorta-cart/static/js/2.9b12fe92.chunk.js.LICENSE"
+    "url": "/sorta-cart/static/js/2.76add6fd.chunk.js.LICENSE"
   },
   {
-    "revision": "daa854da5f2fa6231ef1",
-    "url": "/sorta-cart/static/js/main.4155688d.chunk.js"
+    "revision": "78c88d4749f55818269f",
+    "url": "/sorta-cart/static/js/main.0f742867.chunk.js"
   },
   {
     "revision": "7fc3ce5b84bbd7e3dc4a",
