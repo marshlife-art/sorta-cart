@@ -41,14 +41,23 @@ const registrationStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function Registration(props: {
-  handleNext: () => void
-  setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+function Registration(
+  props: {
+    handleNext: () => void
+    setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
+  } & StepButtonsProps
+) {
   const classes = registrationStyles()
   const [opt, setOpt] = useState<'login' | 'register' | 'guest' | undefined>()
 
-  const { setCanGoToNextStep, handleNext } = props
+  const {
+    setCanGoToNextStep,
+    handleNext,
+    backDisabled,
+    handleBack,
+    nextDisabled,
+    nextText
+  } = props
 
   useEffect(() => {
     setCanGoToNextStep(false)
@@ -60,48 +69,53 @@ function Registration(props: {
   }
 
   return (
-    <Paper>
-      {opt && (
-        <Tooltip aria-label="back" title="back">
-          <IconButton onClick={() => setOpt(undefined)}>
-            <BackIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-      {!opt && (
-        <div className={classes.opt}>
-          <div className={classes.optItem}>
-            <Typography variant="body1" gutterBottom>
-              Already a member?
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setOpt('login')}
-            >
-              Sign In
-            </Button>
+    <>
+      <Paper>
+        {opt && (
+          <Tooltip aria-label="back" title="back">
+            <IconButton onClick={() => setOpt(undefined)}>
+              <BackIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+        {!opt && (
+          <div className={classes.opt}>
+            <div className={classes.optItem}>
+              <Typography variant="body1" gutterBottom>
+                Already a member?
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setOpt('login')}
+              >
+                Sign In
+              </Button>
+            </div>
+            <div className={classes.optItem}>
+              <Typography variant="body1" gutterBottom>
+                Want to become a member?
+              </Typography>
+              <Button color="secondary" onClick={() => setOpt('register')}>
+                Register
+              </Button>
+            </div>
+            <div className={classes.optItem}>
+              <Typography variant="body1" gutterBottom>
+                ...or continue as a
+              </Typography>
+              <Button onClick={() => onCanContinue()}>Guest</Button>
+            </div>
           </div>
-          <div className={classes.optItem}>
-            <Typography variant="body1" gutterBottom>
-              Want to become a member?
-            </Typography>
-            <Button color="secondary" onClick={() => setOpt('register')}>
-              Register
-            </Button>
-          </div>
-          <div className={classes.optItem}>
-            <Typography variant="body1" gutterBottom>
-              ...or continue as a
-            </Typography>
-            <Button onClick={() => onCanContinue()}>Guest</Button>
-          </div>
-        </div>
-      )}
+        )}
 
-      {opt === 'login' && <Login onLoginFn={onCanContinue} />}
-      {opt === 'register' && <Register onRegisterFn={onCanContinue} />}
-    </Paper>
+        {opt === 'login' && <Login onLoginFn={onCanContinue} />}
+        {opt === 'register' && <Register onRegisterFn={onCanContinue} />}
+      </Paper>
+      <StepButtons
+        {...{ backDisabled, handleBack, nextDisabled, handleNext, nextText }}
+      />
+    </>
   )
 }
 
@@ -121,12 +135,21 @@ const reviewStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function ReviewCart(props: {
-  setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+function ReviewCart(
+  props: {
+    setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
+  } & StepButtonsProps
+) {
   const classes = reviewStyles()
   const cartResult = useCartService()
-  const { setCanGoToNextStep } = props
+  const {
+    setCanGoToNextStep,
+    backDisabled,
+    handleBack,
+    nextDisabled,
+    handleNext,
+    nextText
+  } = props
 
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -139,68 +162,73 @@ function ReviewCart(props: {
   }, [setCanGoToNextStep, email, phone, name])
 
   return (
-    <Grid container justify="center" direction="row">
-      <Grid item xs={12} sm={6}>
-        <Paper className={classes.infoContainer}>
-          <TextField
-            label="email"
-            name="email"
-            type="text"
-            value={email}
-            onChange={(event: any) => setEmail(event.target.value)}
-            autoFocus
-            fullWidth
-            helperText="Required"
-            required
-          />
-          <TextField
-            label="name"
-            name="name"
-            type="text"
-            value={name}
-            onChange={(event: any) => setName(event.target.value)}
-            fullWidth
-            helperText="Required"
-            required
-          />
-          <TextField
-            label="phone"
-            name="phone"
-            type="phone"
-            value={phone}
-            onChange={(event: any) => setPhone(event.target.value)}
-            fullWidth
-            helperText="Required"
-            required
-          />
-          <TextField
-            label="address"
-            name="address"
-            type="text"
-            value={address}
-            onChange={(event: any) => setAddress(event.target.value)}
-            fullWidth
-          />
-          <TextField
-            label="notes"
-            name="notes"
-            type="text"
-            value={notes}
-            onChange={(event: any) => setNotes(event.target.value)}
-            multiline
-            rowsMax="10"
-            fullWidth
-          />
-        </Paper>
+    <>
+      <Grid container justify="center" direction="row">
+        <Grid item xs={12} sm={6}>
+          <Paper className={classes.infoContainer}>
+            <TextField
+              label="email"
+              name="email"
+              type="text"
+              value={email}
+              onChange={(event: any) => setEmail(event.target.value)}
+              autoFocus
+              fullWidth
+              helperText="Required"
+              required
+            />
+            <TextField
+              label="name"
+              name="name"
+              type="text"
+              value={name}
+              onChange={(event: any) => setName(event.target.value)}
+              fullWidth
+              helperText="Required"
+              required
+            />
+            <TextField
+              label="phone"
+              name="phone"
+              type="phone"
+              value={phone}
+              onChange={(event: any) => setPhone(event.target.value)}
+              fullWidth
+              helperText="Required"
+              required
+            />
+            <TextField
+              label="address"
+              name="address"
+              type="text"
+              value={address}
+              onChange={(event: any) => setAddress(event.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="notes"
+              name="notes"
+              type="text"
+              value={notes}
+              onChange={(event: any) => setNotes(event.target.value)}
+              multiline
+              rowsMax="10"
+              fullWidth
+            />
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          {cartResult.status !== 'loaded' && 'Loading...'}
+          {cartResult.status === 'loaded' &&
+            cartResult.payload.line_items.length > 0 && (
+              <CartTable line_items={cartResult.payload.line_items} checkout />
+            )}
+        </Grid>
       </Grid>
-      <Grid item xs={12} sm={6}>
-        {cartResult.status !== 'loaded' && 'Loading...'}
-        {cartResult.status === 'loaded' &&
-          cartResult.payload.line_items.length > 0 && (
-            <CartTable line_items={cartResult.payload.line_items} checkout />
-          )}
-      </Grid>
-    </Grid>
+      <StepButtons
+        {...{ backDisabled, handleBack, nextDisabled, handleNext, nextText }}
+      />
+    </>
   )
 }
 
@@ -215,36 +243,98 @@ const paymentStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function Payment(props: {
-  setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+function Payment(
+  props: {
+    setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
+  } & StepButtonsProps
+) {
   const classes = paymentStyles()
   const cartResult = useCartService()
-  const { setCanGoToNextStep } = props
+  const {
+    setCanGoToNextStep,
+    backDisabled,
+    handleBack,
+    nextDisabled,
+    handleNext,
+    nextText
+  } = props
 
   useEffect(() => {
     setCanGoToNextStep(cartResult && cartResult.status === 'loaded')
   }, [setCanGoToNextStep, cartResult])
 
   return (
-    <Grid container justify="center" direction="row">
-      <Grid item xs={12} sm={6}>
-        {cartResult.status !== 'loaded' && 'Loading...'}
-        {cartResult.status === 'loaded' &&
-          cartResult.payload.line_items.length > 0 && (
-            <CartTable
-              line_items={cartResult.payload.line_items}
-              checkout
-              summary
-            />
-          )}
+    <>
+      <Grid container justify="center" direction="row">
+        <Grid item xs={12} sm={6}>
+          {cartResult.status !== 'loaded' && 'Loading...'}
+          {cartResult.status === 'loaded' &&
+            cartResult.payload.line_items.length > 0 && (
+              <CartTable
+                line_items={cartResult.payload.line_items}
+                checkout
+                summary
+              />
+            )}
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Paper className={classes.paymentContainer}>
+            Square Payment stuff will go here...
+          </Paper>
+        </Grid>
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <Paper className={classes.paymentContainer}>
-          Square Payment stuff will go here...
-        </Paper>
-      </Grid>
-    </Grid>
+      <StepButtons
+        {...{ backDisabled, handleBack, nextDisabled, handleNext, nextText }}
+      />
+    </>
+  )
+}
+
+const stepButtonsStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      display: 'flex',
+      justifyContent: 'flex-end',
+      marginTop: theme.spacing(2)
+    },
+    button: {
+      marginLeft: theme.spacing(2)
+    }
+  })
+)
+
+interface StepButtonsProps {
+  backDisabled: boolean
+  handleBack: () => void
+  nextDisabled: boolean
+  handleNext: () => void
+  nextText: string
+}
+
+function StepButtons(props: StepButtonsProps) {
+  const classes = stepButtonsStyles()
+
+  const { backDisabled, handleBack, nextDisabled, handleNext, nextText } = props
+  return (
+    <div className={classes.root}>
+      <Button
+        disabled={backDisabled}
+        onClick={handleBack}
+        className={classes.button}
+      >
+        Back
+      </Button>
+
+      <Button
+        disabled={nextDisabled}
+        variant="contained"
+        color="primary"
+        onClick={handleNext}
+        className={classes.button}
+      >
+        {nextText}
+      </Button>
+    </div>
   )
 }
 
@@ -253,9 +343,6 @@ const checkoutStyles = makeStyles((theme: Theme) =>
     root: {
       width: '100%',
       padding: theme.spacing(2)
-    },
-    button: {
-      marginLeft: theme.spacing(2)
     },
     instructions: {
       marginTop: theme.spacing(2),
@@ -323,34 +410,32 @@ function Checkout() {
                 <Registration
                   handleNext={handleNext}
                   setCanGoToNextStep={setCanGoToNextStep}
+                  backDisabled={true}
+                  handleBack={handleBack}
+                  nextDisabled={!canGoToNextStep || activeStep === 0}
+                  nextText={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                 />
               )}
               {activeStep === 1 && (
-                <ReviewCart setCanGoToNextStep={setCanGoToNextStep} />
+                <ReviewCart
+                  setCanGoToNextStep={setCanGoToNextStep}
+                  backDisabled={true}
+                  handleBack={handleBack}
+                  nextDisabled={!canGoToNextStep}
+                  handleNext={handleNext}
+                  nextText={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                />
               )}
               {activeStep === 2 && (
-                <Payment setCanGoToNextStep={setCanGoToNextStep} />
+                <Payment
+                  setCanGoToNextStep={setCanGoToNextStep}
+                  backDisabled={false}
+                  handleBack={handleBack}
+                  nextDisabled={!canGoToNextStep}
+                  handleNext={handleNext}
+                  nextText={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                />
               )}
-
-              <div className={classes.stepBtnz}>
-                <Button
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  className={classes.button}
-                >
-                  Back
-                </Button>
-
-                <Button
-                  disabled={!canGoToNextStep || activeStep === 0}
-                  variant="contained"
-                  color="primary"
-                  onClick={handleNext}
-                  className={classes.button}
-                >
-                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                </Button>
-              </div>
             </div>
           )}
         </div>
