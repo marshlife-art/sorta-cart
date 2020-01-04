@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableFooter from '@material-ui/core/TableFooter'
 import Paper from '@material-ui/core/Paper'
+import Tooltip from '@material-ui/core/Tooltip'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import Select from '@material-ui/core/Select'
@@ -121,13 +122,18 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             <TableRow key={`li${idx}`}>
               <TableCell align="center">
                 {!summary && (
-                  <IconButton
-                    aria-label="delete"
-                    size="small"
-                    onClick={(event: any) => removeLineItem(line_item.id)}
+                  <Tooltip
+                    aria-label="remove line item"
+                    title="REMOVE LINE ITEM"
                   >
-                    <ClearIcon fontSize="inherit" />
-                  </IconButton>
+                    <IconButton
+                      aria-label="delete"
+                      size="small"
+                      onClick={(event: any) => removeLineItem(line_item.id)}
+                    >
+                      <ClearIcon fontSize="inherit" />
+                    </IconButton>
+                  </Tooltip>
                 )}
               </TableCell>
               <TableCell>
