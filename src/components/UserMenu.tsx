@@ -112,22 +112,26 @@ function UserMenu(props: Props) {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <StyledMenuItem>
-          <ListItemText
-            primary="Sign in"
-            onClick={() => history.push('/login')}
-          />
+        <StyledMenuItem
+          onClick={() => {
+            history.push('/login')
+            handleClose()
+          }}
+        >
+          <ListItemText primary="Sign in" />
         </StyledMenuItem>
 
-        <StyledMenuItem>
-          <ListItemText
-            primary="Register"
-            onClick={() => history.push('/register')}
-          />
+        <StyledMenuItem
+          onClick={() => {
+            history.push('/register')
+            handleClose()
+          }}
+        >
+          <ListItemText primary="Register" />
         </StyledMenuItem>
 
-        <StyledMenuItem>
-          <ListItemText onClick={() => setUseDarkTheme(prev => !prev)}>
+        <StyledMenuItem onClick={() => setUseDarkTheme(prev => !prev)}>
+          <ListItemText>
             <div
               style={{
                 display: 'flex',
