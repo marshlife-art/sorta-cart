@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import Paper from '@material-ui/core/Paper'
+// import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
     crumbz: {
       display: 'flex',
       flexDirection: 'row',
+      justifyContent: 'flex-start',
       alignItems: 'center',
       flexGrow: 1
     },
@@ -106,10 +107,13 @@ function Landing(props: RouteComponentProps) {
 
   return (
     <>
-      <NavBar>
+      <NavBar showCart>
         {selectedCat && (
           <div className={classes.crumbz}>
             <Fade in>
+              <ChevronRightIcon fontSize="large" />
+            </Fade>
+            <Fade in style={{ transitionDelay: '50ms' }}>
               <Button
                 variant="text"
                 size="large"
@@ -124,10 +128,10 @@ function Landing(props: RouteComponentProps) {
               </Button>
             </Fade>
 
-            <Fade in style={{ transitionDelay: '50ms' }}>
+            <Fade in style={{ transitionDelay: '100ms' }}>
               <ChevronRightIcon fontSize="large" />
             </Fade>
-            <Fade in style={{ transitionDelay: '100ms' }}>
+            <Fade in style={{ transitionDelay: '150ms' }}>
               <Typography variant="h6">{selectedCat.toUpperCase()}</Typography>
             </Fade>
           </div>

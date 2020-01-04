@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { ThunkDispatch } from 'redux-thunk'
 import { withStyles } from '@material-ui/core/styles'
@@ -48,20 +49,24 @@ const StyledMenuItem = withStyles(theme => ({
   }
 }))(MenuItem)
 
-function UserMenu(
-  props: PreferencesServiceProps &
-    DispatchProps & {
-      anchorEl: HTMLElement | null
-      setAnchorEl: React.Dispatch<React.SetStateAction<HTMLElement | null>>
-    }
-) {
+interface UserMenuProps {
+  anchorEl: HTMLElement | null
+  setAnchorEl: React.Dispatch<React.SetStateAction<HTMLElement | null>>
+}
+type Props = PreferencesServiceProps &
+  DispatchProps &
+  RouteComponentProps &
+  UserMenuProps
+
+function UserMenu(props: Props) {
   // const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const {
     anchorEl,
     setAnchorEl,
     preferencesService,
     getPreferences,
-    setPreferences
+    setPreferences,
+    history
   } = props
 
   const [useDarkTheme, setUseDarkTheme] = useState<null | boolean>(null)
@@ -110,14 +115,14 @@ function UserMenu(
         <StyledMenuItem>
           <ListItemText
             primary="Sign in"
-            onClick={() => console.log('login')}
+            onClick={() => history.push('/login')}
           />
         </StyledMenuItem>
 
         <StyledMenuItem>
           <ListItemText
             primary="Register"
-            onClick={() => console.log('register')}
+            onClick={() => history.push('/register')}
           />
         </StyledMenuItem>
 
@@ -164,4 +169,7 @@ const mapDispatchToProps = (
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserMenu)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(UserMenu))

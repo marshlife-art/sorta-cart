@@ -1,10 +1,12 @@
 import React, { useState, useEffect, createRef } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import MaterialTable, { Action } from 'material-table'
-import { Chip } from '@material-ui/core'
+import Chip from '@material-ui/core/Chip'
 import Badge from '@material-ui/core/Badge'
 import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
+import Typography from '@material-ui/core/Typography'
+import Button from '@material-ui/core/Button'
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart'
 import RemoveShoppingCartIcon from '@material-ui/icons/RemoveShoppingCart'
@@ -246,7 +248,15 @@ function DataTable(
               })
           })
         }
-        title="MARSH COOP"
+        title={
+          <Button
+            variant="text"
+            size="large"
+            onClick={() => props.history.push('/')}
+          >
+            <Typography variant="h6">MARSH COOP</Typography>
+          </Button>
+        }
         options={{
           headerStyle: { position: 'sticky', top: 0 },
           filterCellStyle: { maxWidth: '132px' },

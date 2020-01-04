@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
-import InputBase from '@material-ui/core/InputBase'
+import Button from '@material-ui/core/Button'
+import Fade from '@material-ui/core/Fade'
 import Badge from '@material-ui/core/Badge'
 import { createStyles, fade, Theme, makeStyles } from '@material-ui/core/styles'
 import TagFacesIcon from '@material-ui/icons/TagFaces'
-import SearchIcon from '@material-ui/icons/Search'
+// import SearchIcon from '@material-ui/icons/Search'
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
 
 import UserMenu from './UserMenu'
@@ -27,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
     menuButton: {
       marginLeft: theme.spacing(2)
     },
-    title: {
+    grow: {
       flexGrow: 1
       // display: 'none',
       // [theme.breakpoints.up('sm')]: {
@@ -74,10 +76,16 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function NavBar(props: { children?: React.ReactNode }) {
+interface NavBarProps {
+  showCart?: boolean
+  children?: React.ReactNode
+}
+
+function NavBar(props: NavBarProps & RouteComponentProps) {
   const classes = useStyles()
   const itemCount = useCartItemCount()
 
+  const { showCart } = props
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(
     null
@@ -90,11 +98,19 @@ export default function NavBar(props: { children?: React.ReactNode }) {
   return (
     <AppBar position="static" className={classes.root}>
       <Toolbar className={classes.toolbar}>
-        <Typography className={classes.title} variant="h6" noWrap>
-          MARSH COOP
-        </Typography>
+        <div>
+          <Fade in>
+            <Button
+              variant="text"
+              size="large"
+              onClick={() => props.history.push('/')}
+            >
+              <Typography variant="h6">MARSH COOP</Typography>
+            </Button>
+          </Fade>
+        </div>
 
-        {props.children}
+        {props.children || <div className={classes.grow}>&nbsp;</div>}
 
         {/* <div className={classes.search}>
           <div className={classes.searchIcon}>
@@ -110,7 +126,7 @@ export default function NavBar(props: { children?: React.ReactNode }) {
           />
         </div> */}
 
-        {itemCount > 0 && (
+        {showCart && itemCount > 0 && (
           <IconButton
             edge="end"
             className={classes.menuButton}
@@ -139,3 +155,5 @@ export default function NavBar(props: { children?: React.ReactNode }) {
     </AppBar>
   )
 }
+
+export default withRouter(NavBar)

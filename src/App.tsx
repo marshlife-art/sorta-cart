@@ -10,6 +10,10 @@ import { PreferencesServiceProps } from './redux/preferences/reducers'
 
 import DataTable from './components/DataTable'
 import Landing from './components/Landing'
+import Checkout from './components/Checkout'
+import Login from './components/Login'
+import Register from './components/Register'
+import NavBar from './components/NavBar'
 
 export function App(props: PreferencesServiceProps) {
   const { preferencesService } = props
@@ -21,22 +25,31 @@ export function App(props: PreferencesServiceProps) {
       : lightTheme
   return (
     <ThemeProvider theme={theme}>
-      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
-      {/* #TODO: add router */}
       <Router>
         <Switch>
+          <Route path="/checkout" exact component={Checkout} />
           <Route path="/products" exact component={DataTable} />
           <Route path="/products/:cat/" exact component={DataTable} />
           <Route path="/products/:cat/:subcat" component={DataTable} />
+          <Route path="/login" exact>
+            <>
+              <NavBar />
+              <Login showTitle />
+            </>
+          </Route>
+          <Route path="/register" exact>
+            <>
+              <NavBar />
+              <Register showTitle />
+            </>
+          </Route>
           <Route path="/" component={Landing} />
         </Switch>
       </Router>
     </ThemeProvider>
   )
 }
-
-// export default App
 
 const mapStateToProps = (states: RootState): PreferencesServiceProps => {
   return {

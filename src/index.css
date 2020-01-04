@@ -17,14 +17,19 @@ code {
     monospace;
 }
 
+/* ugh, this is just because the mui data table filter is not wide enough.
+ * ... this stylez all popoverz :/
+ */
+
 .MuiPopover-paper {
   min-width: 380px !important;
 }
 
+/* 
 .MuiTableSortLabel-icon {
   overflow: visible !important;
 }
 
 .MuiTableCell-root {
   padding: 6px !important;
-}
+} */
