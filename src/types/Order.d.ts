@@ -1,4 +1,6 @@
-import { LineItem } from './Cart'
+import { Product } from './Product'
+import { User } from './User'
+import { Member } from './Member'
 
 export type PaymentStatus =
   | 'balance_due'
@@ -13,21 +15,59 @@ export type ShipmentStatus =
   | 'pending'
   | 'ready'
   | 'shipped'
-export type OrderStatus = 'new' | 'needs_review' | 'void' | 'archived'
+export type OrderStatus =
+  | 'new'
+  | 'pending'
+  | 'needs_review'
+  | 'void'
+  | 'complete'
+  | 'archived'
 
-export interface OrderDoc {
-  _id: string
-  _rev?: string
+export interface Order {
+  id: number | string
   status: OrderStatus
   payment_status: PaymentStatus
   shipment_status: ShipmentStatus
-  line_items: LineItem[]
   total: number
   name: string
   email: string
   phone: string
   address?: string
   notes?: string
+  subtotal?: number
+  item_count: number
+  email_sent?: boolean
+  history?: object
+  createdAt: string
+  updatedAt: string
+  OrderLineItems: OrderLineItem[]
+  UserId?: string
+  User?: User
+  Member?: Member
+}
+
+export type PartialOrder = Partial<Order>
+
+export interface OrderRouterProps {
+  id: string
+}
+
+export interface OrderLineItem {
+  description?: string
+  price?: number
+  kind?: string
+
+  id?: string
+  // description: string
+  quantity: number
+  selected_unit?: string
+  // price: number
+  total: number
+  // kind: string
+  vendor?: string
+  WholesaleOrderId?: number
+  OrderId?: number
+  data?: { product?: Product }
 }
 
 export type PartialOrderDoc = Partial<OrderDoc>

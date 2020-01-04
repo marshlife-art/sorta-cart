@@ -25,6 +25,15 @@ interface LineItemProps {
   quantity: number
   selected_unit: string
   total: number
+
+  // id?: string
+  description?: string
+  price?: number
+  kind?: string
+  vendor?: string
+  WholesaleOrderId?: number
+  OrderId?: number
+  data?: { product?: Product }
 }
 
 export type LineItem = Product & LineItemProps

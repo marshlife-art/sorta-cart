@@ -17,6 +17,8 @@ import { useCartService } from '../services/useCartService'
 import CartTable from './CartTable'
 import Login from './Login'
 import Register from './Register'
+import { Order, OrderLineItem } from '../types/Order'
+import { BLANK_ORDER } from '../constants'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -138,6 +140,7 @@ const reviewStyles = makeStyles((theme: Theme) =>
 function ReviewCart(
   props: {
     setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
+    setOrder: React.Dispatch<React.SetStateAction<Order>>
   } & StepButtonsProps
 ) {
   const classes = reviewStyles()
@@ -147,8 +150,8 @@ function ReviewCart(
     backDisabled,
     handleBack,
     nextDisabled,
-    handleNext,
-    nextText
+    nextText,
+    setOrder
   } = props
 
   const [email, setEmail] = useState('')
@@ -160,6 +163,24 @@ function ReviewCart(
   useEffect(() => {
     setCanGoToNextStep && setCanGoToNextStep(!!(email && phone && name))
   }, [setCanGoToNextStep, email, phone, name])
+
+  function handleNext() {
+    const OrderLineItems =
+      cartResult.status === 'loaded' && cartResult.payload.line_items
+        ? (cartResult.payload.line_items as OrderLineItem[])
+        : ([] as OrderLineItem[])
+
+    setOrder(order => ({
+      ...order,
+      email,
+      phone,
+      name,
+      address,
+      notes,
+      OrderLineItems
+    }))
+    props.handleNext()
+  }
 
   return (
     <>
@@ -246,6 +267,7 @@ const paymentStyles = makeStyles((theme: Theme) =>
 function Payment(
   props: {
     setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
+    order: Order
   } & StepButtonsProps
 ) {
   const classes = paymentStyles()
@@ -255,13 +277,18 @@ function Payment(
     backDisabled,
     handleBack,
     nextDisabled,
-    handleNext,
-    nextText
+    nextText,
+    order
   } = props
 
   useEffect(() => {
     setCanGoToNextStep(cartResult && cartResult.status === 'loaded')
   }, [setCanGoToNextStep, cartResult])
+
+  function handleNext() {
+    console.log('on handleNext should submit order:', order)
+    // props.handleNext()
+  }
 
   return (
     <>
@@ -372,6 +399,8 @@ function Checkout() {
 
   const [activeStep, setActiveStep] = useState(0)
   const [canGoToNextStep, setCanGoToNextStep] = useState(false)
+  const [order, setOrder] = useState<Order>(BLANK_ORDER)
+
   const steps = getSteps()
 
   const handleNext = () => {
@@ -424,6 +453,7 @@ function Checkout() {
                   nextDisabled={!canGoToNextStep}
                   handleNext={handleNext}
                   nextText={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                  setOrder={setOrder}
                 />
               )}
               {activeStep === 2 && (
@@ -434,6 +464,7 @@ function Checkout() {
                   nextDisabled={!canGoToNextStep}
                   handleNext={handleNext}
                   nextText={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                  order={order}
                 />
               )}
             </div>
