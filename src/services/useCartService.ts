@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react'
 import { AppDatabase } from '../appDatabase'
 import { Service } from '../types/Service'
 import { Cart } from '../types/Cart'
-import { LineItem, Product } from '../types/Product'
+import { Product } from '../types/Product'
+import { OrderLineItem } from '../types/Order'
+import { IDatabaseChange } from 'dexie-observable/api'
 
 const db = new AppDatabase()
 
@@ -50,27 +52,33 @@ const getCartItemCount = () => {
 const useCartItemCount = () => {
   const [itemCount, setItemCount] = useState(0)
 
+  const subscriber = (changes: IDatabaseChange[]) => {
+    changes.find(change => change.table === 'cart') &&
+      getCartItemCount().then(count => setItemCount(count))
+  }
+
   useEffect(() => {
     getCartItemCount().then(count => setItemCount(count))
 
-    db.on('changes', changes => {
-      changes.find(change => change.table === 'cart') &&
-        getCartItemCount().then(count => setItemCount(count))
-    })
+    db.on('changes', subscriber)
+
+    return () => db.on('changes').unsubscribe(subscriber)
   }, [])
 
   return itemCount
 }
 
 const addToCart = (product: Product) => {
-  let line_item: LineItem = {
-    ...product,
-    product_id: product.id,
+  let line_item: OrderLineItem = {
     quantity: 1,
-    total: parseFloat(product.ws_price),
-    selected_unit: 'CS'
+    total: +product.ws_price,
+    selected_unit: 'CS',
+    price: +product.ws_price,
+    description: `${product.name} ${product.description}`.trim(),
+    kind: 'product',
+    vendor: product.vendor,
+    data: { product }
   }
-  delete line_item.id // delete id field that moved to product_id so indexDB will auto-increment and so cart items will order correctly.
 
   db.cart
     .add(line_item)
@@ -89,10 +97,12 @@ const emptyCart = () => {
   })
 }
 
-const updateLineItem = (line_item: LineItem) => {
-  db.cart
-    .update(line_item.id, line_item)
-    .catch(error => console.warn('[updateLineItem] caught error:', error))
+const updateLineItem = (line_item: OrderLineItem) => {
+  line_item &&
+    line_item.id &&
+    db.cart
+      .update(line_item.id, line_item)
+      .catch(error => console.warn('[updateLineItem] caught error:', error))
 }
 
 export {

@@ -25,3 +25,20 @@ export const BLANK_ORDER: Order = {
   updatedAt: '',
   OrderLineItems: []
 }
+
+// export const ORDER_PAYMENT_STATUSES: PaymentStatus[] = [
+//   'balance_due',
+//   'credit_owed',
+//   'failed',
+//   'paid',
+//   'void'
+// ]
+
+// export const ORDER_SHIPMENT_STATUSES: ShipmentStatus[] = [
+//   'backorder',
+//   'canceled',
+//   'partial',
+//   'pending',
+//   'ready',
+//   'shipped'
+// ]

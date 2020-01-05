@@ -15,7 +15,7 @@ import TagFacesIcon from '@material-ui/icons/TagFaces'
 import UserMenu from './UserMenu'
 import CartDrawer from './CartDrawer'
 import { useCartItemCount, addToCart } from '../services/useCartService'
-import { API_HOST } from '../util/utilz'
+import { API_HOST } from '../constants'
 
 const PROPERTY_MAP: { [index: string]: string } = {
   a: 'Artificial ingredients',

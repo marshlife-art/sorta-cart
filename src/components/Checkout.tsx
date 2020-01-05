@@ -10,15 +10,16 @@ import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
+import Box from '@material-ui/core/Box'
 import BackIcon from '@material-ui/icons/ArrowBack'
 
 import NavBar from './NavBar'
-import { useCartService } from '../services/useCartService'
+import { useCartService, emptyCart } from '../services/useCartService'
 import CartTable from './CartTable'
 import Login from './Login'
 import Register from './Register'
 import { Order, OrderLineItem } from '../types/Order'
-import { BLANK_ORDER } from '../constants'
+import { BLANK_ORDER, API_HOST } from '../constants'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -165,7 +166,7 @@ function ReviewCart(
   }, [setCanGoToNextStep, email, phone, name])
 
   function handleNext() {
-    const OrderLineItems =
+    const cartItems =
       cartResult.status === 'loaded' && cartResult.payload.line_items
         ? (cartResult.payload.line_items as OrderLineItem[])
         : ([] as OrderLineItem[])
@@ -177,16 +178,20 @@ function ReviewCart(
       name,
       address,
       notes,
-      OrderLineItems
+      item_count: cartItems.length,
+      OrderLineItems: [
+        ...cartItems,
+        ...order.OrderLineItems.filter(li => li.kind !== 'product')
+      ]
     }))
     props.handleNext()
   }
 
   return (
     <>
-      <Grid container justify="center" direction="row">
-        <Grid item xs={12} sm={6}>
-          <Paper className={classes.infoContainer}>
+      <Paper className={classes.infoContainer}>
+        <Grid container justify="center" direction="row" spacing={2}>
+          <Grid item xs={12} sm={4}>
             <TextField
               label="email"
               name="email"
@@ -236,16 +241,20 @@ function ReviewCart(
               rowsMax="10"
               fullWidth
             />
-          </Paper>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            {cartResult.status !== 'loaded' && 'Loading...'}
+            {cartResult.status === 'loaded' &&
+              cartResult.payload.line_items.length > 0 && (
+                <CartTable
+                  line_items={cartResult.payload.line_items}
+                  setOrder={setOrder}
+                  checkout
+                />
+              )}
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          {cartResult.status !== 'loaded' && 'Loading...'}
-          {cartResult.status === 'loaded' &&
-            cartResult.payload.line_items.length > 0 && (
-              <CartTable line_items={cartResult.payload.line_items} checkout />
-            )}
-        </Grid>
-      </Grid>
+      </Paper>
       <StepButtons
         {...{ backDisabled, handleBack, nextDisabled, handleNext, nextText }}
       />
@@ -260,6 +269,12 @@ const paymentStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center'
+    },
+    error: {
+      display: 'flex',
+      flexDirection: 'column',
+      textAlign: 'right',
+      padding: theme.spacing(2)
     }
   })
 )
@@ -281,35 +296,73 @@ function Payment(
     order
   } = props
 
+  const [error, setError] = useState('')
+
   useEffect(() => {
     setCanGoToNextStep(cartResult && cartResult.status === 'loaded')
   }, [setCanGoToNextStep, cartResult])
 
   function handleNext() {
     console.log('on handleNext should submit order:', order)
-    // props.handleNext()
+    setError('')
+    fetch(`${API_HOST}/store/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(order)
+    })
+      .then(r => r.json())
+      .then(response => {
+        if (response.error) {
+          console.warn('/store/checkout ERROR response:', response)
+          setError(response.msg || 'onoz! could not submit your order ;(')
+        } else {
+          console.log('/store/checkout response ok:', response)
+          emptyCart()
+          props.handleNext()
+        }
+      })
+      .catch(err => {
+        console.warn('onoz! caught error /store/checkout err:', err)
+        setError('onoz! could not submit your order ;(')
+      })
   }
 
   return (
     <>
-      <Grid container justify="center" direction="row">
-        <Grid item xs={12} sm={6}>
-          {cartResult.status !== 'loaded' && 'Loading...'}
-          {cartResult.status === 'loaded' &&
-            cartResult.payload.line_items.length > 0 && (
-              <CartTable
-                line_items={cartResult.payload.line_items}
-                checkout
-                summary
-              />
-            )}
+      <Paper>
+        <Grid container justify="center" direction="row">
+          <Grid item xs={12} sm={6}>
+            {cartResult.status !== 'loaded' && 'Loading...'}
+            {cartResult.status === 'loaded' &&
+              cartResult.payload.line_items.length > 0 && (
+                <CartTable
+                  line_items={cartResult.payload.line_items}
+                  checkout
+                  summary
+                />
+              )}
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <div className={classes.paymentContainer}>
+              Square Payment stuff will go here...
+            </div>
+          </Grid>
+          {error && (
+            <Grid item xs={12}>
+              <Box color="error.main" className={classes.error}>
+                <Typography variant="overline" display="block">
+                  onoz! an error!
+                </Typography>
+                <Typography variant="body1" display="block" gutterBottom>
+                  {error}
+                </Typography>
+              </Box>
+            </Grid>
+          )}
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <Paper className={classes.paymentContainer}>
-            Square Payment stuff will go here...
-          </Paper>
-        </Grid>
-      </Grid>
+      </Paper>
       <StepButtons
         {...{ backDisabled, handleBack, nextDisabled, handleNext, nextText }}
       />

@@ -53,11 +53,12 @@ export interface OrderRouterProps {
 }
 
 export interface OrderLineItem {
+  id?: number
+
   description?: string
   price?: number
   kind?: string
 
-  id?: string
   // description: string
   quantity: number
   selected_unit?: string
