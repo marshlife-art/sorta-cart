@@ -201,7 +201,9 @@ function Landing(props: RouteComponentProps) {
                   key={`lb${idx}`}
                   onClick={() =>
                     props.history.push(
-                      `/products/${selectedCat}/${subCat.name}`
+                      `/products/${encodeURIComponent(
+                        selectedCat
+                      )}/${encodeURIComponent(subCat.name)}`
                     )
                   }
                 >
@@ -225,7 +227,11 @@ function Landing(props: RouteComponentProps) {
                 className={classes.gridBtn}
                 variant="outlined"
                 size="large"
-                onClick={() => props.history.push(`/products/${selectedCat}`)}
+                onClick={() =>
+                  props.history.push(
+                    `/products/${encodeURIComponent(selectedCat)}`
+                  )
+                }
               >
                 <Typography variant="h5" className={classes.catBtn}>
                   See Everything

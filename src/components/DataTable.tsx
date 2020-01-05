@@ -122,10 +122,10 @@ function DataTable(
 
   const catDefaultFilter = props.match &&
     props.match.params &&
-    props.match.params.cat && [props.match.params.cat]
+    props.match.params.cat && [decodeURIComponent(props.match.params.cat)]
   const subCatDefaultFilter = props.match &&
     props.match.params &&
-    props.match.params.subcat && [props.match.params.subcat]
+    props.match.params.subcat && [decodeURIComponent(props.match.params.subcat)]
 
   return (
     <>
