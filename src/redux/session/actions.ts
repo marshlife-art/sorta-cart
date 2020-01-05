@@ -50,7 +50,7 @@ export const checkSession = (): ThunkAction<
       if (!token) {
         // reject('no token')
         dispatch(isFetching(false))
-        dispatch(set({ email: undefined, token: undefined }))
+        dispatch(set(NULL_USER))
         resolve()
         return
       }

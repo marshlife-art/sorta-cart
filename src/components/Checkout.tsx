@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import Stepper from '@material-ui/core/Stepper'
 import Step from '@material-ui/core/Step'
@@ -20,6 +21,8 @@ import Login from './Login'
 import Register from './Register'
 import { Order, OrderLineItem } from '../types/Order'
 import { BLANK_ORDER, API_HOST } from '../constants'
+import { UserServiceProps } from '../redux/session/reducers'
+import { RootState } from '../redux'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -138,129 +141,182 @@ const reviewStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function ReviewCart(
-  props: {
-    setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
-    setOrder: React.Dispatch<React.SetStateAction<Order>>
-  } & StepButtonsProps
-) {
-  const classes = reviewStyles()
-  const cartResult = useCartService()
-  const {
-    setCanGoToNextStep,
-    backDisabled,
-    handleBack,
-    nextDisabled,
-    nextText,
-    setOrder
-  } = props
-
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [name, setName] = useState('')
-  const [address, setAddress] = useState('')
-  const [notes, setNotes] = useState('')
-
-  useEffect(() => {
-    setCanGoToNextStep && setCanGoToNextStep(!!(email && phone && name))
-  }, [setCanGoToNextStep, email, phone, name])
-
-  function handleNext() {
-    const cartItems =
-      cartResult.status === 'loaded' && cartResult.payload.line_items
-        ? (cartResult.payload.line_items as OrderLineItem[])
-        : ([] as OrderLineItem[])
-
-    setOrder(order => ({
-      ...order,
-      email,
-      phone,
-      name,
-      address,
-      notes,
-      item_count: cartItems.length,
-      OrderLineItems: [
-        ...cartItems,
-        ...order.OrderLineItems.filter(li => li.kind !== 'product')
-      ]
-    }))
-    props.handleNext()
-  }
-
-  return (
-    <>
-      <Paper className={classes.infoContainer}>
-        <Grid container justify="center" direction="row" spacing={2}>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="email"
-              name="email"
-              type="text"
-              value={email}
-              onChange={(event: any) => setEmail(event.target.value)}
-              autoFocus
-              fullWidth
-              helperText="Required"
-              required
-            />
-            <TextField
-              label="name"
-              name="name"
-              type="text"
-              value={name}
-              onChange={(event: any) => setName(event.target.value)}
-              fullWidth
-              helperText="Required"
-              required
-            />
-            <TextField
-              label="phone"
-              name="phone"
-              type="phone"
-              value={phone}
-              onChange={(event: any) => setPhone(event.target.value)}
-              fullWidth
-              helperText="Required"
-              required
-            />
-            <TextField
-              label="address"
-              name="address"
-              type="text"
-              value={address}
-              onChange={(event: any) => setAddress(event.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="notes"
-              name="notes"
-              type="text"
-              value={notes}
-              onChange={(event: any) => setNotes(event.target.value)}
-              multiline
-              rowsMax="10"
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={8}>
-            {cartResult.status !== 'loaded' && 'Loading...'}
-            {cartResult.status === 'loaded' &&
-              cartResult.payload.line_items.length > 0 && (
-                <CartTable
-                  line_items={cartResult.payload.line_items}
-                  setOrder={setOrder}
-                  checkout
-                />
-              )}
-          </Grid>
-        </Grid>
-      </Paper>
-      <StepButtons
-        {...{ backDisabled, handleBack, nextDisabled, handleNext, nextText }}
-      />
-    </>
-  )
+interface ReviewCartProps {
+  setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
+  setOrder: React.Dispatch<React.SetStateAction<Order>>
 }
+
+const mapStateToProps = (states: RootState): UserServiceProps => {
+  return {
+    userService: states.session.userService
+  }
+}
+
+const ReviewCart = connect(mapStateToProps)(
+  (props: ReviewCartProps & StepButtonsProps & UserServiceProps) => {
+    const classes = reviewStyles()
+    const cartResult = useCartService()
+    const {
+      setCanGoToNextStep,
+      backDisabled,
+      handleBack,
+      nextDisabled,
+      nextText,
+      setOrder,
+      userService
+    } = props
+
+    const [email, setEmail] = useState('')
+    const [phone, setPhone] = useState('')
+    const [name, setName] = useState('')
+    const [address, setAddress] = useState('')
+    const [notes, setNotes] = useState('')
+
+    useEffect(() => {
+      console.log('ReviewCart fx userService:', userService)
+      userService.user &&
+        userService.user.token &&
+        fetch(`${API_HOST}/member/me`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${userService.user.token}`
+          }
+        })
+          .then(r => r.json())
+          .then(response => {
+            console.log('/member/me response', response)
+            const member = response.member
+            if (member) {
+              member.name && setName(member.name)
+              member.phone && setPhone(member.phone)
+              member.address && setAddress(member.address)
+            }
+            setEmail(
+              userService.user && userService.user.email
+                ? userService.user.email
+                : ''
+            )
+
+            setOrder(prevOrder => ({
+              ...prevOrder,
+              UserId:
+                userService.user && userService.user.id
+                  ? userService.user.id
+                  : undefined,
+              MemberId: member && member.id ? member.id : undefined
+            }))
+          })
+          .catch(err => console.warn('onoz /member/me caught err:', err))
+    }, [])
+
+    useEffect(() => {
+      setCanGoToNextStep && setCanGoToNextStep(!!(email && phone && name))
+    }, [setCanGoToNextStep, email, phone, name])
+
+    function handleNext() {
+      const cartItems =
+        cartResult.status === 'loaded' && cartResult.payload.line_items
+          ? (cartResult.payload.line_items as OrderLineItem[])
+          : ([] as OrderLineItem[])
+
+      setOrder(order => ({
+        ...order,
+        email,
+        phone,
+        name,
+        address,
+        notes,
+        item_count: cartItems.length,
+        OrderLineItems: [
+          ...cartItems,
+          ...order.OrderLineItems.filter(li => li.kind !== 'product')
+        ]
+      }))
+      props.handleNext()
+    }
+
+    return (
+      <>
+        <Paper className={classes.infoContainer}>
+          <Grid container justify="center" direction="row" spacing={2}>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label="email"
+                name="email"
+                type="text"
+                value={email}
+                onChange={(event: any) => setEmail(event.target.value)}
+                autoFocus
+                fullWidth
+                helperText="Required"
+                required
+              />
+              <TextField
+                label="name"
+                name="name"
+                type="text"
+                value={name}
+                onChange={(event: any) => setName(event.target.value)}
+                fullWidth
+                helperText="Required"
+                required
+              />
+              <TextField
+                label="phone"
+                name="phone"
+                type="phone"
+                value={phone}
+                onChange={(event: any) => setPhone(event.target.value)}
+                fullWidth
+                helperText="Required"
+                required
+              />
+              <TextField
+                label="address"
+                name="address"
+                type="text"
+                value={address}
+                onChange={(event: any) => setAddress(event.target.value)}
+                fullWidth
+              />
+              <TextField
+                label="notes"
+                name="notes"
+                type="text"
+                value={notes}
+                onChange={(event: any) => setNotes(event.target.value)}
+                multiline
+                rowsMax="10"
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} sm={8}>
+              {cartResult.status !== 'loaded' && 'Loading...'}
+              {cartResult.status === 'loaded' &&
+                cartResult.payload.line_items.length > 0 && (
+                  <CartTable
+                    line_items={cartResult.payload.line_items}
+                    setOrder={setOrder}
+                    checkout
+                  />
+                )}
+            </Grid>
+          </Grid>
+        </Paper>
+        <StepButtons
+          {...{ backDisabled, handleBack, nextDisabled, handleNext, nextText }}
+        />
+      </>
+    )
+  }
+)
+
+// function ReviewCart(
+//   props: ReviewCartProps & StepButtonsProps
+// ) {
+
+// }
 
 const paymentStyles = makeStyles((theme: Theme) =>
   createStyles({
