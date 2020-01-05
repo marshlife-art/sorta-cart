@@ -234,7 +234,24 @@ function ReviewCart(
         ...order.OrderLineItems.filter(li => li.kind !== 'product')
       ]
     }))
-    props.handleNext()
+    //
+
+    fetch(`${API_HOST}/store/validate_line_items`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cartItems)
+    })
+      .then(r => r.json())
+      .then(response => {
+        console.log('validate response:', response)
+        if (!response.error) {
+          props.handleNext()
+        }
+        // #TOOOOODOOOO handle removing/updating invalid line items
+      })
+      .catch(err => console.warn('o noz! validation caight error:', err))
   }
 
   return (

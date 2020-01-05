@@ -19,7 +19,8 @@ import {
   // useCartService,
   // emptyCart,
   updateLineItem,
-  removeItemFromCart
+  removeItemFromCart,
+  addToCart
 } from '../services/useCartService'
 import { Order, OrderLineItem } from '../types/Order'
 import { TAX_RATE, TAX_RATE_STRING } from '../constants'
@@ -136,6 +137,29 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
     id && removeItemFromCart(id)
   }
 
+  // NOTE: this is useful for debugging line item validtion
+  // const setInvalidPrice = () => {
+  //   const someLi = props.line_items.filter(li => li.kind === 'product')[0]
+  //   someLi.total = 0
+  //   someLi.price = 0
+  //   updateLineItem(someLi)
+  // }
+  // const addInvalidItem = () => {
+  //   addToCart({
+  //     id: 666,
+  //     pk: 666,
+  //     ws_price: '0',
+  //     u_price: '0',
+  //     name: 'invalid',
+  //     description: 'product',
+  //     category: 'invalid',
+  //     sub_category: 'invalid',
+  //     size: '6',
+  //     unit_type: 'EA',
+  //     vendor: 'invalid'
+  //   })
+  // }
+
   return (
     <Table className={classes.root} aria-label="cart">
       <TableHead>
@@ -244,6 +268,27 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             <b>{usdFormat(invoiceTotal)}</b>
           </TableCell>
         </TableRow>
+        {/* #NOTE: this is tempporary */}
+        {/* <TableRow>
+          <TableCell colSpan={3} align="center">
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => setInvalidPrice()}
+            >
+              set invalid price
+            </Button>
+          </TableCell>
+          <TableCell colSpan={3} align="center">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => addInvalidItem()}
+            >
+              add invalid item
+            </Button>
+          </TableCell>
+        </TableRow> */}
       </TableBody>
       {!summary && !checkout && (
         <TableFooter>
