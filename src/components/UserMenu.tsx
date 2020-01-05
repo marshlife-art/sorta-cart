@@ -12,10 +12,13 @@ import { RootState } from '../redux'
 import { PreferencesServiceProps } from '../redux/preferences/reducers'
 import { getPreferences, setPreferences } from '../redux/preferences/actions'
 import { Preferences } from '../types/Preferences'
+import { logout } from '../redux/session/actions'
+import { UserServiceProps } from '../redux/session/reducers'
 
 interface DispatchProps {
   getPreferences: () => void
   setPreferences: (preferences: Preferences) => void
+  logout: () => void
 }
 
 const StyledMenu = withStyles({
@@ -56,7 +59,8 @@ interface UserMenuProps {
 type Props = PreferencesServiceProps &
   DispatchProps &
   RouteComponentProps &
-  UserMenuProps
+  UserMenuProps &
+  UserServiceProps
 
 function UserMenu(props: Props) {
   // const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -66,6 +70,8 @@ function UserMenu(props: Props) {
     preferencesService,
     getPreferences,
     setPreferences,
+    userService,
+    logout,
     history
   } = props
 
@@ -103,32 +109,71 @@ function UserMenu(props: Props) {
     setAnchorEl(null)
   }
 
+  const hasUser = !!(userService && userService.user && userService.user.id)
+  const isAdmin = !!(
+    userService &&
+    userService.user &&
+    userService.user.role === 'admin'
+  )
   return (
     <>
       <StyledMenu
-        id="user--menu"
+        id="user-menu"
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <StyledMenuItem
-          onClick={() => {
-            history.push('/login')
-            handleClose()
-          }}
-        >
-          <ListItemText primary="Sign in" />
-        </StyledMenuItem>
+        {hasUser && (
+          <ListItemText
+            primary={userService.user && userService.user.email}
+            secondary={userService.user && userService.user.role}
+            style={{ padding: '0 16px 6px', borderBottom: 'thin solid #f60' }}
+          />
+        )}
+        {isAdmin && (
+          <StyledMenuItem
+            onClick={() => {
+              handleClose()
+              window.location.assign('https://admin.marshcoop.org/')
+            }}
+          >
+            <ListItemText primary="ADMIN" />
+          </StyledMenuItem>
+        )}
 
-        <StyledMenuItem
-          onClick={() => {
-            history.push('/register')
-            handleClose()
-          }}
-        >
-          <ListItemText primary="Register" />
-        </StyledMenuItem>
+        {hasUser && (
+          <StyledMenuItem
+            onClick={() => {
+              logout()
+              handleClose()
+            }}
+          >
+            <ListItemText primary="Log out" />
+          </StyledMenuItem>
+        )}
+
+        {!hasUser && (
+          <StyledMenuItem
+            onClick={() => {
+              history.push('/login')
+              handleClose()
+            }}
+          >
+            <ListItemText primary="Sign in" />
+          </StyledMenuItem>
+        )}
+
+        {!hasUser && (
+          <StyledMenuItem
+            onClick={() => {
+              history.push('/register')
+              handleClose()
+            }}
+          >
+            <ListItemText primary="Register" />
+          </StyledMenuItem>
+        )}
 
         <StyledMenuItem onClick={() => setUseDarkTheme(prev => !prev)}>
           <ListItemText>
@@ -157,9 +202,12 @@ function UserMenu(props: Props) {
   )
 }
 
-const mapStateToProps = (states: RootState): PreferencesServiceProps => {
+const mapStateToProps = (
+  states: RootState
+): PreferencesServiceProps & UserServiceProps => {
   return {
-    preferencesService: states.preferences.preferencesService
+    preferencesService: states.preferences.preferencesService,
+    userService: states.session.userService
   }
 }
 
@@ -169,7 +217,8 @@ const mapDispatchToProps = (
   return {
     getPreferences: () => dispatch(getPreferences()),
     setPreferences: (preferences: Preferences) =>
-      dispatch(setPreferences(preferences))
+      dispatch(setPreferences(preferences)),
+    logout: () => dispatch(logout())
   }
 }
 

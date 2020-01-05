@@ -32,7 +32,8 @@ export const isFetching = (isFetching: boolean): SetFetcing => {
 const NULL_USER: User = {
   id: undefined,
   email: undefined,
-  token: undefined
+  token: undefined,
+  role: undefined
 }
 
 export const checkSession = (): ThunkAction<
@@ -45,6 +46,7 @@ export const checkSession = (): ThunkAction<
     return new Promise<void>(resolve => {
       dispatch(isFetching(true))
 
+      // gonna get weird when there's no localStorage :/
       const token = localStorage && localStorage.getItem('token')
 
       if (!token) {
@@ -60,9 +62,9 @@ export const checkSession = (): ThunkAction<
       })
         .then(response => response.json())
         .then(response => {
-          // console.log('check_session', response)
+          console.log('check_session', response)
           if (response.msg === 'ok' && response.user) {
-            dispatch(set(response.user))
+            dispatch(set({ ...response.user, token }))
           } else {
             dispatch(set(NULL_USER))
           }

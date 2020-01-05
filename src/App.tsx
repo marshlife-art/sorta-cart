@@ -1,12 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { ThunkDispatch } from 'redux-thunk'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ThemeProvider } from '@material-ui/core/styles'
 
 import { darkTheme, lightTheme } from './theme'
 import { RootState } from './redux'
+
+import { UserServiceProps } from './redux/session/reducers'
+import { checkSession } from './redux/session/actions'
+
 import { PreferencesServiceProps } from './redux/preferences/reducers'
+import { getPreferences } from './redux/preferences/actions'
 
 import DataTable from './components/DataTable'
 import Landing from './components/Landing'
@@ -15,8 +21,24 @@ import Login from './components/Login'
 import Register from './components/Register'
 import NavBar from './components/NavBar'
 
-export function App(props: PreferencesServiceProps) {
-  const { preferencesService } = props
+interface DispatchProps {
+  checkSession: () => void
+  getPreferences: () => void
+}
+
+export function App(
+  props: PreferencesServiceProps & UserServiceProps & DispatchProps
+) {
+  const { preferencesService, checkSession, getPreferences } = props
+
+  useEffect(() => {
+    getPreferences && getPreferences()
+  }, [getPreferences])
+
+  useEffect(() => {
+    checkSession && checkSession()
+  }, [checkSession])
+
   const theme =
     preferencesService &&
     preferencesService.preferences &&
@@ -51,10 +73,22 @@ export function App(props: PreferencesServiceProps) {
   )
 }
 
-const mapStateToProps = (states: RootState): PreferencesServiceProps => {
+const mapStateToProps = (
+  states: RootState
+): UserServiceProps & PreferencesServiceProps => {
   return {
+    userService: states.session.userService,
     preferencesService: states.preferences.preferencesService
   }
 }
 
-export default connect(mapStateToProps, {})(App)
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<{}, {}, any>
+): DispatchProps => {
+  return {
+    checkSession: () => dispatch(checkSession()),
+    getPreferences: () => dispatch(getPreferences())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)
