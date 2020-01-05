@@ -19,8 +19,8 @@ import {
   // useCartService,
   // emptyCart,
   updateLineItem,
-  removeItemFromCart,
-  addToCart
+  removeItemFromCart
+  // addToCart
 } from '../services/useCartService'
 import { Order, OrderLineItem } from '../types/Order'
 import { TAX_RATE, TAX_RATE_STRING } from '../constants'

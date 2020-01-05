@@ -23,6 +23,7 @@ import { Order, OrderLineItem } from '../types/Order'
 import { BLANK_ORDER, API_HOST } from '../constants'
 import { UserServiceProps } from '../redux/session/reducers'
 import { RootState } from '../redux'
+import SquarePayment from './SquarePayment'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -366,8 +367,8 @@ function Payment(
   const [error, setError] = useState('')
 
   useEffect(() => {
-    setCanGoToNextStep(cartResult && cartResult.status === 'loaded')
-  }, [setCanGoToNextStep, cartResult])
+    setCanGoToNextStep(false)
+  }, [setCanGoToNextStep])
 
   function handleNext() {
     console.log('on handleNext should submit order:', order)
@@ -413,7 +414,7 @@ function Payment(
           </Grid>
           <Grid item xs={12} sm={6}>
             <div className={classes.paymentContainer}>
-              Square Payment stuff will go here...
+              <SquarePayment handleNext={handleNext} />
             </div>
           </Grid>
           {error && (
@@ -472,15 +473,17 @@ function StepButtons(props: StepButtonsProps) {
         Back
       </Button>
 
-      <Button
-        disabled={nextDisabled}
-        variant="contained"
-        color="primary"
-        onClick={handleNext}
-        className={classes.button}
-      >
-        {nextText}
-      </Button>
+      {nextText !== 'Finish' && (
+        <Button
+          disabled={nextDisabled}
+          variant="contained"
+          color="primary"
+          onClick={handleNext}
+          className={classes.button}
+        >
+          {nextText}
+        </Button>
+      )}
     </div>
   )
 }
