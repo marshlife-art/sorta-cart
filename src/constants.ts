@@ -27,7 +27,9 @@ export const BLANK_ORDER: Order = {
 }
 
 export const SQUARE_PAYMENT_JS = 'https://js.squareupsandbox.com/v2/paymentform'
-// https://js.squareup.com/v2/paymentform
+// process.env.NODE_ENV === 'production'
+//   ? 'https://js.squareup.com/v2/paymentform'
+//   : 'https://js.squareupsandbox.com/v2/paymentform'
 export const SQUARE_APP_ID: string = 'sandbox-sq0idb-JHHiCIhNvJdJH4pJxLaDzA'
 export const SQUARE_LOCATION_ID: string = 'D2MV0BZC6EV9Y'
 

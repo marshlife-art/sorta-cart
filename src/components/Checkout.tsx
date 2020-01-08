@@ -113,12 +113,12 @@ function Registration(
                 Register
               </Button>
             </div>
-            <div className={classes.optItem}>
+            {/* <div className={classes.optItem}>
               <Typography variant="body1" gutterBottom>
                 ...or continue as a
               </Typography>
               <Button onClick={() => onCanContinue()}>Guest</Button>
-            </div>
+            </div> */}
           </div>
         )}
 

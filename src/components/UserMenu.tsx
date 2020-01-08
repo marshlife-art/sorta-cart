@@ -10,13 +10,12 @@ import Switch from '@material-ui/core/Switch'
 
 import { RootState } from '../redux'
 import { PreferencesServiceProps } from '../redux/preferences/reducers'
-import { getPreferences, setPreferences } from '../redux/preferences/actions'
+import { setPreferences } from '../redux/preferences/actions'
 import { Preferences } from '../types/Preferences'
 import { logout } from '../redux/session/actions'
 import { UserServiceProps } from '../redux/session/reducers'
 
 interface DispatchProps {
-  getPreferences: () => void
   setPreferences: (preferences: Preferences) => void
   logout: () => void
 }
@@ -68,7 +67,6 @@ function UserMenu(props: Props) {
     anchorEl,
     setAnchorEl,
     preferencesService,
-    getPreferences,
     setPreferences,
     userService,
     logout,
@@ -76,10 +74,6 @@ function UserMenu(props: Props) {
   } = props
 
   const [useDarkTheme, setUseDarkTheme] = useState<null | boolean>(null)
-
-  useEffect(() => {
-    getPreferences()
-  }, [getPreferences])
 
   useEffect(() => {
     if (!preferencesService.isFetching && preferencesService.preferences) {
@@ -215,7 +209,6 @@ const mapDispatchToProps = (
   dispatch: ThunkDispatch<{}, {}, any>
 ): DispatchProps => {
   return {
-    getPreferences: () => dispatch(getPreferences()),
     setPreferences: (preferences: Preferences) =>
       dispatch(setPreferences(preferences)),
     logout: () => dispatch(logout())
