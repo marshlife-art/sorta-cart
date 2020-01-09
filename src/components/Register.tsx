@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { ThunkDispatch } from 'redux-thunk'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import Container from '@material-ui/core/Container'
-import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import Radio from '@material-ui/core/Radio'
@@ -82,7 +81,7 @@ const useStyles = makeStyles(theme => ({
 function Register(props: Props) {
   const { userService, showTitle, onRegisterFn, history } = props
   const classes = useStyles()
-  const [error, setError] = useState('')
+  // const [error, setError] = useState('')
   const [purchaseshare, setPurchaseshare] = useState('')
   const [understandBylaws, setUnderstandBylaws] = useState(false)
   const [registrationFee, setRegistrationFee] = useState(100)
@@ -365,7 +364,7 @@ function Register(props: Props) {
               </Typography>
             </>
           )}
-          {error && (
+          {/* {error && (
             <>
               <Typography variant="overline" display="block">
                 onoz! an error!
@@ -374,7 +373,7 @@ function Register(props: Props) {
                 {error}
               </Typography>
             </>
-          )}
+          )} */}
         </Box>
       </form>
     </Container>
