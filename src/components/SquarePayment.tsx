@@ -44,10 +44,12 @@ const styles: { [key: string]: React.CSSProperties } = {
   }
 }
 
-function SquarePaymentForm(props: {
+interface SquarePaymentFormProps {
   paymentForm: any
   handleNext: () => void
-}) {
+  amount: number
+}
+function SquarePaymentForm(props: SquarePaymentFormProps) {
   const [cardBrand, setCardBrand] = useState('')
   const [nonce, setNonce] = useState(undefined)
   const [googlePay, setGooglePay] = useState(false)
@@ -116,13 +118,13 @@ function SquarePaymentForm(props: {
           countryCode: 'US',
           total: {
             label: 'MARSH COOP',
-            amount: '100',
+            amount: props.amount,
             pending: false
           },
           lineItems: [
             {
               label: 'Subtotal',
-              amount: '100',
+              amount: props.amount,
               pending: false
             }
           ]
@@ -257,7 +259,7 @@ function SquarePaymentForm(props: {
               fullWidth
               disabled={nonce !== undefined}
             >
-              Pay
+              Pay ${(props.amount / 100).toFixed(2)}
             </Button>
           </div>
           <p style={styles.error} id="error">
@@ -269,7 +271,12 @@ function SquarePaymentForm(props: {
   )
 }
 
-export default function SquarePayment(props: { handleNext: () => void }) {
+interface SquarePaymentProps {
+  handleNext: () => void
+  amount?: number
+}
+
+export default function SquarePayment(props: SquarePaymentProps) {
   const [jsloaded, setJsloaded] = useState(false)
 
   useEffect(() => {
@@ -285,6 +292,7 @@ export default function SquarePayment(props: { handleNext: () => void }) {
     <SquarePaymentForm
       paymentForm={SqPaymentForm}
       handleNext={props.handleNext}
+      amount={props.amount || 0}
     />
   ) : (
     <Loading />

@@ -20,6 +20,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import { RootState } from '../redux'
 import { login } from '../redux/session/actions'
 import { UserServiceProps } from '../redux/session/reducers'
+import SquarePayment from './SquarePayment'
+import { Slider } from '@material-ui/core'
 
 interface OwnProps {
   onRegisterFn?: () => void
@@ -62,32 +64,48 @@ const useStyles = makeStyles(theme => ({
       marginBottom: theme.spacing(1)
     }
   },
+  slider: {
+    margin: theme.spacing(4)
+  },
   submit: {
     margin: theme.spacing(3, 0, 2)
+  },
+  paymentContainer: {
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: '33vh'
   }
 }))
 
 function Register(props: Props) {
-  const doLogin = (event: React.FormEvent) => {
-    event.preventDefault()
-    setError('')
-    const target = event.currentTarget as HTMLFormElement
-    const emailEl = target.elements.namedItem('email') as HTMLInputElement
-    const passwordEl = target.elements.namedItem('password') as HTMLInputElement
-
-    if (
-      emailEl &&
-      emailEl.value.length > 0 &&
-      passwordEl &&
-      passwordEl.value.length > 0
-    ) {
-      props.login(emailEl.value, passwordEl.value)
-    }
-  }
-
   const { userService, showTitle, onRegisterFn, history } = props
   const classes = useStyles()
   const [error, setError] = useState('')
+  const [purchaseshare, setPurchaseshare] = useState('')
+  const [understandBylaws, setUnderstandBylaws] = useState(false)
+  const [registrationFee, setRegistrationFee] = useState(100)
+  const [subsityAmount, setSubsityAmount] = useState(99)
+  const [otherexpexplain, setOtherexpexplain] = useState(false)
+
+  const doRegister = () => {
+    console.log('doRegister understandBylaws:', understandBylaws)
+  }
+
+  const handlePurchaseShareChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    value: string
+  ) => {
+    console.log('handlePurchaseShareChange value:', value)
+    setRegistrationFee(100)
+    setSubsityAmount(99)
+    setPurchaseshare(value)
+  }
+
+  function valuetext(value: number) {
+    return `$${value.toFixed(2)}`
+  }
 
   // when userService changes, figure out if the page should redirect if a user is already logged in.
   useEffect(() => {
@@ -102,7 +120,7 @@ function Register(props: Props) {
 
   return (
     <Container maxWidth="sm">
-      <form onSubmit={doLogin} className={classes.form}>
+      <form onSubmit={doRegister} className={classes.form}>
         {showTitle && (
           <div className={classes.title}>
             <Typography variant="h2" display="block">
@@ -153,13 +171,13 @@ function Register(props: Props) {
         <FormControl component="fieldset" className={classes.formControl}>
           <FormLabel component="legend">Purchase Share:</FormLabel>
           <RadioGroup
-            aria-label="freq"
-            name="freq"
+            aria-label="purchaseshare"
+            name="purchaseshare"
             // value={value}
-            // onChange={handleChange}
+            onChange={handlePurchaseShareChange}
           >
             <FormControlLabel
-              value="whole"
+              value="oneshare"
               control={<Radio />}
               label="I am purchasing a share for $100."
             />
@@ -168,64 +186,69 @@ function Register(props: Props) {
               control={<Radio />}
               label="I can pay some for my share and am requesting a subsidy."
             />
+            {purchaseshare === 'requestsubsidy' && (
+              <Slider
+                className={classes.slider}
+                getAriaValueText={valuetext}
+                value={subsityAmount}
+                onChange={(_, amt: number | number[]) => {
+                  setSubsityAmount(Array.isArray(amt) ? amt[0] : amt)
+                  setRegistrationFee(Array.isArray(amt) ? amt[0] : amt)
+                }}
+                step={1}
+                min={25}
+                max={99}
+                marks={[
+                  {
+                    value: 25,
+                    label: '$25'
+                  },
+                  {
+                    value: 99,
+                    label: '$99'
+                  }
+                ]}
+                valueLabelDisplay="on"
+              />
+            )}
             <FormControlLabel
-              value="requestsubsidy"
+              value="payadditional"
               control={<Radio />}
               label="I can pay $100 and would like to pay an additional amount to
               subsidize others."
             />
-          </RadioGroup>
-          <FormHelperText>Required</FormHelperText>
-        </FormControl>
-
-        <FormControl component="fieldset" className={classes.formControl}>
-          <FormLabel component="legend">
-            I am interested in ordering groceries:
-          </FormLabel>
-          <RadioGroup
-            aria-label="freq"
-            name="freq"
-            // value="freq"
-            // onChange={handleChange}
-          >
-            <FormControlLabel
-              value="1week"
-              control={<Radio />}
-              label="Once a week"
-            />
-            <FormControlLabel
-              value="2month"
-              control={<Radio />}
-              label="Twice a month"
-            />
-            <FormControlLabel
-              value="1month"
-              control={<Radio />}
-              label="Once a month"
-            />
-          </RadioGroup>
-          <FormHelperText>Required</FormHelperText>
-        </FormControl>
-
-        <FormControl component="fieldset" className={classes.formControl}>
-          <FormLabel component="legend">Check your preference below:</FormLabel>
-          <RadioGroup
-            aria-label="freq"
-            name="freq"
-            // value={value}
-            // onChange={handleChange}
-          >
-            <FormControlLabel
-              value="online"
-              control={<Radio />}
-              label=" I have Internet access and would like to order directly from the
-            grocery catalog online."
-            />
-            <FormControlLabel
-              value="inperson"
-              control={<Radio />}
-              label="I would like to work with Co-op staff to develop my order in person."
-            />
+            {purchaseshare === 'payadditional' && (
+              <Slider
+                className={classes.slider}
+                getAriaValueText={valuetext}
+                value={registrationFee}
+                onChange={(_, amt: number | number[]) =>
+                  setRegistrationFee(Array.isArray(amt) ? amt[0] : amt)
+                }
+                step={1}
+                min={101}
+                max={1000}
+                marks={[
+                  {
+                    value: 150,
+                    label: '$150'
+                  },
+                  {
+                    value: 250,
+                    label: '$250'
+                  },
+                  {
+                    value: 350,
+                    label: '$350'
+                  },
+                  {
+                    value: 500,
+                    label: '$500'
+                  }
+                ]}
+                valueLabelDisplay="on"
+              />
+            )}
           </RadioGroup>
           <FormHelperText>Required</FormHelperText>
         </FormControl>
@@ -277,20 +300,24 @@ function Register(props: Props) {
               control={
                 <Checkbox
                   // checked={false}
-                  onChange={console.log}
+                  onChange={(_, checked: boolean) =>
+                    setOtherexpexplain(checked)
+                  }
                   value="otherexp"
                 />
               }
               label="I have other relevant experience."
             />
-            <TextField
-              label="explain"
-              name="otherexpexplain"
-              type="text"
-              multiline
-              rowsMax="10"
-              fullWidth
-            />
+            {otherexpexplain && (
+              <TextField
+                label="explain"
+                name="otherexpexplain"
+                type="text"
+                multiline
+                rowsMax="10"
+                fullWidth
+              />
+            )}
           </FormGroup>
         </FormControl>
 
@@ -303,7 +330,10 @@ function Register(props: Props) {
               control={
                 <Checkbox
                   // checked={false}
-                  onChange={console.log}
+                  name="understandBylaws"
+                  onChange={(_, checked: boolean) =>
+                    setUnderstandBylaws(checked)
+                  }
                   value="agree"
                 />
               }
@@ -315,17 +345,13 @@ function Register(props: Props) {
           <FormHelperText>Required</FormHelperText>
         </FormControl>
 
-        <div>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            disabled={props.userService.isFetching}
-            className={classes.submit}
-          >
-            Register
-          </Button>
+        <div className={classes.paymentContainer}>
+          {purchaseshare && understandBylaws && (
+            <SquarePayment
+              handleNext={doRegister}
+              amount={registrationFee * 100}
+            />
+          )}
         </div>
 
         <Box color="error.main">
