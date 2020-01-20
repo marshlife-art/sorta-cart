@@ -63,7 +63,7 @@ export function App(
           <Route path="/register" exact>
             <>
               <NavBar />
-              <Register showTitle />
+              <Register />
             </>
           </Route>
           <Route path="/" component={Landing} />

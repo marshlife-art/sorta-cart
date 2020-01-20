@@ -46,7 +46,7 @@ const styles: { [key: string]: React.CSSProperties } = {
 
 interface SquarePaymentFormProps {
   paymentForm: any
-  handleNext: () => void
+  handleNext: (nonce: string) => void
   amount: number
 }
 function SquarePaymentForm(props: SquarePaymentFormProps) {
@@ -146,7 +146,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
         }
         console.log('cardNonceResponseReceived nonce:', nonce)
         setNonce(nonce)
-        props.handleNext()
+        props.handleNext(nonce)
       },
       unsupportedBrowserDetected: () => {},
       inputEventReceived: (inputEvent: any) => {
@@ -272,7 +272,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
 }
 
 interface SquarePaymentProps {
-  handleNext: () => void
+  handleNext: (nonce: string) => void
   amount?: number
 }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import Stepper from '@material-ui/core/Stepper'
 import Step from '@material-ui/core/Step'
@@ -18,7 +19,6 @@ import NavBar from './NavBar'
 import { useCartService, emptyCart } from '../services/useCartService'
 import CartTable from './CartTable'
 import Login from './Login'
-import Register from './Register'
 import { Order, OrderLineItem } from '../types/Order'
 import { BLANK_ORDER, API_HOST } from '../constants'
 import { UserServiceProps } from '../redux/session/reducers'
@@ -51,6 +51,7 @@ const registrationStyles = makeStyles((theme: Theme) =>
 function Registration(
   props: {
     handleNext: () => void
+    history: any
     setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
   } & StepButtonsProps &
     UserServiceProps
@@ -109,7 +110,10 @@ function Registration(
               <Typography variant="body1" gutterBottom>
                 Want to become a member?
               </Typography>
-              <Button color="secondary" onClick={() => setOpt('register')}>
+              <Button
+                color="secondary"
+                onClick={() => props.history.push('/register')}
+              >
                 Register
               </Button>
             </div>
@@ -123,7 +127,6 @@ function Registration(
         )}
 
         {opt === 'login' && <Login onLoginFn={onCanContinue} />}
-        {opt === 'register' && <Register onRegisterFn={onCanContinue} />}
       </Paper>
       <StepButtons
         {...{ backDisabled, handleBack, nextDisabled, handleNext, nextText }}
@@ -370,15 +373,15 @@ function Payment(
     setCanGoToNextStep(false)
   }, [setCanGoToNextStep])
 
-  function handleNext() {
-    console.log('on handleNext should submit order:', order)
+  function handleNext(nonce: string) {
+    console.log('on handleNext should submit order:', order, ' nonce:', nonce)
     setError('')
     fetch(`${API_HOST}/store/checkout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(order)
+      body: JSON.stringify({ order, nonce })
     })
       .then(r => r.json())
       .then(response => {
@@ -432,7 +435,8 @@ function Payment(
         </Grid>
       </Paper>
       <StepButtons
-        {...{ backDisabled, handleBack, nextDisabled, handleNext, nextText }}
+        {...{ backDisabled, handleBack, nextDisabled, nextText }}
+        handleNext={props.handleNext}
       />
     </>
   )
@@ -517,9 +521,9 @@ function getSteps() {
   return ['Member Registration', 'Review Order', 'Payment']
 }
 
-function Checkout(props: UserServiceProps) {
+function Checkout(props: UserServiceProps & RouteComponentProps) {
   const classes = checkoutStyles()
-  const { userService } = props
+  const { userService, history } = props
 
   const [activeStep, setActiveStep] = useState(0)
   const [canGoToNextStep, setCanGoToNextStep] = useState(false)
@@ -568,6 +572,7 @@ function Checkout(props: UserServiceProps) {
                   nextDisabled={!canGoToNextStep || activeStep === 0}
                   nextText={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                   userService={userService}
+                  history={history}
                 />
               )}
               {activeStep === 1 && (
@@ -607,4 +612,4 @@ const mapStateToProps = (states: RootState): UserServiceProps => {
   }
 }
 
-export default connect(mapStateToProps)(Checkout)
+export default connect(mapStateToProps)(withRouter(Checkout))

@@ -86,7 +86,6 @@ function UserLoginPrompt(props: RouteComponentProps) {
       )}
 
       {doLogin && <Login />}
-      {/* {opt === 'register' && <Register onRegisterFn={onCanContinue} />} */}
     </div>
   )
 }

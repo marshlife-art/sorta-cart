@@ -11,6 +11,7 @@ export interface User {
   Member?: Member
   createdAt?: string
   updatedAt?: string
+  password?: string
 }
 
 export interface UserLogin {

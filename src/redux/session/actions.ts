@@ -3,6 +3,7 @@ import { AnyAction } from 'redux'
 
 import { User, LoginError } from '../../types/User'
 import { API_HOST } from '../../constants'
+import { Member } from '../../types/Member'
 
 export interface SetAction {
   type: 'SET'
@@ -83,8 +84,9 @@ export const checkSession = (): ThunkAction<
 }
 
 export const register = (
-  regKey: string,
-  password: string
+  user: Partial<User>,
+  member: Partial<Member>,
+  nonce: string
 ): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
     return new Promise<void>(resolve => {
@@ -95,7 +97,11 @@ export const register = (
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ regKey, password })
+        body: JSON.stringify({
+          user,
+          member,
+          nonce
+        })
       })
         .then(response => response.json())
         .then(response => {
