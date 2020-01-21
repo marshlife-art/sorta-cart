@@ -48,10 +48,10 @@ interface SquarePaymentFormProps {
   paymentForm: any
   handleNext: (nonce: string) => void
   amount: number
+  loading: boolean
 }
 function SquarePaymentForm(props: SquarePaymentFormProps) {
   const [cardBrand, setCardBrand] = useState('')
-  const [nonce, setNonce] = useState(undefined)
   const [googlePay, setGooglePay] = useState(false)
   const [applePay, setApplePay] = useState(false)
   const [masterpass, setMasterpass] = useState(false)
@@ -145,7 +145,6 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
           return
         }
         console.log('cardNonceResponseReceived nonce:', nonce)
-        setNonce(nonce)
         props.handleNext(nonce)
       },
       unsupportedBrowserDetected: () => {},
@@ -257,7 +256,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
               color="primary"
               onClick={requestCardNonce}
               fullWidth
-              disabled={nonce !== undefined}
+              disabled={props.loading}
             >
               Pay ${(props.amount / 100).toFixed(2)}
             </Button>
@@ -273,7 +272,8 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
 
 interface SquarePaymentProps {
   handleNext: (nonce: string) => void
-  amount?: number
+  amount: number
+  loading: boolean
 }
 
 export default function SquarePayment(props: SquarePaymentProps) {
@@ -293,6 +293,7 @@ export default function SquarePayment(props: SquarePaymentProps) {
       paymentForm={SqPaymentForm}
       handleNext={props.handleNext}
       amount={props.amount || 0}
+      loading={props.loading}
     />
   ) : (
     <Loading />

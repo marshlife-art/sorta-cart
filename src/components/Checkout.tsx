@@ -368,6 +368,7 @@ function Payment(
   } = props
 
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setCanGoToNextStep(false)
@@ -376,6 +377,7 @@ function Payment(
   function handleNext(nonce: string) {
     console.log('on handleNext should submit order:', order, ' nonce:', nonce)
     setError('')
+    setLoading(true)
     fetch(`${API_HOST}/store/checkout`, {
       method: 'POST',
       headers: {
@@ -398,6 +400,7 @@ function Payment(
         console.warn('onoz! caught error /store/checkout err:', err)
         setError('onoz! could not submit your order ;(')
       })
+      .finally(() => setLoading(false))
   }
 
   return (
@@ -417,7 +420,11 @@ function Payment(
           </Grid>
           <Grid item xs={12} sm={6}>
             <div className={classes.paymentContainer}>
-              <SquarePayment handleNext={handleNext} />
+              <SquarePayment
+                handleNext={handleNext}
+                loading={loading}
+                amount={order.total * 100}
+              />
             </div>
           </Grid>
           {error && (

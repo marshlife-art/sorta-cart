@@ -123,28 +123,11 @@ function Register(props: Props) {
       nonce
     )
 
-    props.register(userData, { ...member, data: memberData }, nonce)
-    // fetch(`${API_HOST}/register`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({
-    //     user: userData,
-    //     member: { ...member, data: memberData },
-    //     nonce
-    //   })
-    // })
-    //   .then(r => r.json())
-    //   .then(response => {
-    //     console.log('/register response:', response)
-    //     if (response && response.user && response.user.token) {
-    //       localStorage && localStorage.setItem('token', response.user.token)
-    //       checkSession()
-    //       setComplete(true)
-    //     }
-    //   })
-    //   .catch(err => console.warn('onoz! register err:', err))
+    props.register(
+      userData,
+      { ...member, data: memberData, fees_paid: registrationFee },
+      nonce
+    )
   }
 
   useEffect(() => {
@@ -509,6 +492,7 @@ function Register(props: Props) {
               <SquarePayment
                 handleNext={doRegister}
                 amount={registrationFee * 100}
+                loading={userService.isFetching}
               />
             ) : (
               <Box color="error.main" className={classes.natValid}>
