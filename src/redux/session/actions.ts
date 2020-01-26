@@ -192,3 +192,45 @@ export const logout = (): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
     })
   }
 }
+
+export const resetPassword = (
+  regKey: string,
+  password: string
+): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
+  return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
+    return new Promise<void>(resolve => {
+      dispatch(isFetching(true))
+
+      fetch(`${API_HOST}/resetpassword`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ regKey, password })
+      })
+        .then(response => response.json())
+        .then(response => {
+          // console.log('[session/actions] user login', response)
+          if (response.msg === 'ok' && response.user && response.user.token) {
+            localStorage && localStorage.setItem('token', response.user.token)
+            dispatch(set(response.user))
+          } else {
+            dispatch(setError({ error: 'error', reason: response.message }))
+          }
+        })
+        .catch(e => {
+          console.log('reset password error:', e)
+          dispatch(
+            setError({
+              error: 'error',
+              reason: 'unable to reset password right now :('
+            })
+          )
+        })
+        .finally(() => {
+          dispatch(isFetching(false))
+          resolve()
+        })
+    })
+  }
+}

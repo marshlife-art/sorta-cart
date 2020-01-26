@@ -20,6 +20,8 @@ import Checkout from './components/Checkout'
 import Login from './components/Login'
 import Register from './components/Register'
 import NavBar from './components/NavBar'
+import ForgotPassword from './components/ForgotPassword'
+import ResetPassword from './components/ResetPassword'
 
 interface DispatchProps {
   checkSession: () => void
@@ -54,6 +56,18 @@ export function App(
           <Route path="/products" exact component={DataTable} />
           <Route path="/products/:cat/" exact component={DataTable} />
           <Route path="/products/:cat/:subcat" component={DataTable} />
+          <Route path="/forgotpassword" exact>
+            <>
+              <NavBar />
+              <ForgotPassword />
+            </>
+          </Route>
+          <Route path="/resetpassword" exact>
+            <>
+              <NavBar />
+              <ResetPassword />
+            </>
+          </Route>
           <Route path="/login" exact>
             <>
               <NavBar />

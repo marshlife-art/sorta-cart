@@ -1,8 +1,8 @@
 {
   "name": "sorta-cart",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
-  "homepage": "https://marshlife-art.github.io/sorta-cart/",
+  "homepage": "https://marshcoop.org",
   "repository": "github:marshlife-art/sorta-cart",
   "dependencies": {
     "@material-ui/core": "^4.8.2",
