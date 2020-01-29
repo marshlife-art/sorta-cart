@@ -26,26 +26,6 @@ export const BLANK_ORDER: Order = {
   OrderLineItems: []
 }
 
-export const SQUARE_PAYMENT_JS = 'https://js.squareupsandbox.com/v2/paymentform'
-// process.env.NODE_ENV === 'production'
-//   ? 'https://js.squareup.com/v2/paymentform'
-//   : 'https://js.squareupsandbox.com/v2/paymentform'
-export const SQUARE_APP_ID: string = 'sandbox-sq0idb-JHHiCIhNvJdJH4pJxLaDzA'
-export const SQUARE_LOCATION_ID: string = 'D2MV0BZC6EV9Y'
-
-// export const ORDER_PAYMENT_STATUSES: PaymentStatus[] = [
-//   'balance_due',
-//   'credit_owed',
-//   'failed',
-//   'paid',
-//   'void'
-// ]
-
-// export const ORDER_SHIPMENT_STATUSES: ShipmentStatus[] = [
-//   'backorder',
-//   'canceled',
-//   'partial',
-//   'pending',
-//   'ready',
-//   'shipped'
-// ]
+export const SQUARE_PAYMENT_JS = 'https://js.squareup.com/v2/paymentform'
+export const SQUARE_APP_ID: string = 'sq0idp-TfU74GGFyRSTe7XZYsZp-g'
+export const SQUARE_LOCATION_ID: string = 'FY8AAVD6K7T7A'
