@@ -22,6 +22,7 @@ import Register from './components/Register'
 import NavBar from './components/NavBar'
 import ForgotPassword from './components/ForgotPassword'
 import ResetPassword from './components/ResetPassword'
+import MyOrders from './components/MyOrders'
 
 interface DispatchProps {
   checkSession: () => void
@@ -56,6 +57,12 @@ export function App(
           <Route path="/products" exact component={DataTable} />
           <Route path="/products/:cat/" exact component={DataTable} />
           <Route path="/products/:cat/:subcat" component={DataTable} />
+          <Route path="/orders" exact>
+            <>
+              <NavBar />
+              <MyOrders />
+            </>
+          </Route>
           <Route path="/forgotpassword" exact>
             <>
               <NavBar />

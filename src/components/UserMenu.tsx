@@ -139,6 +139,17 @@ function UserMenu(props: Props) {
         {hasUser && (
           <StyledMenuItem
             onClick={() => {
+              history.push('/orders')
+              handleClose()
+            }}
+          >
+            <ListItemText primary="My Orders" />
+          </StyledMenuItem>
+        )}
+
+        {hasUser && (
+          <StyledMenuItem
+            onClick={() => {
               logout()
               handleClose()
             }}

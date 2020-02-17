@@ -26,6 +26,13 @@ export const BLANK_ORDER: Order = {
   OrderLineItems: []
 }
 
-export const SQUARE_PAYMENT_JS = 'https://js.squareup.com/v2/paymentform'
-export const SQUARE_APP_ID: string = 'sq0idp-TfU74GGFyRSTe7XZYsZp-g'
-export const SQUARE_LOCATION_ID: string = 'FY8AAVD6K7T7A'
+export const SQUARE_PAYMENT_JS =
+  process.env.NODE_ENV === 'production'
+    ? 'https://js.squareup.com/v2/paymentform'
+    : 'https://js.squareupsandbox.com/v2/paymentform'
+export const SQUARE_APP_ID: string =
+  process.env.NODE_ENV === 'production'
+    ? 'sq0idp-TfU74GGFyRSTe7XZYsZp-g'
+    : 'sandbox-sq0idb-JHHiCIhNvJdJH4pJxLaDzA'
+export const SQUARE_LOCATION_ID: string =
+  process.env.NODE_ENV === 'production' ? 'FY8AAVD6K7T7A' : 'D2MV0BZC6EV9Y'
