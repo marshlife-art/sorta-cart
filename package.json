@@ -2,7 +2,7 @@
   "name": "sorta-cart",
   "version": "0.0.3",
   "private": true,
-  "homepage": "https://marshcoop.org",
+  "homepage": "https://www.marshcoop.org/",
   "repository": "github:marshlife-art/sorta-cart",
   "dependencies": {
     "@material-ui/core": "^4.8.2",

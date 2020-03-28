@@ -64,8 +64,13 @@ function Landing(props: RouteComponentProps) {
     fetch(`${API_HOST}/categories`)
       .then(response => response.json())
       .then(result => {
-        console.log('result', result)
-        setCategories(Object.keys(result))
+        // console.log('categories result', result)
+        const catz = Object.keys(result).filter(cat => {
+          const tcat = cat.trim()
+          return !!tcat && tcat !== 'null'
+        })
+        // console.log('categories result', catz)
+        setCategories(catz)
       })
       .catch(err => {
         console.warn('onoz, caught err:', err)
@@ -83,20 +88,26 @@ function Landing(props: RouteComponentProps) {
     })
       .then(response => response.json())
       .then(result => {
-        console.log('result', result)
+        console.log('sub_categories result', result)
+
         setSubCategories(
-          Object.keys(result).map(name => ({
-            name,
-            label: name
-              .split(':')
-              .join(': ')
-              .split(',')
-              .join(', ')
-              .split('/')
-              .join(' / ')
-              .split('-')
-              .join(' - ')
-          }))
+          Object.keys(result)
+            .map(name => ({
+              name,
+              label: name
+                .split(':')
+                .join(': ')
+                .split(',')
+                .join(', ')
+                .split('/')
+                .join(' / ')
+                .split('-')
+                .join(' - ')
+            }))
+            .filter(subcat => {
+              const tsubcat = subcat.trim()
+              return !!tsubcat && tsubcat !== 'null'
+            })
         )
       })
       .catch(err => {
