@@ -92,6 +92,10 @@ function Landing(props: RouteComponentProps) {
 
         setSubCategories(
           Object.keys(result)
+            .filter(subcat => {
+              const tsubcat = subcat.trim()
+              return !!tsubcat && tsubcat !== 'null'
+            })
             .map(name => ({
               name,
               label: name
@@ -104,10 +108,6 @@ function Landing(props: RouteComponentProps) {
                 .split('-')
                 .join(' - ')
             }))
-            .filter(subcat => {
-              const tsubcat = subcat.trim()
-              return !!tsubcat && tsubcat !== 'null'
-            })
         )
       })
       .catch(err => {
