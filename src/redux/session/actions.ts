@@ -188,6 +188,7 @@ export const logout = (): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
           dispatch(set(NULL_USER))
           dispatch(isFetching(false))
           resolve()
+          window.location.href = '/'
         })
     })
   }
