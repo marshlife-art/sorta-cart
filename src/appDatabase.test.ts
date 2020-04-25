@@ -86,7 +86,7 @@ it('can add an item', async () => {
     .then(() => {
       return db.cart.toArray()
     })
-    .catch(e => {
+    .catch((e) => {
       console.error('add error: ' + e.stack || e)
     })
 
@@ -97,7 +97,7 @@ it('can bulk add items', async () => {
   const cart = await db.cart
     .bulkAdd(lineItems)
     .then(() => db.cart.toArray())
-    .catch(e => {
+    .catch((e) => {
       console.error('bulkAdd error: ' + e.stack || e)
     })
 

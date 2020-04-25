@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import { API_HOST } from '../constants'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
     // minHeight: '100vh',
@@ -44,8 +44,8 @@ function ForgotPassword() {
         },
         body: JSON.stringify({ email })
       })
-        .then(r => r.json())
-        .then(response => {
+        .then((r) => r.json())
+        .then((response) => {
           if (response.msg && response.msg === 'ok') {
             setSuccess(
               'Please check your email for link to reset your password.'
@@ -58,7 +58,7 @@ function ForgotPassword() {
             }
           }
         })
-        .catch(err => setError('Unknown email.'))
+        .catch((err) => setError('Unknown email.'))
         .finally(() => setLoading(false))
     } else {
       setError('...type your email')
@@ -80,7 +80,7 @@ function ForgotPassword() {
           type="text"
           value={email}
           onChange={(event: any) => setEmail(event.target.value)}
-          onKeyPress={event => {
+          onKeyPress={(event) => {
             if (event.key === 'Enter') {
               requestForgotPassword()
             }

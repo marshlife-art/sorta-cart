@@ -26,7 +26,7 @@ import { UserServiceProps } from '../redux/session/reducers'
 import { register } from '../redux/session/actions'
 import { API_HOST } from '../constants'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   form: {
     width: '100%',
     // minHeight: '100vh',
@@ -157,7 +157,7 @@ function Register(props: Props) {
     event.persist()
     event &&
       event.target &&
-      setUserData(data => ({
+      setUserData((data) => ({
         ...data,
         [event.target.name]: event.target.value
       }))
@@ -167,7 +167,7 @@ function Register(props: Props) {
     event.persist()
     event &&
       event.target &&
-      setMember(member => ({
+      setMember((member) => ({
         ...member,
         [event.target.name]: event.target.value
       }))
@@ -186,12 +186,12 @@ function Register(props: Props) {
           email: userData.email
         })
       })
-        .then(r => r.json())
-        .then(response => {
+        .then((r) => r.json())
+        .then((response) => {
           console.log('/register/check response:', response)
           setValidEmail(!!response && response.valid)
         })
-        .catch(err => console.warn('onoz! register/check err:', err))
+        .catch((err) => console.warn('onoz! register/check err:', err))
     } else {
       setValidEmail(undefined)
     }
@@ -375,7 +375,10 @@ function Register(props: Props) {
                       event: React.ChangeEvent<HTMLInputElement>,
                       checked: boolean
                     ) => {
-                      setMemberData(data => ({ ...data, workerOwner: checked }))
+                      setMemberData((data) => ({
+                        ...data,
+                        workerOwner: checked
+                      }))
                     }}
                     value="worker-owner"
                   />
@@ -389,7 +392,7 @@ function Register(props: Props) {
                       event: React.ChangeEvent<HTMLInputElement>,
                       checked: boolean
                     ) => {
-                      setMemberData(data => ({ ...data, producer: checked }))
+                      setMemberData((data) => ({ ...data, producer: checked }))
                     }}
                     value="producer-owner"
                   />
@@ -403,7 +406,7 @@ function Register(props: Props) {
                       event: React.ChangeEvent<HTMLInputElement>,
                       checked: boolean
                     ) => {
-                      setMemberData(data => ({
+                      setMemberData((data) => ({
                         ...data,
                         kitchenExperience: checked
                       }))
@@ -420,7 +423,7 @@ function Register(props: Props) {
                       event: React.ChangeEvent<HTMLInputElement>,
                       checked: boolean
                     ) => {
-                      setMemberData(data => ({
+                      setMemberData((data) => ({
                         ...data,
                         farmingGardeningExperience: checked
                       }))
@@ -449,7 +452,7 @@ function Register(props: Props) {
                     event.persist()
                     event &&
                       event.target &&
-                      setMemberData(data => ({
+                      setMemberData((data) => ({
                         ...data,
                         otherexpExplain: event.target.value
                       }))

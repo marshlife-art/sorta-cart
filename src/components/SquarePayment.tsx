@@ -134,7 +134,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
         if (errors) {
           // Log errors from nonce generation to the Javascript console
           console.log('Encountered errors:')
-          errors.forEach(function(error: any) {
+          errors.forEach(function (error: any) {
             console.log('  ' + error.message)
           })
           setError(
@@ -173,7 +173,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
             break
         }
       },
-      paymentFormLoaded: function() {
+      paymentFormLoaded: function () {
         console.log('paymentFormLoaded!')
         setLoading(false)
         // document.getElementById('name').style.display = "inline-flex";

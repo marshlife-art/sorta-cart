@@ -108,15 +108,15 @@ function DataTable(
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
     fetch(`${API_HOST}/categories`)
-      .then(response => response.json())
-      .then(result => setCategoryLookup(result))
+      .then((response) => response.json())
+      .then((result) => setCategoryLookup(result))
       .catch(console.warn)
   })
 
   const [subCategoryLookup, setSubCategoryLookup] = useState<object>(() => {
     fetch(`${API_HOST}/sub_categories`)
-      .then(response => response.json())
-      .then(result => setSubCategoryLookup(result))
+      .then((response) => response.json())
+      .then((result) => setSubCategoryLookup(result))
       .catch(console.warn)
   })
 
@@ -145,7 +145,7 @@ function DataTable(
             field: 'sub_category',
             type: 'string',
             lookup: subCategoryLookup,
-            editComponent: arg => {
+            editComponent: (arg) => {
               console.log('editComponent arg:', arg)
               return <>subcat</>
             },
@@ -157,7 +157,7 @@ function DataTable(
             field: 'description',
             type: 'string',
             filtering: false,
-            render: row => {
+            render: (row) => {
               if (row.name) {
                 return `${row.name} -- ${row.description}`
               } else {
@@ -190,7 +190,7 @@ function DataTable(
             field: 'u_price',
             type: 'currency',
             filtering: false,
-            render: row =>
+            render: (row) =>
               row.ws_price !== row.u_price ? `$${row.u_price}` : ''
           },
           {
@@ -199,13 +199,13 @@ function DataTable(
             type: 'string',
             lookup: PROPERTY_MAP,
             filterPlaceholder: 'filter',
-            render: row => renderCodes(row.codes)
+            render: (row) => renderCodes(row.codes)
           },
           {
             title: undefined,
             field: undefined,
             type: 'string',
-            render: row => {
+            render: (row) => {
               const inCart = true
               const label = inCart
                 ? 'add to shopping cart'
@@ -233,7 +233,7 @@ function DataTable(
           // { title: 'unf', field: 'unf', type: 'string' },
           { title: 'id', field: 'id', type: 'string', hidden: true }
         ]}
-        data={query =>
+        data={(query) =>
           new Promise((resolve, reject) => {
             console.log('query:', query)
             fetch(`${API_HOST}/products`, {
@@ -243,12 +243,12 @@ function DataTable(
               },
               body: JSON.stringify(query)
             })
-              .then(response => response.json())
-              .then(result => {
+              .then((response) => response.json())
+              .then((result) => {
                 console.log('result', result)
                 resolve(result)
               })
-              .catch(err => {
+              .catch((err) => {
                 console.warn('onoz, caught err:', err)
                 return resolve({ data: [], page: 0, totalCount: 0 })
               })

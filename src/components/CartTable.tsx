@@ -98,15 +98,15 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
 
   useEffect(() => {
     if (setOrder) {
-      setOrder(order => {
+      setOrder((order) => {
         const newOrder = {
           ...order,
           subtotal: +invoiceSubtotal.toFixed(2),
           total: +invoiceTotal.toFixed(2),
-          item_count: order.OrderLineItems.filter(li => li.kind === 'product')
+          item_count: order.OrderLineItems.filter((li) => li.kind === 'product')
             .length,
           OrderLineItems: [
-            ...order.OrderLineItems.filter(li => li.kind !== 'tax'),
+            ...order.OrderLineItems.filter((li) => li.kind !== 'tax'),
             {
               kind: 'tax',
               description: TAX_RATE_STRING,

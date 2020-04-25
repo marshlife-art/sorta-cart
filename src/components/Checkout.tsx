@@ -188,8 +188,8 @@ function ReviewCart(
           Authorization: `Bearer ${userService.user.token}`
         }
       })
-        .then(r => r.json())
-        .then(response => {
+        .then((r) => r.json())
+        .then((response) => {
           console.log('/member/me response', response)
           const member = response.member
           if (member) {
@@ -203,7 +203,7 @@ function ReviewCart(
               : ''
           )
 
-          setOrder(prevOrder => ({
+          setOrder((prevOrder) => ({
             ...prevOrder,
             UserId:
               userService.user && userService.user.id
@@ -212,7 +212,7 @@ function ReviewCart(
             MemberId: member && member.id ? member.id : undefined
           }))
         })
-        .catch(err => console.warn('onoz /member/me caught err:', err))
+        .catch((err) => console.warn('onoz /member/me caught err:', err))
   }, [setOrder, userService])
 
   useEffect(() => {
@@ -225,7 +225,7 @@ function ReviewCart(
         ? (cartResult.payload.line_items as OrderLineItem[])
         : ([] as OrderLineItem[])
 
-    setOrder(order => ({
+    setOrder((order) => ({
       ...order,
       email,
       phone,
@@ -235,7 +235,7 @@ function ReviewCart(
       item_count: cartItems.length,
       OrderLineItems: [
         ...cartItems,
-        ...order.OrderLineItems.filter(li => li.kind !== 'product')
+        ...order.OrderLineItems.filter((li) => li.kind !== 'product')
       ]
     }))
     //
@@ -247,15 +247,15 @@ function ReviewCart(
       },
       body: JSON.stringify(cartItems)
     })
-      .then(r => r.json())
-      .then(response => {
+      .then((r) => r.json())
+      .then((response) => {
         console.log('validate response:', response)
         if (!response.error) {
           props.handleNext()
         }
         // #TOOOOODOOOO handle removing/updating invalid line items
       })
-      .catch(err => console.warn('o noz! validation caight error:', err))
+      .catch((err) => console.warn('o noz! validation caight error:', err))
   }
 
   return (
@@ -385,8 +385,8 @@ function Payment(
       },
       body: JSON.stringify({ order, nonce })
     })
-      .then(r => r.json())
-      .then(response => {
+      .then((r) => r.json())
+      .then((response) => {
         if (response.error) {
           console.warn('/store/checkout ERROR response:', response)
           setError(response.msg || 'onoz! could not submit your order ;(')
@@ -396,7 +396,7 @@ function Payment(
           props.handleNext()
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.warn('onoz! caught error /store/checkout err:', err)
         setError('onoz! could not submit your order ;(')
       })
@@ -539,11 +539,11 @@ function Checkout(props: UserServiceProps & RouteComponentProps) {
   const steps = getSteps()
 
   const handleNext = () => {
-    setActiveStep(prevActiveStep => prevActiveStep + 1)
+    setActiveStep((prevActiveStep) => prevActiveStep + 1)
   }
 
   const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1)
+    setActiveStep((prevActiveStep) => prevActiveStep - 1)
   }
 
   return (

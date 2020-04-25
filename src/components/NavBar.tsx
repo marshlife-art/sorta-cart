@@ -132,7 +132,7 @@ function NavBar(props: NavBarProps & RouteComponentProps) {
             className={classes.menuButton}
             color="inherit"
             aria-label="show cart"
-            onClick={() => setCartDrawerOpen(prev => !prev)}
+            onClick={() => setCartDrawerOpen((prev) => !prev)}
           >
             <Badge badgeContent={itemCount} max={99} color="secondary">
               <ShoppingCartIcon />

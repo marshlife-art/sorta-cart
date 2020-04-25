@@ -16,23 +16,23 @@ const useCartService = () => {
   useEffect(() => {
     db.cart
       .toArray()
-      .then(line_items =>
+      .then((line_items) =>
         setResult({ status: 'loaded', payload: { line_items: line_items } })
       )
-      .catch(e => {
+      .catch((e) => {
         // console.warn('[useCartService] caught error:', e)
         setResult({ status: 'error', error: e })
       })
 
-    db.on('changes', changes => {
-      changes.find(change => change.table === 'cart') &&
+    db.on('changes', (changes) => {
+      changes.find((change) => change.table === 'cart') &&
         db.cart
           .toArray()
-          .then(line_items => {
+          .then((line_items) => {
             console.log('[useCartService] db changes!! ')
             setResult({ status: 'loaded', payload: { line_items: line_items } })
           })
-          .catch(e => {
+          .catch((e) => {
             // console.warn('[useCartService] caught error:', e)
             setResult({ status: 'error', error: e })
           })
@@ -43,7 +43,7 @@ const useCartService = () => {
 }
 
 const getCartItemCount = () => {
-  return db.cart.count().catch(e => {
+  return db.cart.count().catch((e) => {
     console.warn('[useCartItemCount] caught error:', e)
     return 0
   })
@@ -53,12 +53,12 @@ const useCartItemCount = () => {
   const [itemCount, setItemCount] = useState(0)
 
   const subscriber = (changes: IDatabaseChange[]) => {
-    changes.find(change => change.table === 'cart') &&
-      getCartItemCount().then(count => setItemCount(count))
+    changes.find((change) => change.table === 'cart') &&
+      getCartItemCount().then((count) => setItemCount(count))
   }
 
   useEffect(() => {
-    getCartItemCount().then(count => setItemCount(count))
+    getCartItemCount().then((count) => setItemCount(count))
 
     db.on('changes', subscriber)
 
@@ -82,17 +82,17 @@ const addToCart = (product: Product) => {
 
   db.cart
     .add(line_item)
-    .catch(error => console.warn('[addToCart] caught error:', error))
+    .catch((error) => console.warn('[addToCart] caught error:', error))
 }
 
 const removeItemFromCart = (index: number) => {
   db.cart
     .delete(index)
-    .catch(error => console.warn('[removeItemFromCart] caught error:', error))
+    .catch((error) => console.warn('[removeItemFromCart] caught error:', error))
 }
 
 const emptyCart = () => {
-  db.cart.clear().catch(function(err) {
+  db.cart.clear().catch(function (err) {
     console.warn('[emptyCart] caught error:', err)
   })
 }
@@ -102,7 +102,7 @@ const updateLineItem = (line_item: OrderLineItem) => {
     line_item.id &&
     db.cart
       .update(line_item.id, line_item)
-      .catch(error => console.warn('[updateLineItem] caught error:', error))
+      .catch((error) => console.warn('[updateLineItem] caught error:', error))
 }
 
 export {

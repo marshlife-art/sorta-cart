@@ -40,7 +40,7 @@ const StyledMenu = withStyles({
   />
 ))
 
-const StyledMenuItem = withStyles(theme => ({
+const StyledMenuItem = withStyles((theme) => ({
   root: {
     // '&:focus': {
     //   backgroundColor: theme.palette.primary.main,
@@ -180,7 +180,7 @@ function UserMenu(props: Props) {
           </StyledMenuItem>
         )}
 
-        <StyledMenuItem onClick={() => setUseDarkTheme(prev => !prev)}>
+        <StyledMenuItem onClick={() => setUseDarkTheme((prev) => !prev)}>
           <ListItemText>
             <div
               style={{

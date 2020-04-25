@@ -24,12 +24,12 @@ function MyOrders(props: UserServiceProps & RouteComponentProps) {
           Authorization: `Bearer ${userService.user.token}`
         }
       })
-        .then(r => r.json())
-        .then(response => {
+        .then((r) => r.json())
+        .then((response) => {
           console.log('/myorders', response)
           setMyOrders(response.orders || [])
         })
-        .catch(err => console.warn('onoz /member/me caught err:', err))
+        .catch((err) => console.warn('onoz /member/me caught err:', err))
   }, [userService])
 
   return (
@@ -65,7 +65,7 @@ function MyOrders(props: UserServiceProps & RouteComponentProps) {
       ]}
       data={myorders}
       title="My Orders"
-      detailPanel={order => <OrderDetailPanel order={order} />}
+      detailPanel={(order) => <OrderDetailPanel order={order} />}
       onRowClick={(event, rowData, togglePanel) => togglePanel && togglePanel()}
       options={{
         headerStyle: { position: 'sticky', top: 0 },

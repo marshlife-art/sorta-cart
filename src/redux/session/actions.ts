@@ -44,7 +44,7 @@ export const checkSession = (): ThunkAction<
   AnyAction
 > => {
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
 
       // gonna get weird when there's no localStorage :/
@@ -61,8 +61,8 @@ export const checkSession = (): ThunkAction<
       fetch(`${API_HOST}/check_session`, {
         headers: { Authorization: `Bearer ${token}` }
       })
-        .then(response => response.json())
-        .then(response => {
+        .then((response) => response.json())
+        .then((response) => {
           console.log('check_session', response)
           if (response.msg === 'ok' && response.user) {
             dispatch(set({ ...response.user, token }))
@@ -70,7 +70,7 @@ export const checkSession = (): ThunkAction<
             dispatch(set(NULL_USER))
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.warn('check_session caught err:', err)
           // hmm, maybe the API is just down? ...is it really necessary to NULL the user?
           dispatch(set(NULL_USER))
@@ -89,7 +89,7 @@ export const register = (
   nonce: string
 ): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
 
       fetch(`${API_HOST}/register`, {
@@ -103,8 +103,8 @@ export const register = (
           nonce
         })
       })
-        .then(response => response.json())
-        .then(response => {
+        .then((response) => response.json())
+        .then((response) => {
           // console.log('[session/actions] user login', response)
           if (response.msg === 'ok' && response.user && response.user.token) {
             localStorage && localStorage.setItem('token', response.user.token)
@@ -113,7 +113,7 @@ export const register = (
             dispatch(setError({ error: 'error', reason: response.message }))
           }
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('register error:', e)
           dispatch(
             setError({
@@ -135,7 +135,7 @@ export const login = (
   password: string
 ): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
 
       fetch(`${API_HOST}/login`, {
@@ -145,8 +145,8 @@ export const login = (
         },
         body: JSON.stringify({ email, password })
       })
-        .then(response => response.json())
-        .then(response => {
+        .then((response) => response.json())
+        .then((response) => {
           // console.log('[session/actions] user login', response)
           if (response.msg === 'ok' && response.user && response.user.token) {
             localStorage && localStorage.setItem('token', response.user.token)
@@ -155,7 +155,7 @@ export const login = (
             dispatch(setError({ error: 'error', reason: response.message }))
           }
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('login error:', e)
           dispatch(
             setError({ error: 'error', reason: 'unable to login right now :(' })
@@ -171,7 +171,7 @@ export const login = (
 
 export const logout = (): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
 
       const token = localStorage && localStorage.getItem('token')
@@ -198,7 +198,7 @@ export const resetPassword = (
   password: string
 ): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
 
       fetch(`${API_HOST}/resetpassword`, {
@@ -208,8 +208,8 @@ export const resetPassword = (
         },
         body: JSON.stringify({ regKey, password })
       })
-        .then(response => response.json())
-        .then(response => {
+        .then((response) => response.json())
+        .then((response) => {
           // console.log('[session/actions] user login', response)
           if (response.msg === 'ok' && response.user && response.user.token) {
             localStorage && localStorage.setItem('token', response.user.token)
@@ -218,7 +218,7 @@ export const resetPassword = (
             dispatch(setError({ error: 'error', reason: response.message }))
           }
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('reset password error:', e)
           dispatch(
             setError({
