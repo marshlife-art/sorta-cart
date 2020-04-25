@@ -30,9 +30,14 @@ const styles = makeStyles((theme: Theme) =>
     },
     optItem: {
       display: 'flex',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       alignItems: 'center',
       marginBottom: theme.spacing(2),
+      width: '100%'
+    },
+    spacer: {
+      height: '50px',
+      lineHeight: '50px',
       width: '100%'
     }
   })
@@ -54,9 +59,9 @@ function UserLoginPrompt(props: RouteComponentProps) {
       {!doLogin && (
         <>
           <div className={classes.optItem}>
-            <Typography variant="body1" gutterBottom>
-              Already a member?
-            </Typography>
+            <Typography variant="body1">Already a member?</Typography>
+          </div>
+          <div className={classes.optItem}>
             <Button
               variant="contained"
               color="primary"
@@ -65,15 +70,16 @@ function UserLoginPrompt(props: RouteComponentProps) {
               Sign In
             </Button>
           </div>
+          <div className={classes.spacer}>&nbsp;</div>
           <div className={classes.optItem}>
-            <Typography variant="body1" gutterBottom>
-              Want to become a member?
-            </Typography>
+            <Typography variant="body1">Want to become a member?</Typography>
+          </div>
+          <div className={classes.optItem}>
             <Button
               color="secondary"
               onClick={() => props.history.push('/register')}
             >
-              Register
+              Join the Co-op
             </Button>
           </div>
           {/* <div className={classes.optItem}>

@@ -114,7 +114,7 @@ function Registration(
                 color="secondary"
                 onClick={() => props.history.push('/register')}
               >
-                Register
+                Join the Co-op
               </Button>
             </div>
             {/* <div className={classes.optItem}>

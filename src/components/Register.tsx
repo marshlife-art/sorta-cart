@@ -216,7 +216,7 @@ function Register(props: Props) {
         <form className={classes.form}>
           <div className={classes.title}>
             <Typography variant="h2" display="block">
-              Register
+              Join the Co-op
             </Typography>
           </div>
           <TextField

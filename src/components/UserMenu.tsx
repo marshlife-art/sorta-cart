@@ -176,7 +176,7 @@ function UserMenu(props: Props) {
               handleClose()
             }}
           >
-            <ListItemText primary="Register" />
+            <ListItemText primary="Join the Co-op" />
           </StyledMenuItem>
         )}
 
