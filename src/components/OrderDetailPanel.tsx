@@ -9,6 +9,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 
 import { Order } from '../types/Order'
+import PaymentDialog from './PaymentDialog'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,11 +32,31 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function OrderDetailPanel(props: { order: Order }) {
+export default function OrderDetailPanel(props: {
+  order: Order
+  setRefetchOrders: React.Dispatch<React.SetStateAction<number>>
+}) {
   const classes = useStyles()
   const order = props.order
   const line_items = props.order.OrderLineItems || []
-  const adjustments = line_items.filter((li) => li.kind !== 'product')
+  const adjustments = line_items.filter(
+    (li) =>
+      li.kind !== 'product' && li.kind !== 'payment' && li.kind !== 'credit'
+  )
+  const payments = line_items.filter((li) => li.kind === 'payment')
+  const paymentsTotal = payments.reduce(
+    (acc, v) => acc + parseFloat(`${v.total}`),
+    0
+  )
+  const credits = line_items.filter((li) => li.kind === 'credit')
+  const creditsTotal = credits.reduce(
+    (acc, v) => acc + parseFloat(`${v.total}`),
+    0
+  )
+  const balance =
+    parseFloat(`${order.total}`) +
+    parseFloat(`${creditsTotal}`) +
+    parseFloat(`${paymentsTotal}`)
 
   return (
     <div className={classes.root}>
@@ -105,6 +126,86 @@ export default function OrderDetailPanel(props: { order: Order }) {
               <TableCell align="right">{li.total}</TableCell>
             </TableRow>
           ))}
+
+          <TableRow>
+            <TableCell component="td" scope="row" colSpan={3} />
+            <TableCell component="td" scope="row" align="right">
+              <b>Order Total</b>
+            </TableCell>
+            <TableCell component="td" scope="row" align="right">
+              {order.total}
+            </TableCell>
+          </TableRow>
+
+          {payments.length > 0 && (
+            <TableRow>
+              <TableCell component="td" scope="row">
+                <b>Payments</b>
+              </TableCell>
+            </TableRow>
+          )}
+          {payments.map((li, idx) => (
+            <TableRow key={`orderli${idx}`}>
+              <TableCell component="td" scope="row" colSpan={3}>
+                {li.description}
+              </TableCell>
+              <TableCell align="right">{li.quantity}</TableCell>
+              <TableCell align="right">{li.total}</TableCell>
+            </TableRow>
+          ))}
+
+          {credits.length > 0 && (
+            <TableRow>
+              <TableCell component="td" scope="row">
+                <b>Credits</b>
+              </TableCell>
+            </TableRow>
+          )}
+          {credits.map((li, idx) => (
+            <TableRow key={`orderli${idx}`}>
+              <TableCell component="td" scope="row" colSpan={3}>
+                {li.description}
+              </TableCell>
+              <TableCell align="right">{li.quantity}</TableCell>
+              <TableCell align="right">{li.total}</TableCell>
+            </TableRow>
+          ))}
+
+          {balance > 0 && (
+            <>
+              <TableRow>
+                <TableCell component="td" scope="row" colSpan={3} />
+                <TableCell component="td" scope="row" align="right">
+                  <b>Balance Due</b>
+                </TableCell>
+                <TableCell component="td" scope="row" align="right">
+                  {balance.toFixed(2)}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell colSpan={5} align="right">
+                  <PaymentDialog
+                    amount={balance}
+                    description={`#${order.id}`}
+                    order={order}
+                    setRefetchOrders={props.setRefetchOrders}
+                  />
+                </TableCell>
+              </TableRow>
+            </>
+          )}
+
+          {balance < 0 && (
+            <TableRow>
+              <TableCell component="td" scope="row" colSpan={3} />
+              <TableCell component="td" scope="row" align="right">
+                <b>Credit Owed</b>
+              </TableCell>
+              <TableCell component="td" scope="row" align="right">
+                {Math.abs(balance).toFixed(2)}
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
 

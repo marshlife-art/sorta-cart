@@ -160,6 +160,9 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
   //   })
   // }
 
+  const products = props.line_items.filter((li) => li.kind === 'product')
+  const adjustments = props.line_items.filter((li) => li.kind === 'adjustment')
+
   return (
     <Table className={classes.root} aria-label="cart">
       <TableHead>
@@ -173,7 +176,7 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
         </TableRow>
       </TableHead>
       <TableBody>
-        {props.line_items.map((line_item, idx) => (
+        {products.map((line_item, idx) => (
           <TableRow key={`li${idx}`}>
             <TableCell align="center">
               {!summary && (
@@ -249,6 +252,44 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             <TableCell align="right">{usdFormat(line_item.total)}</TableCell>
           </TableRow>
         ))}
+
+        {adjustments && adjustments.length > 0 && (
+          <TableRow>
+            <TableCell colSpan={5}>Adjustments</TableCell>
+          </TableRow>
+        )}
+
+        {adjustments.map((line_item, idx) => (
+          <TableRow key={`li${idx}`}>
+            <TableCell align="center">
+              {!summary && (
+                <Tooltip aria-label="remove line item" title="REMOVE LINE ITEM">
+                  <IconButton
+                    aria-label="delete"
+                    size="small"
+                    onClick={(event: any) => removeLineItem(line_item.id)}
+                  >
+                    <ClearIcon fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </TableCell>
+            <TableCell>{line_item.description}</TableCell>
+            <TableCell align="right">
+              <div>
+                {/* {line_item.selected_unit === 'EA' && line_item.u_price
+                    ? usdFormat(line_item.u_price)
+                    : usdFormat(line_item.ws_price)} */}
+                {usdFormat(line_item.price)}
+              </div>
+              <div>{liPkSize(line_item)}</div>
+            </TableCell>
+            <TableCell align="center"></TableCell>
+            <TableCell align="right">{line_item.quantity}</TableCell>
+            <TableCell align="right">{usdFormat(line_item.total)}</TableCell>
+          </TableRow>
+        ))}
+
         <TableRow>
           <TableCell rowSpan={3} colSpan={3} />
           <TableCell>Subtotal</TableCell>

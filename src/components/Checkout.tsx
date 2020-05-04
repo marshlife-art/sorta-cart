@@ -14,16 +14,22 @@ import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
 import Box from '@material-ui/core/Box'
 import BackIcon from '@material-ui/icons/ArrowBack'
+import Link from '@material-ui/core/Link'
 
 import NavBar from './NavBar'
-import { useCartService, emptyCart } from '../services/useCartService'
+import {
+  useCartService,
+  emptyCart,
+  addStoreCreditToCart
+} from '../services/useCartService'
 import CartTable from './CartTable'
 import Login from './Login'
 import { Order, OrderLineItem } from '../types/Order'
 import { BLANK_ORDER, API_HOST } from '../constants'
-import { UserServiceProps } from '../redux/session/reducers'
+import { UserService, UserServiceProps } from '../redux/session/reducers'
 import { RootState } from '../redux'
 import SquarePayment from './SquarePayment'
+import { fetchStoreCredit } from './MyOrders'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -147,6 +153,9 @@ const reviewStyles = makeStyles((theme: Theme) =>
         color: theme.palette.error.main,
         textAlign: 'right'
       }
+    },
+    storeCredit: {
+      marginTop: theme.spacing(4)
     }
   })
 )
@@ -176,6 +185,26 @@ function ReviewCart(
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [notes, setNotes] = useState('')
+  const [storeCredit, setStoreCredit] = useState(0)
+  const [applyStoreCreditDisabled, setApplyStoreCreditDisabled] = useState(
+    false
+  )
+
+  useEffect(() => {
+    if (
+      cartResult.status === 'loaded' &&
+      cartResult.payload.line_items.length
+    ) {
+      const adjustments = cartResult.payload.line_items.filter(
+        (li) => li.kind === 'adjustment'
+      )
+      if (adjustments && adjustments.length) {
+        setApplyStoreCreditDisabled(true)
+      } else {
+        setApplyStoreCreditDisabled(false)
+      }
+    }
+  }, [cartResult])
 
   useEffect(() => {
     console.log('ReviewCart fx userService:', userService)
@@ -202,7 +231,6 @@ function ReviewCart(
               ? userService.user.email
               : ''
           )
-
           setOrder((prevOrder) => ({
             ...prevOrder,
             UserId:
@@ -213,6 +241,9 @@ function ReviewCart(
           }))
         })
         .catch((err) => console.warn('onoz /member/me caught err:', err))
+    userService.user &&
+      userService.user.token &&
+      fetchStoreCredit(userService.user.token, setStoreCredit)
   }, [setOrder, userService])
 
   useEffect(() => {
@@ -243,7 +274,8 @@ function ReviewCart(
     fetch(`${API_HOST}/store/validate_line_items`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userService.user && userService.user.token}`
       },
       body: JSON.stringify(cartItems)
     })
@@ -256,6 +288,11 @@ function ReviewCart(
         // #TOOOOODOOOO handle removing/updating invalid line items
       })
       .catch((err) => console.warn('o noz! validation caight error:', err))
+  }
+
+  function applyStoreCredit() {
+    !applyStoreCreditDisabled && addStoreCreditToCart(storeCredit)
+    setApplyStoreCreditDisabled(true)
   }
 
   return (
@@ -312,6 +349,24 @@ function ReviewCart(
               rowsMax="10"
               fullWidth
             />
+
+            {storeCredit !== 0 && (
+              <Box className={classes.storeCredit}>
+                <Typography variant="overline" display="block">
+                  You have ${Math.abs(storeCredit).toFixed(2)} in store credit
+                </Typography>
+                <Button
+                  disabled={applyStoreCreditDisabled}
+                  onClick={applyStoreCredit}
+                  variant="contained"
+                  color="secondary"
+                >
+                  {applyStoreCreditDisabled
+                    ? 'Store credit applied'
+                    : 'Apply store credit to this order'}
+                </Button>
+              </Box>
+            )}
           </Grid>
           <Grid item xs={12} sm={8}>
             {cartResult.status !== 'loaded' && 'Loading...'}
@@ -354,6 +409,7 @@ function Payment(
   props: {
     setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
     order: Order
+    userService: UserService
   } & StepButtonsProps
 ) {
   const classes = paymentStyles()
@@ -364,7 +420,8 @@ function Payment(
     handleBack,
     nextDisabled,
     nextText,
-    order
+    order,
+    userService
   } = props
 
   const [error, setError] = useState('')
@@ -378,12 +435,20 @@ function Payment(
     console.log('on handleNext should submit order:', order, ' nonce:', nonce)
     setError('')
     setLoading(true)
-    fetch(`${API_HOST}/store/checkout`, {
+
+    const isFree = parseInt(`${order.total}`) === 0
+    const path = isFree ? '/store/freecheckout' : '/store/checkout'
+    const body = isFree ? { order } : { order, nonce }
+
+    fetch(`${API_HOST}${path}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${
+          userService && userService.user && userService.user.token
+        }`
       },
-      body: JSON.stringify({ order, nonce })
+      body: JSON.stringify(body)
     })
       .then((r) => r.json())
       .then((response) => {
@@ -420,11 +485,23 @@ function Payment(
           </Grid>
           <Grid item xs={12} sm={6}>
             <div className={classes.paymentContainer}>
-              <SquarePayment
-                handleNext={handleNext}
-                loading={loading}
-                amount={order.total * 100}
-              />
+              {parseInt(`${order.total}`) === 0 ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={() => handleNext('')}
+                  disabled={!order || order.OrderLineItems.length === 0}
+                >
+                  Submit Order
+                </Button>
+              ) : (
+                <SquarePayment
+                  handleNext={handleNext}
+                  loading={loading}
+                  amount={order.total * 100}
+                />
+              )}
             </div>
           </Grid>
           {error && (
@@ -518,6 +595,7 @@ const checkoutStyles = makeStyles((theme: Theme) =>
       minHeight: '300px',
       width: '100%',
       display: 'flex',
+      flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center'
     }
@@ -564,8 +642,21 @@ function Checkout(props: UserServiceProps & RouteComponentProps) {
         <div>
           {activeStep === steps.length ? (
             <Paper className={classes.finished}>
-              <Typography className={classes.instructions}>
+              <Typography className={classes.instructions} display="block">
                 THANK YOU!
+              </Typography>
+              <Typography className={classes.instructions} display="block">
+                A receipt has been emailed to you.
+              </Typography>
+              <Typography className={classes.instructions} display="block">
+                See the{' '}
+                <Link
+                  color="secondary"
+                  href="https://marshlife-art.org/marsh-food-cooperative-schedule/"
+                >
+                  MARSH Food Cooperative Ordering and Pick-up Schedule
+                </Link>{' '}
+                for more information.
               </Typography>
             </Paper>
           ) : (
@@ -603,6 +694,7 @@ function Checkout(props: UserServiceProps & RouteComponentProps) {
                   handleNext={handleNext}
                   nextText={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                   order={order}
+                  userService={userService}
                 />
               )}
             </div>

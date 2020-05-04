@@ -85,6 +85,47 @@ const addToCart = (product: Product) => {
     .catch((error) => console.warn('[addToCart] caught error:', error))
 }
 
+const addStoreCreditToCart = async (storeCredit: number) => {
+  console.log('[useCartService] addStoreCreditToCart storeCredit:', storeCredit)
+
+  const line_items = await db.cart.toArray()
+  const subtotal = line_items
+    .map(({ total }) => total)
+    .reduce((sum, i) => sum + i, 0)
+
+  if (subtotal <= 0) {
+    console.log('subtotal is 0 or less, not going to addStoreCreditToCart')
+    return
+  }
+
+  const adjustments = line_items.filter((li) => li.kind === 'adjustment')
+  if (adjustments && adjustments.length) {
+    console.log(
+      'cart already has adjustment, not going to addStoreCreditToCart',
+      adjustments
+    )
+    return
+  }
+  // const subtotal =
+  //   order && order.subtotal ? order.subtotal : Math.abs(storeCredit)
+  const amt = Math.abs(storeCredit) >= subtotal ? -subtotal : storeCredit
+  console.log('line_items:', line_items, ' subtotal:', subtotal, ' amt:', amt)
+
+  const adjustment: OrderLineItem = {
+    description: 'STORE CREDIT',
+    quantity: 1,
+    price: amt,
+    total: amt,
+    kind: 'adjustment'
+  }
+
+  db.cart
+    .add(adjustment)
+    .catch((error) =>
+      console.warn('[addStoreCreditToCart] caught error:', error)
+    )
+}
+
 const removeItemFromCart = (index: number) => {
   db.cart
     .delete(index)
@@ -111,5 +152,6 @@ export {
   addToCart,
   removeItemFromCart,
   emptyCart,
-  updateLineItem
+  updateLineItem,
+  addStoreCreditToCart
 }
