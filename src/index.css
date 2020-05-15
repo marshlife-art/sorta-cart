@@ -20,8 +20,15 @@ code {
 /* ugh, this is just because the mui data table filter is not wide enough.
  * ... this stylez all popoverz :/
  */
-.MuiPopover-paper {
-  min-width: 380px !important;
+@media (min-width: 480px) {
+  .MuiPopover-paper {
+    min-width: 380px !important;
+  }
+}
+@media (max-width: 480px) {
+  .MuiPopover-paper {
+    min-width: 90vw !important;
+  }
 }
 
 /* 
