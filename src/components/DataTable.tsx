@@ -1,6 +1,6 @@
-import React, { useState, useEffect, createRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import MaterialTable, { Action } from 'material-table'
+import MaterialTable, { Action, Query } from 'material-table'
 import Chip from '@material-ui/core/Chip'
 import Badge from '@material-ui/core/Badge'
 import IconButton from '@material-ui/core/IconButton'
@@ -11,6 +11,7 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart'
 import RemoveShoppingCartIcon from '@material-ui/icons/RemoveShoppingCart'
 import TagFacesIcon from '@material-ui/icons/TagFaces'
+import DeleteSweepIcon from '@material-ui/icons/DeleteSweep'
 
 import UserMenu from './UserMenu'
 import CartDrawer from './CartDrawer'
@@ -59,12 +60,6 @@ function renderCodes(codes: string) {
 function DataTable(
   props: RouteComponentProps<{ cat?: string; subcat?: string }>
 ) {
-  let tableRef = createRef<any>()
-
-  // useEffect(() => {
-  //   // tableRef.current && tableRef.current.onQueryChange()
-  //   // console.log('tableRef.current', tableRef && tableRef.current)
-  // }, [tableRef])
   const itemCount = useCartItemCount()
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
@@ -95,13 +90,22 @@ function DataTable(
     onClick: handleUserMenuClick
   }
 
+  const resetAction = {
+    icon: () => <DeleteSweepIcon />,
+    tooltip: 'Reset Filters',
+    isFreeAction: true,
+    onClick: () => {
+      window.location.href = '/products'
+    }
+  }
+
   const [actions, setActions] = useState<Action<any>[]>([userAction])
 
   useEffect(() => {
     if (itemCount) {
-      setActions([cartAction, userAction])
+      setActions([resetAction, cartAction, userAction])
     } else {
-      setActions([userAction])
+      setActions([resetAction, userAction])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemCount, cartDrawerOpen]) // note: adding 'cartAction' and 'userAction' to dep array is not pleasant :/
@@ -120,13 +124,17 @@ function DataTable(
       .catch(console.warn)
   })
 
-  const [catDefaultFilter] = useState<'' | string[] | undefined>(
+  const [catDefaultFilter, setCatDefaultFilter] = useState<
+    '' | string[] | undefined
+  >(
     () =>
       props.match &&
       props.match.params &&
       props.match.params.cat && [decodeURIComponent(props.match.params.cat)]
   )
-  const [subCatDefaultFilter] = useState<'' | string[] | undefined>(
+  const [subCatDefaultFilter, setSubCatDefaultFilter] = useState<
+    '' | string[] | undefined
+  >(
     () =>
       props.match &&
       props.match.params &&
@@ -135,10 +143,56 @@ function DataTable(
       ]
   )
 
+  function setSelectedCatsFromQuery(query: Query<any>) {
+    try {
+      const categories = query.filters
+        .filter((f) => f.column.field === 'category')
+        .reduce(
+          (terms: string[], t: { value: string[] }) => [...terms, ...t.value],
+          []
+        )
+      const subCatz = query.filters
+        .filter((f) => f.column.field === 'sub_category')
+        .reduce(
+          (terms: string[], t: { value: string[] }) => [...terms, ...t.value],
+          []
+        )
+      // console.log('setSelectedCatsFromQuery categories:', categories)
+      if (categories.length === 0) {
+        return
+      }
+
+      fetch(`${API_HOST}/sub_categories`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ categories })
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          // console.log(
+          //   'setSelectedCatsFromQuery sub_categories res len:',
+          //   Object.keys(result).length,
+          //   ' result:',
+          //   result
+          // )
+          setCatDefaultFilter(categories)
+          setSubCategoryLookup(result)
+          setSubCatDefaultFilter(subCatz)
+        })
+        .catch((err) => {
+          console.warn('onoz, caught err:', err)
+          // setSubCategories([])
+        })
+    } catch (e) {
+      console.warn('onoz caught err:', e)
+    }
+  }
+
   return (
     <>
       <MaterialTable
-        tableRef={tableRef}
         columns={[
           {
             title: 'category',
@@ -153,10 +207,6 @@ function DataTable(
             field: 'sub_category',
             type: 'string',
             lookup: subCategoryLookup,
-            editComponent: (arg) => {
-              console.log('editComponent arg:', arg)
-              return <>subcat</>
-            },
             filterPlaceholder: 'filter',
             defaultFilter: subCatDefaultFilter
           },
@@ -246,7 +296,8 @@ function DataTable(
         ]}
         data={(query) =>
           new Promise((resolve, reject) => {
-            console.log('query:', query)
+            // console.log('query:', query)
+            setSelectedCatsFromQuery(query)
             fetch(`${API_HOST}/products`, {
               method: 'post',
               headers: {
@@ -256,7 +307,7 @@ function DataTable(
             })
               .then((response) => response.json())
               .then((result) => {
-                console.log('result', result)
+                // console.log('result', result)
                 resolve(result)
               })
               .catch((err) => {
