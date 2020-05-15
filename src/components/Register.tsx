@@ -59,7 +59,8 @@ const useStyles = makeStyles((theme) => ({
   },
   slider: {
     margin: theme.spacing(4),
-    marginRight: '50px'
+    marginRight: '50px',
+    maxWidth: '83vw'
   },
   submit: {
     margin: theme.spacing(3, 0, 2)
