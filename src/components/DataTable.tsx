@@ -104,7 +104,7 @@ function DataTable(
       setActions([userAction])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemCount]) // note: adding 'cartAction' and 'userAction' to dep array is not pleasant :/
+  }, [itemCount, cartDrawerOpen]) // note: adding 'cartAction' and 'userAction' to dep array is not pleasant :/
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
     fetch(`${API_HOST}/categories`)
