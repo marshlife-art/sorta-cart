@@ -88,7 +88,7 @@ function Landing(props: RouteComponentProps) {
     })
       .then((response) => response.json())
       .then((result) => {
-        console.log('sub_categories result', result)
+        // console.log('sub_categories result', result)
 
         setSubCategories(
           Object.keys(result)
@@ -114,7 +114,7 @@ function Landing(props: RouteComponentProps) {
         console.warn('onoz, caught err:', err)
         setSubCategories([])
       })
-  }, [selectedCat, setSubCategories])
+  }, [selectedCat])
 
   return (
     <>
