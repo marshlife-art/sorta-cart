@@ -63,7 +63,7 @@ export const checkSession = (): ThunkAction<
       })
         .then((response) => response.json())
         .then((response) => {
-          console.log('check_session', response)
+          // console.log('check_session', response)
           if (response.msg === 'ok' && response.user) {
             dispatch(set({ ...response.user, token }))
           } else {
@@ -114,7 +114,7 @@ export const register = (
           }
         })
         .catch((e) => {
-          console.log('register error:', e)
+          console.warn('register error:', e)
           dispatch(
             setError({
               error: 'error',
@@ -156,7 +156,7 @@ export const login = (
           }
         })
         .catch((e) => {
-          console.log('login error:', e)
+          console.warn('login error:', e)
           dispatch(
             setError({ error: 'error', reason: 'unable to login right now :(' })
           )
@@ -220,7 +220,7 @@ export const resetPassword = (
           }
         })
         .catch((e) => {
-          console.log('reset password error:', e)
+          console.warn('reset password error:', e)
           dispatch(
             setError({
               error: 'error',

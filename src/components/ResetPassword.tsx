@@ -52,7 +52,7 @@ function ResetPassword(props: Props) {
 
   let query = useQuery()
   const regKey = query.get('regKey')
-  console.log('[Register] regKey', regKey)
+  // console.log('[Register] regKey', regKey)
 
   const doResetPassword = (event: React.FormEvent) => {
     event.preventDefault()
@@ -80,7 +80,7 @@ function ResetPassword(props: Props) {
   // when userService changes, figure out if the page should redirect if a user is already logged in.
   useEffect(() => {
     if (userService.user && !userService.isFetching && userService.user.role) {
-      console.log('we gotta user!', userService.user)
+      // console.log('we gotta user!', userService.user)
       history.push('/')
     }
     // else if (userService.user && !userService.isFetching) {

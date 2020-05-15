@@ -207,7 +207,7 @@ function ReviewCart(
   }, [cartResult])
 
   useEffect(() => {
-    console.log('ReviewCart fx userService:', userService)
+    // console.log('ReviewCart fx userService:', userService)
     userService.user &&
       userService.user.token &&
       fetch(`${API_HOST}/member/me`, {
@@ -219,7 +219,7 @@ function ReviewCart(
       })
         .then((r) => r.json())
         .then((response) => {
-          console.log('/member/me response', response)
+          // console.log('/member/me response', response)
           const member = response.member
           if (member) {
             member.name && setName(member.name)
@@ -281,7 +281,7 @@ function ReviewCart(
     })
       .then((r) => r.json())
       .then((response) => {
-        console.log('validate response:', response)
+        // console.log('validate response:', response)
         if (!response.error) {
           props.handleNext()
         }
@@ -432,7 +432,7 @@ function Payment(
   }, [setCanGoToNextStep])
 
   function handleNext(nonce: string) {
-    console.log('on handleNext should submit order:', order, ' nonce:', nonce)
+    // console.log('on handleNext should submit order:', order, ' nonce:', nonce)
     setError('')
     setLoading(true)
 
@@ -456,7 +456,7 @@ function Payment(
           console.warn('/store/checkout ERROR response:', response)
           setError(response.msg || 'onoz! could not submit your order ;(')
         } else {
-          console.log('/store/checkout response ok:', response)
+          // console.log('/store/checkout response ok:', response)
           emptyCart()
           props.handleNext()
         }

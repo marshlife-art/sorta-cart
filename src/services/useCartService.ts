@@ -29,7 +29,7 @@ const useCartService = () => {
         db.cart
           .toArray()
           .then((line_items) => {
-            console.log('[useCartService] db changes!! ')
+            // console.log('[useCartService] db changes!! ')
             setResult({ status: 'loaded', payload: { line_items: line_items } })
           })
           .catch((e) => {
@@ -86,7 +86,7 @@ const addToCart = (product: Product) => {
 }
 
 const addStoreCreditToCart = async (storeCredit: number) => {
-  console.log('[useCartService] addStoreCreditToCart storeCredit:', storeCredit)
+  // console.log('[useCartService] addStoreCreditToCart storeCredit:', storeCredit)
 
   const line_items = await db.cart.toArray()
   const subtotal = line_items
@@ -94,22 +94,22 @@ const addStoreCreditToCart = async (storeCredit: number) => {
     .reduce((sum, i) => sum + i, 0)
 
   if (subtotal <= 0) {
-    console.log('subtotal is 0 or less, not going to addStoreCreditToCart')
+    // console.log('subtotal is 0 or less, not going to addStoreCreditToCart')
     return
   }
 
   const adjustments = line_items.filter((li) => li.kind === 'adjustment')
   if (adjustments && adjustments.length) {
-    console.log(
-      'cart already has adjustment, not going to addStoreCreditToCart',
-      adjustments
-    )
+    // console.log(
+    //   'cart already has adjustment, not going to addStoreCreditToCart',
+    //   adjustments
+    // )
     return
   }
   // const subtotal =
   //   order && order.subtotal ? order.subtotal : Math.abs(storeCredit)
   const amt = Math.abs(storeCredit) >= subtotal ? -subtotal : storeCredit
-  console.log('line_items:', line_items, ' subtotal:', subtotal, ' amt:', amt)
+  // console.log('line_items:', line_items, ' subtotal:', subtotal, ' amt:', amt)
 
   const adjustment: OrderLineItem = {
     description: 'STORE CREDIT',

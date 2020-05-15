@@ -111,18 +111,18 @@ function Register(props: Props) {
   const [complete, setComplete] = useState(false)
 
   const doRegister = (nonce: string) => {
-    console.log(
-      'doRegister understandBylaws:',
-      understandBylaws,
-      ' userData:',
-      userData,
-      ' menber:',
-      member,
-      ' memberData:',
-      memberData,
-      ' nonce:',
-      nonce
-    )
+    // console.log(
+    //   'doRegister understandBylaws:',
+    //   understandBylaws,
+    //   ' userData:',
+    //   userData,
+    //   ' menber:',
+    //   member,
+    //   ' memberData:',
+    //   memberData,
+    //   ' nonce:',
+    //   nonce
+    // )
 
     props.register(
       userData,
@@ -133,7 +133,7 @@ function Register(props: Props) {
 
   useEffect(() => {
     if (userService.user && !userService.isFetching && userService.user.role) {
-      console.log('we gotta user!', userService.user)
+      // console.log('we gotta user!', userService.user)
       setComplete(true)
     } else {
       setComplete(false)
@@ -144,7 +144,7 @@ function Register(props: Props) {
     event: React.ChangeEvent<HTMLInputElement>,
     value: string
   ) => {
-    console.log('handlePurchaseShareChange value:', value)
+    // console.log('handlePurchaseShareChange value:', value)
     setRegistrationFee(100)
     setSubsityAmount(99)
     setPurchaseshare(value)
@@ -175,9 +175,9 @@ function Register(props: Props) {
   }
 
   function checkValidEmail(event: any) {
-    console.log('checkValidEmail!! userData.email:', userData.email)
+    // console.log('checkValidEmail!! userData.email:', userData.email)
     if (userData.email && userData.email.length) {
-      console.log('checkValidEmail checking email..')
+      // console.log('checkValidEmail checking email..')
       fetch(`${API_HOST}/register/check`, {
         method: 'POST',
         headers: {
@@ -189,7 +189,7 @@ function Register(props: Props) {
       })
         .then((r) => r.json())
         .then((response) => {
-          console.log('/register/check response:', response)
+          // console.log('/register/check response:', response)
           setValidEmail(!!response && response.valid)
         })
         .catch((err) => console.warn('onoz! register/check err:', err))

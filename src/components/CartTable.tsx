@@ -115,7 +115,7 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             }
           ]
         }
-        console.log('cartTable fx newOrder:', newOrder)
+        // console.log('cartTable fx newOrder:', newOrder)
         return newOrder
       })
     }

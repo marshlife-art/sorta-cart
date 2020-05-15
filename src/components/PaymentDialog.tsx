@@ -104,7 +104,7 @@ function PaymentDialog(props: PaymentDialogProps & UserServiceProps) {
   }
 
   function handleNext(nonce: string) {
-    console.log('handleNext nonce:', nonce)
+    // console.log('handleNext nonce:', nonce)
     setLoading(true)
     setError('')
     fetch(`${API_HOST}/store/payment`, {
@@ -123,7 +123,7 @@ function PaymentDialog(props: PaymentDialogProps & UserServiceProps) {
           console.warn('/store/payment ERROR response:', response)
           setError(response.msg || 'onoz! could not submit your payment ;(')
         } else {
-          console.log('/store/payment response ok:', response)
+          // console.log('/store/payment response ok:', response)
           setComplete(true)
           setRefetchOrders((prev) => prev + 1)
           handleClose()

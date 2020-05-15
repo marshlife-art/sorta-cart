@@ -133,9 +133,9 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
       cardNonceResponseReceived: (errors: any, nonce: any, cardData: any) => {
         if (errors) {
           // Log errors from nonce generation to the Javascript console
-          console.log('Encountered errors:')
+          console.warn('Encountered errors:')
           errors.forEach(function (error: any) {
-            console.log('  ' + error.message)
+            console.warn('  ' + error.message)
           })
           setError(
             `Encountered errors:\n${errors
@@ -144,7 +144,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
           )
           return
         }
-        console.log('cardNonceResponseReceived nonce:', nonce)
+        // console.log('cardNonceResponseReceived nonce:', nonce)
         props.handleNext(nonce)
       },
       unsupportedBrowserDetected: () => {},
@@ -174,7 +174,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
         }
       },
       paymentFormLoaded: function () {
-        console.log('paymentFormLoaded!')
+        // console.log('paymentFormLoaded!')
         setLoading(false)
         // document.getElementById('name').style.display = "inline-flex";
       }
@@ -184,21 +184,21 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
   const paymentFormRef = useRef(new props.paymentForm(config))
 
   function requestCardNonce() {
-    console.log(
-      'requestCardNonce paymentFormRef:',
-      paymentFormRef.current.requestCardNonce,
-      ' props.paymentForm:',
-      props.paymentForm.requestCardNonce
-    )
+    // console.log(
+    //   'requestCardNonce paymentFormRef:',
+    //   paymentFormRef.current.requestCardNonce,
+    //   ' props.paymentForm:',
+    //   props.paymentForm.requestCardNonce
+    // )
     paymentFormRef.current.requestCardNonce &&
       paymentFormRef.current.requestCardNonce()
     // props.paymentForm.requestCardNonce()
   }
 
   useEffect(() => {
-    console.log(
-      '!!! SquarePaymentForm !!! fx, gonna paymentFormRef.current.build() !!!'
-    )
+    // console.log(
+    //   '!!! SquarePaymentForm !!! fx, gonna paymentFormRef.current.build() !!!'
+    // )
     paymentFormRef.current.build()
     // paymentFormRef && paymentFormRef.current && paymentFormRef.current.build()
   }, [])
