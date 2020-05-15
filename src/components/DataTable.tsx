@@ -120,12 +120,20 @@ function DataTable(
       .catch(console.warn)
   })
 
-  const catDefaultFilter = props.match &&
-    props.match.params &&
-    props.match.params.cat && [decodeURIComponent(props.match.params.cat)]
-  const subCatDefaultFilter = props.match &&
-    props.match.params &&
-    props.match.params.subcat && [decodeURIComponent(props.match.params.subcat)]
+  const [catDefaultFilter] = useState<'' | string[] | undefined>(
+    () =>
+      props.match &&
+      props.match.params &&
+      props.match.params.cat && [decodeURIComponent(props.match.params.cat)]
+  )
+  const [subCatDefaultFilter] = useState<'' | string[] | undefined>(
+    () =>
+      props.match &&
+      props.match.params &&
+      props.match.params.subcat && [
+        decodeURIComponent(props.match.params.subcat)
+      ]
+  )
 
   return (
     <>
