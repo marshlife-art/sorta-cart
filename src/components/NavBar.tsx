@@ -78,6 +78,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface NavBarProps {
   showCart?: boolean
+  onBrandBtnClick?: () => void
   children?: React.ReactNode
 }
 
@@ -103,7 +104,10 @@ function NavBar(props: NavBarProps & RouteComponentProps) {
             <Button
               variant="text"
               size="large"
-              onClick={() => props.history.push('/')}
+              onClick={() => {
+                props.history.push('/')
+                props.onBrandBtnClick && props.onBrandBtnClick()
+              }}
             >
               <Typography variant="h6">MARSH COOP</Typography>
             </Button>

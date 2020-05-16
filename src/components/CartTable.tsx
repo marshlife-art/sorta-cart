@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -83,12 +84,14 @@ interface CartTableProps {
   emptyCartAndCloseDrawer?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void
+  closeDrawer?: () => void
   setOrder?: React.Dispatch<React.SetStateAction<Order>>
   checkout?: boolean
   summary?: boolean
 }
 
 function CartTable(props: CartTableProps & RouteComponentProps) {
+  const narrowWidth = useMediaQuery('(max-width:600px)')
   const classes = useStyles()
 
   const { checkout, summary, setOrder } = props
@@ -355,6 +358,18 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
               </Button>
             </TableCell>
           </TableRow>
+          {narrowWidth && (
+            <TableRow>
+              <TableCell colSpan={6} align="center">
+                <Button
+                  variant="contained"
+                  onClick={() => props.closeDrawer && props.closeDrawer()}
+                >
+                  Continue Shopping
+                </Button>
+              </TableCell>
+            </TableRow>
+          )}
         </TableFooter>
       )}
     </Table>

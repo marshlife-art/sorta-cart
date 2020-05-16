@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 import MaterialTable, { Action, Query } from 'material-table'
 import Chip from '@material-ui/core/Chip'
 import Badge from '@material-ui/core/Badge'
@@ -12,6 +13,7 @@ import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart'
 import RemoveShoppingCartIcon from '@material-ui/icons/RemoveShoppingCart'
 import TagFacesIcon from '@material-ui/icons/TagFaces'
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep'
+import BackIcon from '@material-ui/icons/ArrowBack'
 
 import UserMenu from './UserMenu'
 import CartDrawer from './CartDrawer'
@@ -60,6 +62,7 @@ function renderCodes(codes: string) {
 function DataTable(
   props: RouteComponentProps<{ cat?: string; subcat?: string }>
 ) {
+  const narrowWidth = useMediaQuery('(max-width:600px)')
   const itemCount = useCartItemCount()
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
@@ -322,7 +325,11 @@ function DataTable(
             size="large"
             onClick={() => props.history.push('/')}
           >
-            <Typography variant="h6">MARSH COOP</Typography>
+            {narrowWidth ? (
+              <BackIcon />
+            ) : (
+              <Typography variant="h6">MARSH COOP</Typography>
+            )}
           </Button>
         }
         options={{

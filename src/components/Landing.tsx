@@ -19,14 +19,21 @@ const useStyles = makeStyles((theme: Theme) =>
       overflowX: 'auto',
       minHeight: 'calc(100vh - 64px)',
       padding: theme.spacing(2),
-      display: 'flex'
+      display: 'flex',
+      marginTop: 0
+    },
+    flexFill: {
+      flexGrow: 1
     },
     crumbz: {
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'flex-start',
       alignItems: 'center',
-      flexGrow: 1
+      flexGrow: 1,
+      [theme.breakpoints.down('sm')]: {
+        display: 'none'
+      }
     },
     gridBtn: {
       width: '100%',
@@ -118,7 +125,8 @@ function Landing(props: RouteComponentProps) {
 
   return (
     <>
-      <NavBar showCart>
+      <NavBar onBrandBtnClick={() => setSelectedCat('')} showCart>
+        <div className={classes.flexFill}></div>
         {selectedCat && (
           <div className={classes.crumbz}>
             <Fade in>

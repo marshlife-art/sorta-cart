@@ -91,7 +91,7 @@ function MyOrders(props: UserServiceProps & RouteComponentProps) {
   }, [userService, refetchOrders])
 
   return (
-    <div className={classes.root}>
+    <div className={`${classes.root} MyOrders`}>
       <MaterialTable
         columns={[
           {

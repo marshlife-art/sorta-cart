@@ -37,6 +37,7 @@ function CartDrawer(props: CartDrawerProps & UserServiceProps) {
           <CartTable
             line_items={cartResult.payload.line_items}
             emptyCartAndCloseDrawer={emptyCartAndCloseDrawer}
+            closeDrawer={() => setOpen(false)}
           />
         )
       ) : (
