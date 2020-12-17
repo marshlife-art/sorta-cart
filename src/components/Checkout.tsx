@@ -299,7 +299,7 @@ function ReviewCart(
     <>
       <Paper className={classes.infoContainer}>
         <Grid container justify="center" direction="row" spacing={2}>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} md={4}>
             <TextField
               label="email"
               name="email"
@@ -368,7 +368,7 @@ function ReviewCart(
               </Box>
             )}
           </Grid>
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={12} md={8}>
             {cartResult.status !== 'loaded' && 'Loading...'}
             {cartResult.status === 'loaded' &&
               cartResult.payload.line_items.length > 0 && (
@@ -395,6 +395,16 @@ const paymentStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center'
+    },
+    freeOrPayButtonz: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    },
+    freeOrPayButton: {
+      margin: theme.spacing(2),
+      marginTop: theme.spacing(4)
     },
     error: {
       display: 'flex',
@@ -426,6 +436,25 @@ function Payment(
 
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [canPayLater, setCanPayLater] = useState(false)
+  const [isFree, setIsFree] = useState(false)
+
+  useEffect(() => {
+    // if the total of the order is zero, skip CC payment.
+    setIsFree(parseInt(`${order.total}`) === 0)
+  }, [order.total])
+
+  useEffect(() => {
+    if (!order || !order.OrderLineItems) {
+      return
+    }
+    // if all products in cart have 'MARSH ON HAND' category then user can skip CC payment.
+    setCanPayLater(
+      order.OrderLineItems.filter((oli) => oli?.kind === 'product').every(
+        (oli) => oli?.data?.product?.category === 'MARSH ON HAND'
+      )
+    )
+  }, [order])
 
   useEffect(() => {
     setCanGoToNextStep(false)
@@ -436,9 +465,9 @@ function Payment(
     setError('')
     setLoading(true)
 
-    const isFree = parseInt(`${order.total}`) === 0
-    const path = isFree ? '/store/freecheckout' : '/store/checkout'
-    const body = isFree ? { order } : { order, nonce }
+    const path =
+      isFree || canPayLater ? '/store/freecheckout' : '/store/checkout'
+    const body = isFree || canPayLater ? { order } : { order, nonce }
 
     fetch(`${API_HOST}${path}`, {
       method: 'POST',
@@ -472,7 +501,7 @@ function Payment(
     <>
       <Paper>
         <Grid container justify="center" direction="row">
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} md={6}>
             {cartResult.status !== 'loaded' && 'Loading...'}
             {cartResult.status === 'loaded' &&
               cartResult.payload.line_items.length > 0 && (
@@ -483,18 +512,52 @@ function Payment(
                 />
               )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} md={6}>
             <div className={classes.paymentContainer}>
-              {parseInt(`${order.total}`) === 0 ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  onClick={() => handleNext('')}
-                  disabled={!order || order.OrderLineItems.length === 0}
-                >
-                  Submit Order
-                </Button>
+              {isFree || canPayLater ? (
+                isFree ? (
+                  <>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="large"
+                      onClick={() => handleNext('')}
+                      disabled={!order || order.OrderLineItems.length === 0}
+                    >
+                      Complete Order
+                    </Button>
+                  </>
+                ) : (
+                  <div className={classes.freeOrPayButtonz}>
+                    <Typography variant="body1" display="block" gutterBottom>
+                      Pay now or at pick-up
+                    </Typography>
+                    <div>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        onClick={() => setCanPayLater(false)}
+                        disabled={!order || order.OrderLineItems.length === 0}
+                        className={classes.freeOrPayButton}
+                      >
+                        Make a Payment
+                      </Button>
+                    </div>
+                    <div>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        onClick={() => handleNext('')}
+                        disabled={!order || order.OrderLineItems.length === 0}
+                        className={classes.freeOrPayButton}
+                      >
+                        Complete Order and Pay Later
+                      </Button>
+                    </div>
+                  </div>
+                )
               ) : (
                 <SquarePayment
                   handleNext={handleNext}

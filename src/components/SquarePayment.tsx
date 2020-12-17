@@ -206,23 +206,23 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
   return (
     <>
       {loading && <Loading />}
-      <div style={{ display: loading ? 'hidden' : 'block' }}>
+      <div style={{ display: loading ? 'hidden' : 'block', margin: '1em' }}>
         <div className="container">
           <div id="form-container">
             <div id="sq-walletbox">
               <button
                 style={{ display: applePay ? 'inherit' : 'none' }}
-                className="button-google-pay"
+                className="button-apple-pay"
                 id="sq-apple-pay"
               ></button>
               <button
                 style={{ display: masterpass ? 'block' : 'none' }}
-                className="sq-apple-pay"
+                className="button-masterpass"
                 id="sq-masterpass"
               ></button>
               <button
                 style={{ display: googlePay ? 'inherit' : 'none' }}
-                className="sq-masterpass"
+                className="button-google-pay"
                 id="sq-google-pay"
               ></button>
 
