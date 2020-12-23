@@ -3,7 +3,7 @@ import { Order } from './types/Order'
 export const API_HOST: string =
   process.env.NODE_ENV === 'production'
     ? 'https://api.marshcoop.org'
-    : 'http://localhost:3000'
+    : 'https://api.marsh.dev'
 
 export const TAX_RATE = 0.06391
 export const TAX_RATE_STRING = `${(TAX_RATE * 100).toFixed(3)}%`
