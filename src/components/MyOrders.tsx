@@ -24,18 +24,14 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export async function fetchStoreCredit(
-  token: string | null | undefined,
   setStoreCredit: React.Dispatch<React.SetStateAction<number>>
 ) {
-  if (!token) {
-    return
-  }
   const store_credit = await fetch(`${API_HOST}/store_credit`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    }
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include'
   })
     .then((response: any) => response.json())
     .then((response) =>
@@ -72,22 +68,19 @@ function MyOrders(props: UserServiceProps & RouteComponentProps) {
 
   useEffect(() => {
     userService.user &&
-      userService.user.token &&
       fetch(`${API_HOST}/myorders`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userService.user.token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
       })
         .then((r) => r.json())
         .then((response) => {
           setMyOrders(response.orders || [])
         })
         .catch((err) => console.warn('onoz /member/me caught err:', err))
-    userService.user &&
-      userService.user.token &&
-      fetchStoreCredit(userService.user.token, setStoreCredit)
+    userService.user && fetchStoreCredit(setStoreCredit)
   }, [userService, refetchOrders])
 
   return (

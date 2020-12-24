@@ -209,13 +209,12 @@ function ReviewCart(
   useEffect(() => {
     // console.log('ReviewCart fx userService:', userService)
     userService.user &&
-      userService.user.token &&
       fetch(`${API_HOST}/member/me`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userService.user.token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
       })
         .then((r) => r.json())
         .then((response) => {
@@ -241,9 +240,7 @@ function ReviewCart(
           }))
         })
         .catch((err) => console.warn('onoz /member/me caught err:', err))
-    userService.user &&
-      userService.user.token &&
-      fetchStoreCredit(userService.user.token, setStoreCredit)
+    userService.user && fetchStoreCredit(setStoreCredit)
   }, [setOrder, userService])
 
   useEffect(() => {
@@ -274,9 +271,9 @@ function ReviewCart(
     fetch(`${API_HOST}/store/validate_line_items`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${userService.user && userService.user.token}`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify(cartItems)
     })
       .then((r) => r.json())
@@ -430,8 +427,7 @@ function Payment(
     handleBack,
     nextDisabled,
     nextText,
-    order,
-    userService
+    order
   } = props
 
   const [error, setError] = useState('')
@@ -472,11 +468,9 @@ function Payment(
     fetch(`${API_HOST}${path}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${
-          userService && userService.user && userService.user.token
-        }`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify(body)
     })
       .then((r) => r.json())
