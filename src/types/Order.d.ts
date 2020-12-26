@@ -54,20 +54,16 @@ export interface OrderRouterProps {
 
 export interface OrderLineItem {
   id?: number
-
   description?: string
   price?: number
   kind?: string
-
-  // description: string
   quantity: number
   selected_unit?: string
-  // price: number
   total: number
-  // kind: string
   vendor?: string
   WholesaleOrderId?: number
   OrderId?: number
+  invalid?: string
   data?: { product?: Product }
 }
 
