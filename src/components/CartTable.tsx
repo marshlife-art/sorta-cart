@@ -237,10 +237,16 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             <TableCell>
               {line_item.description}
 
-              {line_item?.data?.product?.no_backorder && (
+              {!isNaN(
+                parseInt(`${line_item?.data?.product?.count_on_hand}`)
+              ) && (
                 <>
                   <br />
-                  <i>{line_item?.data?.product?.count_on_hand} ON HAND</i>
+                  <i>
+                    {line_item?.data?.product?.no_backorder && 'ONLY '}
+                    {line_item?.data?.product?.count_on_hand} ON HAND
+                    {line_item?.data?.product?.no_backorder && ' LEFT'}
+                  </i>
                 </>
               )}
             </TableCell>
