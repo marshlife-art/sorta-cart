@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import Drawer from '@material-ui/core/Drawer'
-
 import { RootState } from '../redux'
 import { UserServiceProps } from '../redux/session/reducers'
 import { useCartService, emptyCart } from '../services/useCartService'
@@ -17,11 +16,6 @@ function CartDrawer(props: CartDrawerProps & UserServiceProps) {
   const { open, setOpen, userService } = props
   const cartResult = useCartService()
 
-  useEffect(() => {
-    cartResult.status === 'loaded' &&
-      cartResult.payload.line_items.length > 0 &&
-      console.log('[CartDrawer] cartResult fx! now validate??')
-  }, [cartResult])
   const emptyCartAndCloseDrawer = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
