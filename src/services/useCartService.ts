@@ -6,6 +6,7 @@ import { Cart } from '../types/Cart'
 import { Product } from '../types/Product'
 import { OrderLineItem } from '../types/Order'
 import { IDatabaseChange } from 'dexie-observable/api'
+import { API_HOST } from '../constants'
 
 const db = new AppDatabase()
 
@@ -146,6 +147,67 @@ const updateLineItem = (line_item: OrderLineItem) => {
       .catch((error) => console.warn('[updateLineItem] caught error:', error))
 }
 
+const validateLineItems = async (props: {removeInvalidLineItems: boolean}) => {
+
+  const {removeInvalidLineItems} = props
+  const line_items = await db.cart.toArray()
+
+  line_items.length && fetch(`${API_HOST}/store/validate_line_items`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify(line_items)
+  })
+    .then((r) => r.json())
+    .then((response) => {
+      console.log('[cartService] validateLineItems response:', response)
+      if (response.invalidLineItems && response.invalidLineItems.length) {
+        for (const li of response.invalidLineItems) {
+          console.log('gonna updateLineItem li:', li)
+          if(removeInvalidLineItems && li.id && li.invalid){
+            console.log('gonna removeInvalidLineItems', li)
+            removeItemFromCart(li.id)
+            continue
+          }
+          updateLineItem(li)
+        }
+      }
+    })
+    .catch((err) => console.warn('o noz! validation caight error:', err))
+}
+
+const setDonationAmount = async (amount: number) => {
+
+  const line_items = await db.cart.toArray()
+  const donationItem = line_items.find((li) => li.description === 'DONATION')
+
+  if(donationItem && donationItem.id){
+    if(amount <= 0){
+      removeItemFromCart(donationItem.id)
+    }
+    donationItem.price = +amount.toFixed(2)
+    donationItem.total = +amount.toFixed(2)
+    updateLineItem(donationItem)
+
+  }else{
+    const donation: OrderLineItem = {
+      description: 'DONATION',
+      quantity: 1,
+      price: amount,
+      total: amount,
+      kind: 'adjustment'
+    }
+    db.cart
+      .add(donation)
+      .catch((error) =>
+        console.warn('[addStoreCreditToCart] caught error:', error)
+      )
+  }
+  
+}
+
 export {
   useCartService,
   useCartItemCount,
@@ -153,5 +215,7 @@ export {
   removeItemFromCart,
   emptyCart,
   updateLineItem,
-  addStoreCreditToCart
+  addStoreCreditToCart,
+  validateLineItems,
+  setDonationAmount
 }

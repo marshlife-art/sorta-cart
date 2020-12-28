@@ -12,15 +12,20 @@ import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
+import InputAdornment from '@material-ui/core/InputAdornment'
 import Box from '@material-ui/core/Box'
 import BackIcon from '@material-ui/icons/ArrowBack'
 import Link from '@material-ui/core/Link'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Checkbox from '@material-ui/core/Checkbox'
 
 import NavBar from './NavBar'
 import {
   useCartService,
   emptyCart,
-  addStoreCreditToCart
+  addStoreCreditToCart,
+  validateLineItems,
+  setDonationAmount
 } from '../services/useCartService'
 import CartTable from './CartTable'
 import Login from './Login'
@@ -154,6 +159,14 @@ const reviewStyles = makeStyles((theme: Theme) =>
         textAlign: 'right'
       }
     },
+    donateBoxFlex: {
+      marginTop: theme.spacing(4),
+      display: 'flex',
+      justifyContent: 'space-between'
+    },
+    twoPickups: {
+      marginTop: theme.spacing(4)
+    },
     storeCredit: {
       marginTop: theme.spacing(4)
     }
@@ -189,7 +202,8 @@ function ReviewCart(
   const [applyStoreCreditDisabled, setApplyStoreCreditDisabled] = useState(
     false
   )
-
+  const [canSpecifyTwoPickups, setCanSpecifyTwoPickups] = useState(false)
+  const [wantsTwoPickups, setWantsTwoPickups] = useState(false)
   useEffect(() => {
     if (
       cartResult.status === 'loaded' &&
@@ -203,6 +217,12 @@ function ReviewCart(
       } else {
         setApplyStoreCreditDisabled(false)
       }
+
+      // validateCart and drop invalid items
+      validateLineItems({ removeInvalidLineItems: true })
+
+      // #TODO: check order for both ON HAND and backorder products
+      setCanSpecifyTwoPickups(true)
     }
   }, [cartResult])
 
@@ -259,32 +279,16 @@ function ReviewCart(
       phone,
       name,
       address,
-      notes,
+      notes: `${notes}${wantsTwoPickups ? '\nwantsTwoPickups' : ''}`,
+      wantsTwoPickups,
       item_count: cartItems.length,
       OrderLineItems: [
         ...cartItems,
         ...order.OrderLineItems.filter((li) => li.kind !== 'product')
       ]
     }))
-    //
 
-    fetch(`${API_HOST}/store/validate_line_items`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify(cartItems)
-    })
-      .then((r) => r.json())
-      .then((response) => {
-        // console.log('validate response:', response)
-        if (!response.error) {
-          props.handleNext()
-        }
-        // #TOOOOODOOOO handle removing/updating invalid line items
-      })
-      .catch((err) => console.warn('o noz! validation caight error:', err))
+    props.handleNext()
   }
 
   function applyStoreCredit() {
@@ -346,6 +350,54 @@ function ReviewCart(
               rowsMax="10"
               fullWidth
             />
+
+            <Box className={classes.donateBoxFlex}>
+              <Typography variant="overline">
+                MAKE A DONATION -- Help purchase GROCERY BUNDLES for others
+              </Typography>
+              <TextField
+                label="any amount"
+                name="donation"
+                type="number"
+                // value={donationAmount}
+                onChange={(event: any) =>
+                  setDonationAmount(
+                    isNaN(parseFloat(event.target.value))
+                      ? 0
+                      : +parseFloat(event.target.value).toFixed(2)
+                  )
+                }
+                inputProps={{
+                  min: 0
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  )
+                }}
+                size="small"
+              />
+            </Box>
+
+            {canSpecifyTwoPickups && (
+              <Box className={classes.twoPickups}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>,
+                        checked: boolean
+                      ) => {
+                        setWantsTwoPickups(checked)
+                      }}
+                      value="wantsTwoPickups"
+                    />
+                  }
+                  label="Request two pickups. (You can pick up ON HAND items ASAP and come back again
+                    when the other items arrive.)"
+                />
+              </Box>
+            )}
 
             {storeCredit !== 0 && (
               <Box className={classes.storeCredit}>

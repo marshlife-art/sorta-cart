@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import Drawer from '@material-ui/core/Drawer'
 import { RootState } from '../redux'
 import { UserServiceProps } from '../redux/session/reducers'
-import { useCartService, emptyCart } from '../services/useCartService'
+import {
+  useCartService,
+  emptyCart,
+  validateLineItems
+} from '../services/useCartService'
 import CartTable from './CartTable'
 import UserLoginPrompt from './UserLoginPrompt'
 
@@ -16,6 +20,11 @@ function CartDrawer(props: CartDrawerProps & UserServiceProps) {
   const { open, setOpen, userService } = props
   const cartResult = useCartService()
 
+  useEffect(() => {
+    open && validateLineItems({ removeInvalidLineItems: false })
+  }, [open])
+
+  // cartResult effect or onMount?
   const emptyCartAndCloseDrawer = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {

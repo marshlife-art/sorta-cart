@@ -21,10 +21,11 @@ import {
   // emptyCart,
   updateLineItem,
   removeItemFromCart,
-  addToCart
+  addToCart,
+  validateLineItems
 } from '../services/useCartService'
 import { Order, OrderLineItem } from '../types/Order'
-import { API_HOST, TAX_RATE, TAX_RATE_STRING } from '../constants'
+import { TAX_RATE, TAX_RATE_STRING } from '../constants'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -122,7 +123,6 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
           ]
         }
         // console.log('cartTable fx newOrder:', newOrder)
-        console.log('cartTable fx set newOrder. SHOULD NOW VALIDATE?!')
         return newOrder
       })
     }
@@ -168,32 +168,7 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
       vendor: 'invalid'
     })
   }
-
-  const validateLineItems = () => {
-    fetch(`${API_HOST}/store/validate_line_items`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify(props.line_items)
-    })
-      .then((r) => r.json())
-      .then((response) => {
-        console.log('validate response:', response)
-        if (!response.error) {
-          // props.handleNext()
-        }
-        if (response.invalidLineItems && response.invalidLineItems.length) {
-          for (const li of response.invalidLineItems) {
-            console.log('gonna updateLineItem li:', li)
-            updateLineItem(li)
-          }
-        }
-        // #TOOOOODOOOO handle removing/updating invalid line items
-      })
-      .catch((err) => console.warn('o noz! validation caight error:', err))
-  }
+  // note end temp thingy
 
   const products = props.line_items.filter(
     (li) => li.kind === 'product' && !li.invalid
@@ -408,16 +383,16 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
         </TableRow>
         {/* #NOTE: this is tempporary */}
         <TableRow>
-          <TableCell colSpan={2} align="center">
+          <TableCell colSpan={3} align="center">
             <Button
               variant="contained"
-              color="secondary"
+              color="primary"
               onClick={() => setInvalidPrice()}
             >
               set invalid price
             </Button>
           </TableCell>
-          <TableCell colSpan={2} align="center">
+          <TableCell colSpan={3} align="center">
             <Button
               variant="contained"
               color="primary"
@@ -426,13 +401,28 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
               add invalid item
             </Button>
           </TableCell>
+        </TableRow>
+        <TableRow>
           <TableCell colSpan={2} align="center">
             <Button
               variant="contained"
               color="primary"
-              onClick={() => validateLineItems()}
+              onClick={() =>
+                validateLineItems({ removeInvalidLineItems: false })
+              }
             >
               vallidate
+            </Button>
+          </TableCell>
+          <TableCell colSpan={4} align="center">
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() =>
+                validateLineItems({ removeInvalidLineItems: true })
+              }
+            >
+              vallidate &amp; removeInvalidLineItems
             </Button>
           </TableCell>
         </TableRow>
