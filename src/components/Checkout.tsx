@@ -202,8 +202,7 @@ function ReviewCart(
   const [applyStoreCreditDisabled, setApplyStoreCreditDisabled] = useState(
     false
   )
-  const [canSpecifyTwoPickups, setCanSpecifyTwoPickups] = useState(false)
-  const [wantsTwoPickups, setWantsTwoPickups] = useState(false)
+
   useEffect(() => {
     if (
       cartResult.status === 'loaded' &&
@@ -222,7 +221,6 @@ function ReviewCart(
       validateLineItems({ removeInvalidLineItems: true })
 
       // #TODO: check order for both ON HAND and backorder products
-      setCanSpecifyTwoPickups(true)
     }
   }, [cartResult])
 
@@ -279,8 +277,7 @@ function ReviewCart(
       phone,
       name,
       address,
-      notes: `${notes}${wantsTwoPickups ? '\nwantsTwoPickups' : ''}`,
-      wantsTwoPickups,
+      notes,
       item_count: cartItems.length,
       OrderLineItems: [
         ...cartItems,
@@ -378,26 +375,6 @@ function ReviewCart(
                 size="small"
               />
             </Box>
-
-            {canSpecifyTwoPickups && (
-              <Box className={classes.twoPickups}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>,
-                        checked: boolean
-                      ) => {
-                        setWantsTwoPickups(checked)
-                      }}
-                      value="wantsTwoPickups"
-                    />
-                  }
-                  label="Request two pickups. (You can pick up ON HAND items ASAP and come back again
-                    when the other items arrive.)"
-                />
-              </Box>
-            )}
 
             {storeCredit !== 0 && (
               <Box className={classes.storeCredit}>

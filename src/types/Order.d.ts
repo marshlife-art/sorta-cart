@@ -34,7 +34,6 @@ export interface Order {
   phone: string
   address?: string
   notes?: string
-  wantsTwoPickups?: boolean
   subtotal?: number
   item_count: number
   email_sent?: boolean
