@@ -69,21 +69,34 @@ const useCartItemCount = () => {
   return itemCount
 }
 
-const addToCart = (product: Product) => {
-  let line_item: OrderLineItem = {
-    quantity: 1,
-    total: +product.ws_price,
-    selected_unit: 'CS',
-    price: +product.ws_price,
-    description: `${product.name} ${product.description}`.trim(),
-    kind: 'product',
-    vendor: product.vendor,
-    data: { product }
-  }
+const addToCart = async (product: Product) => {
+  
+  const line_items = await db.cart.toArray()
 
-  db.cart
-    .add(line_item)
-    .catch((error) => console.warn('[addToCart] caught error:', error))
+  const existingLi = line_items.find( li => li.data?.product?.unf === product.unf && li.data?.product?.upc_code === product.upc_code)
+  
+  if(existingLi){
+    // console.log('item already exists in cart! update qty:')
+    existingLi.quantity += 1
+    existingLi.total = +(existingLi.quantity * parseFloat(`${existingLi.price}`)).toFixed(2)
+    updateLineItem(existingLi)
+  }else{
+    let line_item: OrderLineItem = {
+      quantity: 1,
+      total: +product.ws_price,
+      selected_unit: 'CS',
+      price: +product.ws_price,
+      description: `${product.name} ${product.description}`.trim(),
+      kind: 'product',
+      vendor: product.vendor,
+      data: { product }
+    }
+  
+    db.cart
+      .add(line_item)
+      .catch((error) => console.warn('[addToCart] caught error:', error))
+  }
+  
 }
 
 const addStoreCreditToCart = async (storeCredit: number) => {
@@ -162,12 +175,12 @@ const validateLineItems = async (props: {removeInvalidLineItems: boolean}) => {
   })
     .then((r) => r.json())
     .then((response) => {
-      console.log('[cartService] validateLineItems response:', response)
+      // console.log('[cartService] validateLineItems response:', response)
       if (response.invalidLineItems && response.invalidLineItems.length) {
         for (const li of response.invalidLineItems) {
-          console.log('gonna updateLineItem li:', li)
+          // console.log('gonna updateLineItem li:', li)
           if(removeInvalidLineItems && li.id && li.invalid){
-            console.log('gonna removeInvalidLineItems', li)
+            // console.log('gonna removeInvalidLineItems', li)
             removeItemFromCart(li.id)
             continue
           }
