@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
-
 import { makeStyles } from '@material-ui/core/styles'
-
 import MaterialTable from 'material-table'
+import { formatDistance } from 'date-fns'
 
 import { API_HOST } from '../constants'
 import { RootState } from '../redux'
@@ -90,7 +89,12 @@ function MyOrders(props: UserServiceProps & RouteComponentProps) {
           {
             title: 'Created',
             field: 'createdAt',
-            type: 'date'
+            type: 'date',
+            render: (row) =>
+              row.createdAt &&
+              formatDistance(new Date(row.createdAt), Date.now(), {
+                addSuffix: true
+              })
           },
           {
             title: 'Status',

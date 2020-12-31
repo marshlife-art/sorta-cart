@@ -243,11 +243,15 @@ export default function OrderDetailPanel(props: {
           </div>
         </Grid>
       </Grid>
-      {order.createdAt !== order.updatedAt && (
-        <div className={classes.lastUpdated}>
-          <i>Last updated</i> {new Date(order.updatedAt).toLocaleString()}
-        </div>
-      )}
+
+      <div className={classes.lastUpdated}>
+        <i>Created: </i> {new Date(order.createdAt).toLocaleString()}
+        {order.createdAt !== order.updatedAt && (
+          <>
+            <i>, Last updated:</i> {new Date(order.updatedAt).toLocaleString()}
+          </>
+        )}
+      </div>
     </div>
   )
 }
