@@ -16,14 +16,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
 import ClearIcon from '@material-ui/icons/Clear'
 
-import {
-  // useCartService,
-  // emptyCart,
-  updateLineItem,
-  removeItemFromCart,
-  addToCart,
-  validateLineItems
-} from '../services/useCartService'
+import { updateLineItem, removeItemFromCart } from '../services/useCartService'
 import { Order, OrderLineItem } from '../types/Order'
 import { TAX_RATE, TAX_RATE_STRING } from '../constants'
 
@@ -144,32 +137,6 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
     id && removeItemFromCart(id)
   }
 
-  // NOTE: this is useful for debugging line item validtion
-  const setInvalidPrice = () => {
-    const someLi = props.line_items
-      .filter((li) => li.kind === 'product')
-      .reverse()[0]
-    someLi.total = 0
-    someLi.price = 0
-    updateLineItem(someLi)
-  }
-  const addInvalidItem = () => {
-    addToCart({
-      id: 666,
-      pk: 666,
-      ws_price: (Math.random() * 20).toFixed(2),
-      u_price: (Math.random() * 5).toFixed(2),
-      name: 'invalid',
-      description: 'product',
-      category: 'invalid',
-      sub_category: 'invalid',
-      size: '6',
-      unit_type: 'EA',
-      vendor: 'invalid'
-    })
-  }
-  // note end temp thingy
-
   const products = props.line_items.filter(
     (li) => li.kind === 'product' && !li.invalid
   )
@@ -226,12 +193,7 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
               )}
             </TableCell>
             <TableCell align="right">
-              <div>
-                {/* {line_item.selected_unit === 'EA' && line_item.u_price
-                    ? usdFormat(line_item.u_price)
-                    : usdFormat(line_item.ws_price)} */}
-                {usdFormat(line_item.price)}
-              </div>
+              <div>{usdFormat(line_item.price)}</div>
               <div>{liPkSize(line_item)}</div>
             </TableCell>
             <TableCell align="center">
@@ -348,12 +310,7 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             </TableCell>
             <TableCell>{line_item.description}</TableCell>
             <TableCell align="right">
-              <div>
-                {/* {line_item.selected_unit === 'EA' && line_item.u_price
-                    ? usdFormat(line_item.u_price)
-                    : usdFormat(line_item.ws_price)} */}
-                {usdFormat(line_item.price)}
-              </div>
+              <div>{usdFormat(line_item.price)}</div>
               <div>{liPkSize(line_item)}</div>
             </TableCell>
             <TableCell align="center"></TableCell>
@@ -379,51 +336,6 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
           <TableCell>Total</TableCell>
           <TableCell align="right" colSpan={2}>
             <b>{usdFormat(invoiceTotal)}</b>
-          </TableCell>
-        </TableRow>
-        {/* #NOTE: this is tempporary */}
-        <TableRow>
-          <TableCell colSpan={3} align="center">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setInvalidPrice()}
-            >
-              set invalid price
-            </Button>
-          </TableCell>
-          <TableCell colSpan={3} align="center">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => addInvalidItem()}
-            >
-              add invalid item
-            </Button>
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell colSpan={2} align="center">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() =>
-                validateLineItems({ removeInvalidLineItems: false })
-              }
-            >
-              vallidate
-            </Button>
-          </TableCell>
-          <TableCell colSpan={4} align="center">
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() =>
-                validateLineItems({ removeInvalidLineItems: true })
-              }
-            >
-              vallidate &amp; removeInvalidLineItems
-            </Button>
           </TableCell>
         </TableRow>
       </TableBody>
