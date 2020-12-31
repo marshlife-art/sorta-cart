@@ -56,6 +56,7 @@ export function App(
         <Switch>
           <Route path="/checkout" exact component={Checkout} />
           <Route path="/products" exact component={DataTable} />
+          <Route path="/products/onhand/:onhand" exact component={DataTable} />
           <Route path="/products/:cat/" exact component={DataTable} />
           <Route path="/products/:cat/:subcat" component={DataTable} />
           <Route path="/orders" exact>

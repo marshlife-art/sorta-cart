@@ -60,7 +60,7 @@ function renderCodes(codes: string) {
 }
 
 function DataTable(
-  props: RouteComponentProps<{ cat?: string; subcat?: string }>
+  props: RouteComponentProps<{ cat?: string; subcat?: string; onhand?: string }>
 ) {
   const narrowWidth = useMediaQuery('(max-width:600px)')
   const itemCount = useCartItemCount()
@@ -144,6 +144,23 @@ function DataTable(
       props.match.params.subcat && [
         decodeURIComponent(props.match.params.subcat)
       ]
+  )
+
+  const [onHandDefaultFilter] = useState<string | undefined>(() =>
+    !!(
+      props.match &&
+      props.match.params &&
+      props.match.params.onhand &&
+      decodeURIComponent(props.match.params.onhand)
+    )
+      ? 'checked'
+      : undefined
+  )
+  console.log(
+    'onHandDefaultFilter:',
+    onHandDefaultFilter,
+    ' catDefaultFilter:',
+    catDefaultFilter
   )
 
   function setSelectedCatsFromQuery(query: Query<any>) {
@@ -264,6 +281,18 @@ function DataTable(
             lookup: PROPERTY_MAP,
             filterPlaceholder: 'filter',
             render: (row) => renderCodes(row.codes)
+          },
+          {
+            title: 'on hand',
+            field: 'count_on_hand',
+            type: 'boolean',
+            filterCellStyle: {
+              paddingTop: '32px'
+            },
+            // tableData: { checked: true },
+            // lookup: { true: 'TRUE', false: 'FALSE' },
+            defaultFilter: onHandDefaultFilter,
+            render: (row) => row.count_on_hand
           },
           {
             title: undefined,

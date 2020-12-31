@@ -16,8 +16,6 @@ import InputAdornment from '@material-ui/core/InputAdornment'
 import Box from '@material-ui/core/Box'
 import BackIcon from '@material-ui/icons/ArrowBack'
 import Link from '@material-ui/core/Link'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import Checkbox from '@material-ui/core/Checkbox'
 
 import NavBar from './NavBar'
 import {

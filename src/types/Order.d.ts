@@ -68,7 +68,7 @@ export interface OrderLineItem {
   WholesaleOrderId?: number
   OrderId?: number
   invalid?: string
-  status: OLIStatus
+  status?: OLIStatus
   data?: { product?: Product }
 }
 
