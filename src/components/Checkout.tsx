@@ -471,11 +471,16 @@ function Payment(
     if (!order || !order.OrderLineItems) {
       return
     }
-    // if all products in cart have 'MARSH ON HAND' category then user can skip CC payment.
+    // if all products in cart are on_hand then user can skip CC payment.
     setCanPayLater(
       order.OrderLineItems.filter((oli) => oli?.kind === 'product').every(
-        (oli) => oli?.data?.product?.category === 'MARSH ON HAND'
-      )
+        (oli) => oli?.selected_unit === 'EA'
+      ) &&
+        order.OrderLineItems.filter((oli) => oli?.kind === 'product').every(
+          (oli) =>
+            oli?.data?.product?.count_on_hand &&
+            oli?.data?.product?.count_on_hand >= oli?.quantity
+        )
     )
   }, [order])
 
