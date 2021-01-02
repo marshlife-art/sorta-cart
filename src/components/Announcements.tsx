@@ -139,7 +139,7 @@ export default function Announcements(props: { preferences: Preferences }) {
       </ADialogTitle>
 
       <DialogContent dividers={true}>
-        <ReactMarkdown plugins={[gfm]} escapeHtml={false} renderers={renderers}>
+        <ReactMarkdown plugins={[gfm]} renderers={renderers}>
           {announcement ? announcement.content : ''}
         </ReactMarkdown>
       </DialogContent>
