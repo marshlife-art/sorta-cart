@@ -60,7 +60,7 @@ function renderCodes(codes: string) {
 }
 
 function DataTable(
-  props: RouteComponentProps<{ cat?: string; subcat?: string }>
+  props: RouteComponentProps<{ cat?: string; subcat?: string; onhand?: string }>
 ) {
   const narrowWidth = useMediaQuery('(max-width:600px)')
   const itemCount = useCartItemCount()
@@ -146,6 +146,17 @@ function DataTable(
       ]
   )
 
+  const [onHandDefaultFilter] = useState<string | undefined>(() =>
+    !!(
+      props.match &&
+      props.match.params &&
+      props.match.params.onhand &&
+      decodeURIComponent(props.match.params.onhand)
+    )
+      ? 'checked'
+      : undefined
+  )
+
   function setSelectedCatsFromQuery(query: Query<any>) {
     try {
       const categories = query.filters
@@ -160,7 +171,6 @@ function DataTable(
           (terms: string[], t: { value: string[] }) => [...terms, ...t.value],
           []
         )
-      // console.log('setSelectedCatsFromQuery categories:', categories)
       if (categories.length === 0) {
         return
       }
@@ -174,12 +184,6 @@ function DataTable(
       })
         .then((response) => response.json())
         .then((result) => {
-          // console.log(
-          //   'setSelectedCatsFromQuery sub_categories res len:',
-          //   Object.keys(result).length,
-          //   ' result:',
-          //   result
-          // )
           setCatDefaultFilter(categories)
           setSubCategoryLookup(result)
           setSubCatDefaultFilter(subCatz)
@@ -266,6 +270,18 @@ function DataTable(
             render: (row) => renderCodes(row.codes)
           },
           {
+            title: 'on hand',
+            field: 'count_on_hand',
+            type: 'boolean',
+            filterCellStyle: {
+              paddingTop: '32px'
+            },
+            // tableData: { checked: true },
+            // lookup: { true: 'TRUE', false: 'FALSE' },
+            defaultFilter: onHandDefaultFilter,
+            render: (row) => row.count_on_hand
+          },
+          {
             title: undefined,
             field: undefined,
             type: 'string',
@@ -299,7 +315,6 @@ function DataTable(
         ]}
         data={(query) =>
           new Promise((resolve, reject) => {
-            // console.log('query:', query)
             setSelectedCatsFromQuery(query)
             fetch(`${API_HOST}/products`, {
               method: 'post',
@@ -310,7 +325,6 @@ function DataTable(
             })
               .then((response) => response.json())
               .then((result) => {
-                // console.log('result', result)
                 resolve(result)
               })
               .catch((err) => {

@@ -16,13 +16,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
 import ClearIcon from '@material-ui/icons/Clear'
 
-import {
-  // useCartService,
-  // emptyCart,
-  updateLineItem,
-  removeItemFromCart
-  // addToCart
-} from '../services/useCartService'
+import { updateLineItem, removeItemFromCart } from '../services/useCartService'
 import { Order, OrderLineItem } from '../types/Order'
 import { TAX_RATE, TAX_RATE_STRING } from '../constants'
 
@@ -53,7 +47,9 @@ function usdFormat(num?: number | string) {
 }
 
 function subtotal(items: OrderLineItem[]) {
-  return items.map(({ total }) => total).reduce((sum, i) => sum + i, 0)
+  return items
+    .map(({ total }) => total)
+    .reduce((sum, i) => sum + parseFloat(`${i}`), 0)
 }
 
 function liTotal(line_item: OrderLineItem): number {
@@ -118,7 +114,6 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             }
           ]
         }
-        // console.log('cartTable fx newOrder:', newOrder)
         return newOrder
       })
     }
@@ -140,30 +135,12 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
     id && removeItemFromCart(id)
   }
 
-  // NOTE: this is useful for debugging line item validtion
-  // const setInvalidPrice = () => {
-  //   const someLi = props.line_items.filter(li => li.kind === 'product')[0]
-  //   someLi.total = 0
-  //   someLi.price = 0
-  //   updateLineItem(someLi)
-  // }
-  // const addInvalidItem = () => {
-  //   addToCart({
-  //     id: 666,
-  //     pk: 666,
-  //     ws_price: '0',
-  //     u_price: '0',
-  //     name: 'invalid',
-  //     description: 'product',
-  //     category: 'invalid',
-  //     sub_category: 'invalid',
-  //     size: '6',
-  //     unit_type: 'EA',
-  //     vendor: 'invalid'
-  //   })
-  // }
-
-  const products = props.line_items.filter((li) => li.kind === 'product')
+  const products = props.line_items.filter(
+    (li) => li.kind === 'product' && !li.invalid
+  )
+  const invalidProducts = props.line_items.filter(
+    (li) => li.kind === 'product' && li.invalid
+  )
   const adjustments = props.line_items.filter((li) => li.kind === 'adjustment')
 
   return (
@@ -183,7 +160,10 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
           <TableRow key={`li${idx}`}>
             <TableCell align="center">
               {!summary && (
-                <Tooltip aria-label="remove line item" title="REMOVE LINE ITEM">
+                <Tooltip
+                  aria-label="remove line item"
+                  title={`REMOVE ${line_item.description}`}
+                >
                   <IconButton
                     aria-label="delete"
                     size="small"
@@ -194,14 +174,24 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
                 </Tooltip>
               )}
             </TableCell>
-            <TableCell>{line_item.description}</TableCell>
+            <TableCell>
+              {line_item.description}
+
+              {!isNaN(
+                parseInt(`${line_item?.data?.product?.count_on_hand}`)
+              ) && (
+                <>
+                  <br />
+                  <i>
+                    {line_item?.data?.product?.no_backorder && 'ONLY '}
+                    {line_item?.data?.product?.count_on_hand} ON HAND
+                    {line_item?.data?.product?.no_backorder && ' LEFT'}
+                  </i>
+                </>
+              )}
+            </TableCell>
             <TableCell align="right">
-              <div>
-                {/* {line_item.selected_unit === 'EA' && line_item.u_price
-                    ? usdFormat(line_item.u_price)
-                    : usdFormat(line_item.ws_price)} */}
-                {usdFormat(line_item.price)}
-              </div>
+              <div>{usdFormat(line_item.price)}</div>
               <div>{liPkSize(line_item)}</div>
             </TableCell>
             <TableCell align="center">
@@ -246,12 +236,51 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
                   onChange={(event: any) =>
                     handleQtyChange(line_item, parseInt(event.target.value))
                   }
-                  inputProps={{ min: '1', step: '1' }}
+                  inputProps={{
+                    min: '1',
+                    step: '1'
+                  }}
                 />
               ) : (
                 line_item.quantity
               )}
             </TableCell>
+            <TableCell align="right">{usdFormat(line_item.total)}</TableCell>
+          </TableRow>
+        ))}
+
+        {invalidProducts && invalidProducts.length > 0 && (
+          <TableRow>
+            <TableCell colSpan={5}>Out Of Stock</TableCell>
+          </TableRow>
+        )}
+        {invalidProducts.map((line_item, idx) => (
+          <TableRow key={`invalidProduct${idx}`}>
+            <TableCell align="center">
+              {!summary && (
+                <Tooltip
+                  aria-label="remove line item"
+                  title={`REMOVE ${line_item.description}`}
+                >
+                  <IconButton
+                    aria-label="delete"
+                    size="small"
+                    onClick={(event: any) => removeLineItem(line_item.id)}
+                  >
+                    <ClearIcon fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </TableCell>
+            <TableCell>{line_item.description}</TableCell>
+
+            <TableCell align="right">
+              <div>{usdFormat(line_item.price)}</div>
+              <div>{liPkSize(line_item)}</div>
+            </TableCell>
+
+            <TableCell align="center">{line_item.selected_unit}</TableCell>
+            <TableCell align="right">{line_item.quantity}</TableCell>
             <TableCell align="right">{usdFormat(line_item.total)}</TableCell>
           </TableRow>
         ))}
@@ -279,12 +308,7 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             </TableCell>
             <TableCell>{line_item.description}</TableCell>
             <TableCell align="right">
-              <div>
-                {/* {line_item.selected_unit === 'EA' && line_item.u_price
-                    ? usdFormat(line_item.u_price)
-                    : usdFormat(line_item.ws_price)} */}
-                {usdFormat(line_item.price)}
-              </div>
+              <div>{usdFormat(line_item.price)}</div>
               <div>{liPkSize(line_item)}</div>
             </TableCell>
             <TableCell align="center"></TableCell>
@@ -312,27 +336,6 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             <b>{usdFormat(invoiceTotal)}</b>
           </TableCell>
         </TableRow>
-        {/* #NOTE: this is tempporary */}
-        {/* <TableRow>
-          <TableCell colSpan={3} align="center">
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => setInvalidPrice()}
-            >
-              set invalid price
-            </Button>
-          </TableCell>
-          <TableCell colSpan={3} align="center">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => addInvalidItem()}
-            >
-              add invalid item
-            </Button>
-          </TableCell>
-        </TableRow> */}
       </TableBody>
       {!summary && !checkout && (
         <TableFooter>

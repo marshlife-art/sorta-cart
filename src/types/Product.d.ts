@@ -18,6 +18,8 @@ export interface Product {
   vendor: string
   createdAt?: string
   updatedAt?: string
+  count_on_hand?: number
+  no_backorder?: boolean
 }
 
 // interface LineItemProps {

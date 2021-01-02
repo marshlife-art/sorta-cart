@@ -71,12 +71,10 @@ function Landing(props: RouteComponentProps) {
     fetch(`${API_HOST}/categories`)
       .then((response) => response.json())
       .then((result) => {
-        // console.log('categories result', result)
         const catz = Object.keys(result).filter((cat) => {
           const tcat = cat.trim()
           return !!tcat && tcat !== 'null'
         })
-        // console.log('categories result', catz)
         setCategories(catz)
       })
       .catch((err) => {
@@ -95,8 +93,6 @@ function Landing(props: RouteComponentProps) {
     })
       .then((response) => response.json())
       .then((result) => {
-        // console.log('sub_categories result', result)
-
         setSubCategories(
           Object.keys(result)
             .filter((subcat) => {
@@ -183,25 +179,47 @@ function Landing(props: RouteComponentProps) {
           ))}
 
         {categories.length > 0 && !selectedCat && (
-          <Zoom
-            in
-            style={{
-              transitionDelay: `${categories.length * 50}ms`
-            }}
-          >
-            <Grid item xs={12} sm={4} md={3} lg={3}>
-              <Button
-                className={classes.gridBtn}
-                variant="outlined"
-                size="large"
-                onClick={() => props.history.push('/products')}
-              >
-                <Typography variant="h5" className={classes.catBtn}>
-                  See Everything
-                </Typography>
-              </Button>
-            </Grid>
-          </Zoom>
+          <>
+            <Zoom
+              in
+              style={{
+                transitionDelay: `${categories.length * 50}ms`
+              }}
+            >
+              <Grid item xs={12} sm={4} md={3} lg={3}>
+                <Button
+                  className={classes.gridBtn}
+                  variant="outlined"
+                  size="large"
+                  onClick={() => props.history.push('/products/onhand/marsh')}
+                >
+                  <Typography variant="h5" className={classes.catBtn}>
+                    MARSH ON HAND
+                  </Typography>
+                </Button>
+              </Grid>
+            </Zoom>
+
+            <Zoom
+              in
+              style={{
+                transitionDelay: `${categories.length * 50}ms`
+              }}
+            >
+              <Grid item xs={12} sm={4} md={3} lg={3}>
+                <Button
+                  className={classes.gridBtn}
+                  variant="outlined"
+                  size="large"
+                  onClick={() => props.history.push('/products')}
+                >
+                  <Typography variant="h5" className={classes.catBtn}>
+                    See Everything
+                  </Typography>
+                </Button>
+              </Grid>
+            </Zoom>
+          </>
         )}
 
         {subCategories &&

@@ -1,5 +1,4 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import {
   createStyles,
   Theme,
@@ -17,8 +16,6 @@ import PaymentIcon from '@material-ui/icons/AttachMoney'
 import Typography from '@material-ui/core/Typography'
 import Box from '@material-ui/core/Box'
 
-import { UserServiceProps } from '../redux/session/reducers'
-import { RootState } from '../redux'
 import { Order } from '../types/Order'
 import { API_HOST } from '../constants'
 import SquarePayment from './SquarePayment'
@@ -86,8 +83,7 @@ interface PaymentDialogProps {
   setRefetchOrders: React.Dispatch<React.SetStateAction<number>>
 }
 
-function PaymentDialog(props: PaymentDialogProps & UserServiceProps) {
-  const { userService } = props
+function PaymentDialog(props: PaymentDialogProps) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
@@ -104,17 +100,14 @@ function PaymentDialog(props: PaymentDialogProps & UserServiceProps) {
   }
 
   function handleNext(nonce: string) {
-    // console.log('handleNext nonce:', nonce)
     setLoading(true)
     setError('')
     fetch(`${API_HOST}/store/payment`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${
-          userService && userService.user && userService.user.token
-        }`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({ order, amount, description, nonce })
     })
       .then((r) => r.json())
@@ -123,7 +116,6 @@ function PaymentDialog(props: PaymentDialogProps & UserServiceProps) {
           console.warn('/store/payment ERROR response:', response)
           setError(response.msg || 'onoz! could not submit your payment ;(')
         } else {
-          // console.log('/store/payment response ok:', response)
           setComplete(true)
           setRefetchOrders((prev) => prev + 1)
           handleClose()
@@ -181,10 +173,4 @@ function PaymentDialog(props: PaymentDialogProps & UserServiceProps) {
   )
 }
 
-const mapStateToProps = (states: RootState): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-export default connect(mapStateToProps)(PaymentDialog)
+export default PaymentDialog

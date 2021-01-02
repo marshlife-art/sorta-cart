@@ -69,7 +69,6 @@ function Login(props: Props) {
   // when userService changes, figure out if the page should redirect if a user is already logged in.
   useEffect(() => {
     if (userService.user && !userService.isFetching && userService.user.role) {
-      // console.log('we gotta user!', userService.user)
       onLoginFn ? onLoginFn() : history.push('/')
     }
     // else if (userService.user && !userService.isFetching) {

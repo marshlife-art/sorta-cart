@@ -12,6 +12,7 @@ import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
+import InputAdornment from '@material-ui/core/InputAdornment'
 import Box from '@material-ui/core/Box'
 import BackIcon from '@material-ui/icons/ArrowBack'
 import Link from '@material-ui/core/Link'
@@ -20,7 +21,9 @@ import NavBar from './NavBar'
 import {
   useCartService,
   emptyCart,
-  addStoreCreditToCart
+  addStoreCreditToCart,
+  validateLineItems,
+  setDonationAmount
 } from '../services/useCartService'
 import CartTable from './CartTable'
 import Login from './Login'
@@ -154,6 +157,14 @@ const reviewStyles = makeStyles((theme: Theme) =>
         textAlign: 'right'
       }
     },
+    donateBoxFlex: {
+      marginTop: theme.spacing(4),
+      display: 'flex',
+      justifyContent: 'space-between'
+    },
+    twoPickups: {
+      marginTop: theme.spacing(4)
+    },
     storeCredit: {
       marginTop: theme.spacing(4)
     }
@@ -203,23 +214,25 @@ function ReviewCart(
       } else {
         setApplyStoreCreditDisabled(false)
       }
+
+      // validateCart and drop invalid items
+      validateLineItems({ removeInvalidLineItems: true })
+
+      // #TODO: check order for both ON HAND and backorder products
     }
   }, [cartResult])
 
   useEffect(() => {
-    // console.log('ReviewCart fx userService:', userService)
     userService.user &&
-      userService.user.token &&
       fetch(`${API_HOST}/member/me`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userService.user.token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
       })
         .then((r) => r.json())
         .then((response) => {
-          // console.log('/member/me response', response)
           const member = response.member
           if (member) {
             member.name && setName(member.name)
@@ -241,9 +254,7 @@ function ReviewCart(
           }))
         })
         .catch((err) => console.warn('onoz /member/me caught err:', err))
-    userService.user &&
-      userService.user.token &&
-      fetchStoreCredit(userService.user.token, setStoreCredit)
+    userService.user && fetchStoreCredit(setStoreCredit)
   }, [setOrder, userService])
 
   useEffect(() => {
@@ -269,25 +280,8 @@ function ReviewCart(
         ...order.OrderLineItems.filter((li) => li.kind !== 'product')
       ]
     }))
-    //
 
-    fetch(`${API_HOST}/store/validate_line_items`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${userService.user && userService.user.token}`
-      },
-      body: JSON.stringify(cartItems)
-    })
-      .then((r) => r.json())
-      .then((response) => {
-        // console.log('validate response:', response)
-        if (!response.error) {
-          props.handleNext()
-        }
-        // #TOOOOODOOOO handle removing/updating invalid line items
-      })
-      .catch((err) => console.warn('o noz! validation caight error:', err))
+    props.handleNext()
   }
 
   function applyStoreCredit() {
@@ -349,6 +343,34 @@ function ReviewCart(
               rowsMax="10"
               fullWidth
             />
+
+            <Box className={classes.donateBoxFlex}>
+              <Typography variant="overline">
+                MAKE A DONATION -- Help purchase GROCERY BUNDLES for others
+              </Typography>
+              <TextField
+                label="any amount"
+                name="donation"
+                type="number"
+                // value={donationAmount}
+                onChange={(event: any) =>
+                  setDonationAmount(
+                    isNaN(parseFloat(event.target.value))
+                      ? 0
+                      : +parseFloat(event.target.value).toFixed(2)
+                  )
+                }
+                inputProps={{
+                  min: 0
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  )
+                }}
+                size="small"
+              />
+            </Box>
 
             {storeCredit !== 0 && (
               <Box className={classes.storeCredit}>
@@ -430,8 +452,7 @@ function Payment(
     handleBack,
     nextDisabled,
     nextText,
-    order,
-    userService
+    order
   } = props
 
   const [error, setError] = useState('')
@@ -448,11 +469,16 @@ function Payment(
     if (!order || !order.OrderLineItems) {
       return
     }
-    // if all products in cart have 'MARSH ON HAND' category then user can skip CC payment.
+    // if all products in cart are on_hand then user can skip CC payment.
     setCanPayLater(
       order.OrderLineItems.filter((oli) => oli?.kind === 'product').every(
-        (oli) => oli?.data?.product?.category === 'MARSH ON HAND'
-      )
+        (oli) => oli?.selected_unit === 'EA'
+      ) &&
+        order.OrderLineItems.filter((oli) => oli?.kind === 'product').every(
+          (oli) =>
+            oli?.data?.product?.count_on_hand &&
+            oli?.data?.product?.count_on_hand >= oli?.quantity
+        )
     )
   }, [order])
 
@@ -461,7 +487,6 @@ function Payment(
   }, [setCanGoToNextStep])
 
   function handleNext(nonce: string) {
-    // console.log('on handleNext should submit order:', order, ' nonce:', nonce)
     setError('')
     setLoading(true)
 
@@ -472,11 +497,9 @@ function Payment(
     fetch(`${API_HOST}${path}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${
-          userService && userService.user && userService.user.token
-        }`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify(body)
     })
       .then((r) => r.json())
@@ -485,7 +508,6 @@ function Payment(
           console.warn('/store/checkout ERROR response:', response)
           setError(response.msg || 'onoz! could not submit your order ;(')
         } else {
-          // console.log('/store/checkout response ok:', response)
           emptyCart()
           props.handleNext()
         }

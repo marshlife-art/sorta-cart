@@ -41,14 +41,13 @@ function MyOrders(
 
   useEffect(() => {
     userService.user &&
-      userService.user.token &&
       orderId &&
       fetch(`${API_HOST}/getorder`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userService.user.token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ OrderId: orderId })
       })
         .then((r) => r.json())
@@ -62,7 +61,6 @@ function MyOrders(
         .catch((err) => setError('Order not found!'))
   }, [userService, orderId, refetchOrders])
 
-  // console.log('userService:', userService)
   return (
     <Paper className={classes.root}>
       {!userService.isFetching &&

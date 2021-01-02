@@ -6,6 +6,7 @@ import { Cart } from '../types/Cart'
 import { Product } from '../types/Product'
 import { OrderLineItem } from '../types/Order'
 import { IDatabaseChange } from 'dexie-observable/api'
+import { API_HOST } from '../constants'
 
 const db = new AppDatabase()
 
@@ -68,21 +69,34 @@ const useCartItemCount = () => {
   return itemCount
 }
 
-const addToCart = (product: Product) => {
-  let line_item: OrderLineItem = {
-    quantity: 1,
-    total: +product.ws_price,
-    selected_unit: 'CS',
-    price: +product.ws_price,
-    description: `${product.name} ${product.description}`.trim(),
-    kind: 'product',
-    vendor: product.vendor,
-    data: { product }
-  }
+const addToCart = async (product: Product) => {
+  
+  const line_items = await db.cart.toArray()
 
-  db.cart
-    .add(line_item)
-    .catch((error) => console.warn('[addToCart] caught error:', error))
+  const existingLi = line_items.find( li => li.data?.product?.unf === product.unf && li.data?.product?.upc_code === product.upc_code)
+  
+  if(existingLi){
+    // console.log('item already exists in cart! update qty:')
+    existingLi.quantity += 1
+    existingLi.total = +(existingLi.quantity * parseFloat(`${existingLi.price}`)).toFixed(2)
+    updateLineItem(existingLi)
+  }else{
+    let line_item: OrderLineItem = {
+      quantity: 1,
+      total: +product.ws_price,
+      selected_unit: 'CS',
+      price: +product.ws_price,
+      description: `${product.name} ${product.description}`.trim(),
+      kind: 'product',
+      vendor: product.vendor,
+      data: { product }
+    }
+  
+    db.cart
+      .add(line_item)
+      .catch((error) => console.warn('[addToCart] caught error:', error))
+  }
+  
 }
 
 const addStoreCreditToCart = async (storeCredit: number) => {
@@ -146,6 +160,67 @@ const updateLineItem = (line_item: OrderLineItem) => {
       .catch((error) => console.warn('[updateLineItem] caught error:', error))
 }
 
+const validateLineItems = async (props: {removeInvalidLineItems: boolean}) => {
+
+  const {removeInvalidLineItems} = props
+  const line_items = await db.cart.toArray()
+
+  line_items.length && fetch(`${API_HOST}/store/validate_line_items`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify(line_items)
+  })
+    .then((r) => r.json())
+    .then((response) => {
+      // console.log('[cartService] validateLineItems response:', response)
+      if (response.invalidLineItems && response.invalidLineItems.length) {
+        for (const li of response.invalidLineItems) {
+          // console.log('gonna updateLineItem li:', li)
+          if(removeInvalidLineItems && li.id && li.invalid){
+            // console.log('gonna removeInvalidLineItems', li)
+            removeItemFromCart(li.id)
+            continue
+          }
+          updateLineItem(li)
+        }
+      }
+    })
+    .catch((err) => console.warn('o noz! validation caight error:', err))
+}
+
+const setDonationAmount = async (amount: number) => {
+
+  const line_items = await db.cart.toArray()
+  const donationItem = line_items.find((li) => li.description === 'DONATION')
+
+  if(donationItem && donationItem.id){
+    if(amount <= 0){
+      removeItemFromCart(donationItem.id)
+    }
+    donationItem.price = +amount.toFixed(2)
+    donationItem.total = +amount.toFixed(2)
+    updateLineItem(donationItem)
+
+  }else{
+    const donation: OrderLineItem = {
+      description: 'DONATION',
+      quantity: 1,
+      price: amount,
+      total: amount,
+      kind: 'adjustment'
+    }
+    db.cart
+      .add(donation)
+      .catch((error) =>
+        console.warn('[addStoreCreditToCart] caught error:', error)
+      )
+  }
+  
+}
+
 export {
   useCartService,
   useCartItemCount,
@@ -153,5 +228,7 @@ export {
   removeItemFromCart,
   emptyCart,
   updateLineItem,
-  addStoreCreditToCart
+  addStoreCreditToCart,
+  validateLineItems,
+  setDonationAmount
 }

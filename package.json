@@ -1,23 +1,26 @@
 {
   "name": "sorta-cart",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "homepage": "https://www.marshcoop.org/",
   "repository": "github:marshlife-art/sorta-cart",
   "dependencies": {
     "@material-ui/core": "^4.8.2",
     "@material-ui/icons": "^4.5.1",
+    "date-fns": "^2.16.1",
     "dexie": "^2.0.4",
     "dexie-observable": "^1.0.0-beta.5",
     "material-table": "^1.54.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
+    "react-markdown": "^5.0.3",
     "react-redux": "^7.1.3",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.3.0",
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
+    "remark-gfm": "^1.0.0",
     "typescript": "3.7.4"
   },
   "scripts": {
@@ -44,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@types/date-fns": "^2.6.0",
     "@types/jest": "24.0.25",
     "@types/node": "13.1.2",
     "@types/react": "16.9.17",
