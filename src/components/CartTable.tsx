@@ -55,7 +55,6 @@ function subtotal(items: OrderLineItem[]) {
 function liTotal(line_item: OrderLineItem): number {
   const product = line_item.data && line_item.data.product
   if (product) {
-    console.log('liTotal line_item.quantity:', line_item.quantity)
     return line_item.selected_unit === 'EA' && product.u_price
       ? line_item.quantity * parseFloat(product.u_price)
       : line_item.quantity * parseFloat(product.ws_price)
@@ -115,7 +114,6 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
             }
           ]
         }
-        // console.log('cartTable fx newOrder:', newOrder)
         return newOrder
       })
     }

@@ -71,12 +71,10 @@ function Landing(props: RouteComponentProps) {
     fetch(`${API_HOST}/categories`)
       .then((response) => response.json())
       .then((result) => {
-        // console.log('categories result', result)
         const catz = Object.keys(result).filter((cat) => {
           const tcat = cat.trim()
           return !!tcat && tcat !== 'null'
         })
-        // console.log('categories result', catz)
         setCategories(catz)
       })
       .catch((err) => {
@@ -95,8 +93,6 @@ function Landing(props: RouteComponentProps) {
     })
       .then((response) => response.json())
       .then((result) => {
-        // console.log('sub_categories result', result)
-
         setSubCategories(
           Object.keys(result)
             .filter((subcat) => {

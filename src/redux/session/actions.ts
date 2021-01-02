@@ -52,7 +52,6 @@ export const checkSession = (): ThunkAction<
       })
         .then((response) => response.json())
         .then((response) => {
-          console.log('check_session', response)
           if (response.msg === 'ok' && response.user) {
             dispatch(set({ ...response.user }))
           } else {
@@ -94,7 +93,6 @@ export const register = (
       })
         .then((response) => response.json())
         .then((response) => {
-          // console.log('[session/actions] user login', response)
           if (response.msg === 'ok' && response.user) {
             dispatch(set(response.user))
           } else {
@@ -136,7 +134,6 @@ export const login = (
       })
         .then((response) => response.json())
         .then((response) => {
-          // console.log('[session/actions] user login', response)
           if (response.msg === 'ok' && response.user) {
             dispatch(set(response.user))
           } else {
@@ -197,7 +194,6 @@ export const resetPassword = (
       })
         .then((response) => response.json())
         .then((response) => {
-          // console.log('[session/actions] user login', response)
           if (response.msg === 'ok' && response.user) {
             dispatch(set(response.user))
           } else {

@@ -61,7 +61,6 @@ function MyOrders(
         .catch((err) => setError('Order not found!'))
   }, [userService, orderId, refetchOrders])
 
-  // console.log('userService:', userService)
   return (
     <Paper className={classes.root}>
       {!userService.isFetching &&

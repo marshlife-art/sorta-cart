@@ -107,7 +107,6 @@ export default function Announcements(props: { preferences: Preferences }) {
         // check if need to show this announcement
         if (!isNaN(parseInt(last_seen_announcement))) {
           if (result.id <= parseInt(last_seen_announcement)) {
-            // console.log('aready seen this announcement! returning...')
             return
           }
         }

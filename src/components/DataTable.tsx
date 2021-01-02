@@ -156,12 +156,6 @@ function DataTable(
       ? 'checked'
       : undefined
   )
-  console.log(
-    'onHandDefaultFilter:',
-    onHandDefaultFilter,
-    ' catDefaultFilter:',
-    catDefaultFilter
-  )
 
   function setSelectedCatsFromQuery(query: Query<any>) {
     try {
@@ -177,7 +171,6 @@ function DataTable(
           (terms: string[], t: { value: string[] }) => [...terms, ...t.value],
           []
         )
-      // console.log('setSelectedCatsFromQuery categories:', categories)
       if (categories.length === 0) {
         return
       }
@@ -191,12 +184,6 @@ function DataTable(
       })
         .then((response) => response.json())
         .then((result) => {
-          // console.log(
-          //   'setSelectedCatsFromQuery sub_categories res len:',
-          //   Object.keys(result).length,
-          //   ' result:',
-          //   result
-          // )
           setCatDefaultFilter(categories)
           setSubCategoryLookup(result)
           setSubCatDefaultFilter(subCatz)
@@ -328,7 +315,6 @@ function DataTable(
         ]}
         data={(query) =>
           new Promise((resolve, reject) => {
-            // console.log('query:', query)
             setSelectedCatsFromQuery(query)
             fetch(`${API_HOST}/products`, {
               method: 'post',
@@ -339,7 +325,6 @@ function DataTable(
             })
               .then((response) => response.json())
               .then((result) => {
-                // console.log('result', result)
                 resolve(result)
               })
               .catch((err) => {
