@@ -7,6 +7,7 @@ import Menu, { MenuProps } from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Switch from '@material-ui/core/Switch'
+import AnnouncementIcon from '@material-ui/icons/Notifications'
 
 import { RootState } from '../redux'
 import { PreferencesServiceProps } from '../redux/preferences/reducers'
@@ -14,10 +15,12 @@ import { setPreferences } from '../redux/preferences/actions'
 import { Preferences } from '../types/Preferences'
 import { logout } from '../redux/session/actions'
 import { UserServiceProps } from '../redux/session/reducers'
+import { openAnnouncement } from '../redux/announcement/actions'
 
 interface DispatchProps {
   setPreferences: (preferences: Preferences) => void
   logout: () => void
+  openAnnouncement: () => void
 }
 
 const StyledMenu = withStyles({
@@ -70,6 +73,7 @@ function UserMenu(props: Props) {
     setPreferences,
     userService,
     logout,
+    openAnnouncement,
     history
   } = props
 
@@ -94,7 +98,10 @@ function UserMenu(props: Props) {
       (preferencesService.preferences.dark_mode === 'true' ? true : false) !==
         useDarkTheme
     ) {
-      setPreferences({ dark_mode: useDarkTheme ? 'true' : 'false' })
+      setPreferences({
+        ...preferencesService.preferences,
+        dark_mode: useDarkTheme ? 'true' : 'false'
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useDarkTheme])
@@ -202,6 +209,27 @@ function UserMenu(props: Props) {
             </div>
           </ListItemText>
         </StyledMenuItem>
+
+        <StyledMenuItem
+          onClick={() => {
+            openAnnouncement()
+            handleClose()
+          }}
+        >
+          <ListItemText>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+            >
+              <span>Show Announcements</span>
+              <AnnouncementIcon />
+            </div>
+          </ListItemText>
+        </StyledMenuItem>
+
         <StyledMenuItem
           onClick={() => {
             handleClose()
@@ -230,7 +258,8 @@ const mapDispatchToProps = (
   return {
     setPreferences: (preferences: Preferences) =>
       dispatch(setPreferences(preferences)),
-    logout: () => dispatch(logout())
+    logout: () => dispatch(logout()),
+    openAnnouncement: () => dispatch(openAnnouncement())
   }
 }
 

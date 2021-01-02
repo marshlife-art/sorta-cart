@@ -2,6 +2,7 @@
 // so: USE STRINGZ!
 export interface Preferences {
   dark_mode: string
+  last_seen_announcement: string
 }
 
 export interface PreferencesError {

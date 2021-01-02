@@ -14,7 +14,7 @@ const initialState: RootState = {
   preferences: {
     preferencesService: {
       isFetching: false,
-      preferences: { dark_mode: 'true' }
+      preferences: { dark_mode: 'true', last_seen_announcement: '0' }
     }
   }
 }

@@ -24,6 +24,7 @@ import ForgotPassword from './components/ForgotPassword'
 import ResetPassword from './components/ResetPassword'
 import MyOrders from './components/MyOrders'
 import Order from './components/Order'
+import Announcements from './components/Announcements'
 
 interface DispatchProps {
   checkSession: () => void
@@ -49,9 +50,13 @@ export function App(
     preferencesService.preferences.dark_mode === 'true'
       ? darkTheme
       : lightTheme
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {preferencesService.preferences && (
+        <Announcements preferences={preferencesService.preferences} />
+      )}
       <Router>
         <Switch>
           <Route path="/checkout" exact component={Checkout} />

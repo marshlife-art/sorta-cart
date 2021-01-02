@@ -4,6 +4,7 @@ import { AnyAction } from 'redux'
 import { Preferences, PreferencesError } from '../../types/Preferences'
 
 const DEFAULT_PREFERENCES: Preferences = {
+  last_seen_announcement: '-1',
   dark_mode: 'false'
 }
 
