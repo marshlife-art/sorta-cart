@@ -84,7 +84,7 @@ const addToCart = async (product: Product) => {
     let line_item: OrderLineItem = {
       quantity: 1,
       total: +product.ws_price,
-      selected_unit: 'CS',
+      selected_unit: product.unit_type,
       price: +product.ws_price,
       description: `${product.name} ${product.description}`.trim(),
       kind: 'product',
