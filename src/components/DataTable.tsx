@@ -34,6 +34,7 @@ import {
   ListChildComponentProps,
   areEqual
 } from 'react-window'
+import { getCategories, getSubCategories } from '../lib/productsService'
 
 const PROPERTY_MAP: { [index: string]: string } = {
   a: 'Artificial ingredients',
@@ -234,17 +235,11 @@ function DataTable(
   }, [itemCount, cartDrawerOpen]) // note: adding 'cartAction' and 'userAction' to dep array is not pleasant :/
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
-    fetch(`${API_HOST}/categories`)
-      .then((response) => response.json())
-      .then((result) => setCategoryLookup(result))
-      .catch(console.warn)
+    getCategories().then((result) => setCategoryLookup(result))
   })
 
   const [subCategoryLookup, setSubCategoryLookup] = useState<object>(() => {
-    fetch(`${API_HOST}/sub_categories`)
-      .then((response) => response.json())
-      .then((result) => setSubCategoryLookup(result))
-      .catch(console.warn)
+    getSubCategories('').then((result) => setSubCategoryLookup(result))
   })
 
   const [catDefaultFilter, setCatDefaultFilter] = useState<
@@ -277,7 +272,7 @@ function DataTable(
       : undefined
   )
 
-  function setSelectedCatsFromQuery(query: Query<any>) {
+  async function setSelectedCatsFromQuery(query: Query<any>) {
     try {
       const categories = query.filters
         .filter((f) => f.column.field === 'category')
@@ -295,23 +290,19 @@ function DataTable(
         return
       }
 
-      fetch(`${API_HOST}/sub_categories`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ categories })
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          setCatDefaultFilter(categories)
-          setSubCategoryLookup(result)
-          setSubCatDefaultFilter(subCatz)
-        })
-        .catch((err) => {
-          console.warn('onoz, caught err:', err)
-          // setSubCategories([])
-        })
+      let newSubCatz = {}
+
+      for await (const cat of categories) {
+        const result = await getSubCategories(cat)
+        newSubCatz = {
+          ...newSubCatz,
+          ...result
+        }
+      }
+
+      setCatDefaultFilter(categories)
+      setSubCategoryLookup(newSubCatz)
+      setSubCatDefaultFilter(subCatz)
     } catch (e) {
       console.warn('onoz caught err:', e)
     }
@@ -341,10 +332,11 @@ function DataTable(
             title: 'description',
             field: 'description',
             type: 'string',
-            filterPlaceholder: 'filter',
-            filterCellStyle: {
-              paddingTop: '32px'
-            },
+            filtering: false,
+            // filterPlaceholder: 'filter',
+            // filterCellStyle: {
+            //   paddingTop: '32px'
+            // },
             render: (row) => {
               if (row.name) {
                 return `${row.name} -- ${row.description}`
@@ -468,11 +460,19 @@ function DataTable(
                 }
               })
             }
+            // if (q.search) {
+            //   query = query.textSearch('fts', q.search, {
+            //     type: 'websearch',
+            //     config: 'english'
+            //   })
+            // }
             if (q.search) {
-              query = query.textSearch('fts', q.search, {
-                type: 'websearch',
-                config: 'english'
-              })
+              // #todo consider q.search.split(' ')
+              query = query.or(
+                ['name', 'description']
+                  .map((f) => `${f}.ilike.%${q.search}%`)
+                  .join(',')
+              )
             }
             if (q.page) {
               query = query.range(
@@ -497,22 +497,6 @@ function DataTable(
             } else {
               resolve({ data, page: q.page, totalCount: count || 0 })
             }
-
-            // fetch(`${API_HOST}/products`, {
-            //   method: 'post',
-            //   headers: {
-            //     'Content-Type': 'application/json'
-            //   },
-            //   body: JSON.stringify(query)
-            // })
-            //   .then((response) => response.json())
-            //   .then((result) => {
-            //     resolve(result)
-            //   })
-            //   .catch((err) => {
-            //     console.warn('onoz, caught err:', err)
-            //     return resolve({ data: [], page: 0, totalCount: 0 })
-            //   })
           })
         }
         title={
