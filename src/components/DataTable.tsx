@@ -456,12 +456,12 @@ function DataTable(
                 } else if (filter.column.field && filter.value) {
                   if (filter.value instanceof Array && filter.value.length) {
                     const or = filter.value
-                      .map((v) => `${String(filter.column.field)}.eq.${v}`)
+                      .map((v) => `${String(filter.column.field)}.eq."${v}"`)
                       .join(',')
                     query = query.or(or)
                   } else if (filter.value.length) {
                     query = query.or(
-                      `${String(filter.column.field)}.eq.${filter.value}`
+                      `${String(filter.column.field)}.eq."${filter.value}"`
                     )
                   }
                 }
@@ -471,7 +471,7 @@ function DataTable(
               // #todo consider q.search.split(' ')
               query = query.or(
                 ['name', 'description']
-                  .map((f) => `${f}.ilike.%${q.search}%`)
+                  .map((f) => `${f}.ilike."%${q.search}%"`)
                   .join(',')
               )
             }
