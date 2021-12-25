@@ -26,7 +26,6 @@ import BackIcon from '@material-ui/icons/ArrowBack'
 import UserMenu from './UserMenu'
 import CartDrawer from './CartDrawer'
 import { useCartItemCount, addToCart } from '../services/useCartService'
-import { API_HOST } from '../constants'
 import { supabase } from '../lib/supabaseClient'
 import {
   FixedSizeList as List,
@@ -446,7 +445,15 @@ function DataTable(
 
             if (q.filters.length) {
               q.filters.forEach((filter) => {
-                if (filter.column.field && filter.value) {
+                console.log('zomg filter:', filter)
+                if (filter.column.field === 'count_on_hand') {
+                  const or = `count_on_hand.${
+                    filter.value === 'checked'
+                      ? 'gt.0'
+                      : 'is.null,count_on_hand.lte.0'
+                  }`
+                  query = query.or(or)
+                } else if (filter.column.field && filter.value) {
                   if (filter.value instanceof Array && filter.value.length) {
                     const or = filter.value
                       .map((v) => `${String(filter.column.field)}.eq.${v}`)
@@ -460,12 +467,6 @@ function DataTable(
                 }
               })
             }
-            // if (q.search) {
-            //   query = query.textSearch('fts', q.search, {
-            //     type: 'websearch',
-            //     config: 'english'
-            //   })
-            // }
             if (q.search) {
               // #todo consider q.search.split(' ')
               query = query.or(
