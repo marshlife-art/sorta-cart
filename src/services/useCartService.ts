@@ -7,6 +7,8 @@ import { Product } from '../types/Product'
 import { OrderLineItem } from '../types/Order'
 import { IDatabaseChange } from 'dexie-observable/api'
 import { API_HOST } from '../constants'
+import { SupaOrderLineItem } from '../types/SupaTypes'
+import { validateLineItemsService } from './orderService'
 
 const db = new AppDatabase()
 
@@ -70,17 +72,22 @@ const useCartItemCount = () => {
 }
 
 const addToCart = async (product: Product) => {
-  
   const line_items = await db.cart.toArray()
 
-  const existingLi = line_items.find( li => li.data?.product?.unf === product.unf && li.data?.product?.upc_code === product.upc_code)
-  
-  if(existingLi){
+  const existingLi = line_items.find(
+    (li) =>
+      li.data?.product?.unf === product.unf &&
+      li.data?.product?.upc_code === product.upc_code
+  )
+
+  if (existingLi) {
     // console.log('item already exists in cart! update qty:')
     existingLi.quantity += 1
-    existingLi.total = +(existingLi.quantity * parseFloat(`${existingLi.price}`)).toFixed(2)
+    existingLi.total = +(
+      existingLi.quantity * parseFloat(`${existingLi.price}`)
+    ).toFixed(2)
     updateLineItem(existingLi)
-  }else{
+  } else {
     let line_item: OrderLineItem = {
       quantity: 1,
       total: +product.ws_price,
@@ -91,12 +98,11 @@ const addToCart = async (product: Product) => {
       vendor: product.vendor,
       data: { product }
     }
-  
+
     db.cart
       .add(line_item)
       .catch((error) => console.warn('[addToCart] caught error:', error))
   }
-  
 }
 
 const addStoreCreditToCart = async (storeCredit: number) => {
@@ -160,51 +166,48 @@ const updateLineItem = (line_item: OrderLineItem) => {
       .catch((error) => console.warn('[updateLineItem] caught error:', error))
 }
 
-const validateLineItems = async (props: {removeInvalidLineItems: boolean}) => {
+const validateLineItems = async (props: {
+  removeInvalidLineItems: boolean
+}) => {
+  const { removeInvalidLineItems } = props
+  const line_items = (await db.cart.toArray()) as SupaOrderLineItem[]
 
-  const {removeInvalidLineItems} = props
-  const line_items = await db.cart.toArray()
-
-  line_items.length && fetch(`${API_HOST}/store/validate_line_items`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(line_items)
-  })
-    .then((r) => r.json())
-    .then((response) => {
-      // console.log('[cartService] validateLineItems response:', response)
-      if (response.invalidLineItems && response.invalidLineItems.length) {
-        for (const li of response.invalidLineItems) {
-          // console.log('gonna updateLineItem li:', li)
-          if(removeInvalidLineItems && li.id && li.invalid){
-            // console.log('gonna removeInvalidLineItems', li)
-            removeItemFromCart(li.id)
-            continue
-          }
-          updateLineItem(li)
+  if (line_items.length) {
+    const validateResponse = await validateLineItemsService(line_items)
+    // console.log(
+    //   '[cartService] validateLineItemsService response:',
+    //   validateResponse
+    // )
+    if (
+      validateResponse.invalidLineItems &&
+      validateResponse.invalidLineItems.length
+    ) {
+      for (const li of validateResponse.invalidLineItems) {
+        // console.log('gonna updateLineItem li:', li)
+        if (removeInvalidLineItems && li.id && li.invalid) {
+          // console.log('gonna removeInvalidLineItems', li)
+          removeItemFromCart(li.id)
+          continue
         }
+        updateLineItem(li as OrderLineItem)
       }
-    })
-    .catch((err) => console.warn('o noz! validation caight error:', err))
+    }
+  }
 }
 
 const setDonationAmount = async (amount: number) => {
-
   const line_items = await db.cart.toArray()
   const donationItem = line_items.find((li) => li.description === 'DONATION')
 
-  if(donationItem && donationItem.id){
-    if(amount <= 0){
+  if (donationItem && donationItem.id) {
+    if (amount <= 0) {
       removeItemFromCart(donationItem.id)
+      return
     }
     donationItem.price = +amount.toFixed(2)
     donationItem.total = +amount.toFixed(2)
     updateLineItem(donationItem)
-
-  }else{
+  } else {
     const donation: OrderLineItem = {
       description: 'DONATION',
       quantity: 1,
@@ -218,7 +221,6 @@ const setDonationAmount = async (amount: number) => {
         console.warn('[addStoreCreditToCart] caught error:', error)
       )
   }
-  
 }
 
 export {

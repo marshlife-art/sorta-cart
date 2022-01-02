@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
@@ -33,6 +33,7 @@ import { UserService, UserServiceProps } from '../redux/session/reducers'
 import { RootState } from '../redux'
 import SquarePayment from './SquarePayment'
 import { fetchStoreCredit } from './MyOrders'
+import { getMyMember } from '../services/orderService'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -197,9 +198,8 @@ function ReviewCart(
   const [address, setAddress] = useState('')
   const [notes, setNotes] = useState('')
   const [storeCredit, setStoreCredit] = useState(0)
-  const [applyStoreCreditDisabled, setApplyStoreCreditDisabled] = useState(
-    false
-  )
+  const [applyStoreCreditDisabled, setApplyStoreCreditDisabled] =
+    useState(false)
 
   useEffect(() => {
     if (
@@ -222,40 +222,32 @@ function ReviewCart(
     }
   }, [cartResult])
 
+  const getMemberInfo = useCallback(async () => {
+    if (userService.user && userService.user.id) {
+      const member = await getMyMember(userService.user.id)
+      if (member) {
+        member.name && setName(member.name)
+        member.phone && setPhone(member.phone)
+        member.address && setAddress(member.address)
+      }
+      setEmail(
+        userService.user && userService.user.email ? userService.user.email : ''
+      )
+      setOrder((prevOrder) => ({
+        ...prevOrder,
+        UserId:
+          userService.user && userService.user.id
+            ? userService.user.id
+            : undefined,
+        MemberId: member && member.id ? member.id : undefined
+      }))
+    }
+  }, [userService])
+
   useEffect(() => {
-    userService.user &&
-      fetch(`${API_HOST}/member/me`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      })
-        .then((r) => r.json())
-        .then((response) => {
-          const member = response.member
-          if (member) {
-            member.name && setName(member.name)
-            member.phone && setPhone(member.phone)
-            member.address && setAddress(member.address)
-          }
-          setEmail(
-            userService.user && userService.user.email
-              ? userService.user.email
-              : ''
-          )
-          setOrder((prevOrder) => ({
-            ...prevOrder,
-            UserId:
-              userService.user && userService.user.id
-                ? userService.user.id
-                : undefined,
-            MemberId: member && member.id ? member.id : undefined
-          }))
-        })
-        .catch((err) => console.warn('onoz /member/me caught err:', err))
+    userService.user && getMemberInfo()
     userService.user && fetchStoreCredit(setStoreCredit)
-  }, [setOrder, userService])
+  }, [userService])
 
   useEffect(() => {
     setCanGoToNextStep && setCanGoToNextStep(!!(email && phone && name))
@@ -490,17 +482,16 @@ function Payment(
     setError('')
     setLoading(true)
 
-    const path =
-      isFree || canPayLater ? '/store/freecheckout' : '/store/checkout'
-    const body = isFree || canPayLater ? { order } : { order, nonce }
+    // const path =
+    //   isFree || canPayLater ? '/store/freecheckout' : '/store/checkout'
+    // const body = isFree || canPayLater ? { order } : { order, nonce }
 
-    fetch(`${API_HOST}${path}`, {
+    fetch(`${API_HOST}/store/checkout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials: 'include',
-      body: JSON.stringify(body)
+      body: JSON.stringify({ order, nonce })
     })
       .then((r) => r.json())
       .then((response) => {

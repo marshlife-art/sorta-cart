@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { ThunkDispatch } from 'redux-thunk'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { Container, Button, TextField } from '@material-ui/core'
+import { Container, Button, TextField, Link } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
@@ -17,7 +17,7 @@ interface OwnProps {
 }
 
 interface DispatchProps {
-  login: (email: string, password: string) => void
+  login: (email: string, password?: string) => void
 }
 
 type Props = UserServiceProps & OwnProps & DispatchProps & RouteComponentProps
@@ -41,24 +41,23 @@ const useStyles = makeStyles((theme) => ({
   },
   forgotpassword: {
     marginTop: theme.spacing(3)
+  },
+  passwordlogin: {
+    marginTop: theme.spacing(2)
   }
 }))
 
 function Login(props: Props) {
+  const [email, setEmail] = useState('')
+  const [usePasswordLogin, setUsePasswordLogin] = useState(false)
+  const [password, setPassword] = useState('')
   const doLogin = (event: React.FormEvent) => {
     event.preventDefault()
     setError('')
-    const target = event.currentTarget as HTMLFormElement
-    const emailEl = target.elements.namedItem('email') as HTMLInputElement
-    const passwordEl = target.elements.namedItem('password') as HTMLInputElement
-
-    if (
-      emailEl &&
-      emailEl.value.length > 0 &&
-      passwordEl &&
-      passwordEl.value.length > 0
-    ) {
-      props.login(emailEl.value, passwordEl.value)
+    if (email && !usePasswordLogin) {
+      props.login(email)
+    } else if (usePasswordLogin && password && email) {
+      props.login(email, password)
     }
   }
 
@@ -90,17 +89,29 @@ function Login(props: Props) {
           label="email"
           name="email"
           type="text"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           autoFocus
           fullWidth
           required
         />
-        <TextField
-          label="password"
-          name="password"
-          type="password"
-          fullWidth
-          required
-        />
+        {usePasswordLogin ? (
+          <TextField
+            label="password"
+            name="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            fullWidth
+            required
+          />
+        ) : (
+          <div className={classes.passwordlogin}>
+            <Link color="primary" onClick={() => setUsePasswordLogin(true)}>
+              Use Password Login...
+            </Link>
+          </div>
+        )}
 
         <div>
           <Button
@@ -111,10 +122,17 @@ function Login(props: Props) {
             disabled={props.userService.isFetching}
             className={classes.submit}
           >
-            Login
+            {!usePasswordLogin ? 'Email Magic Link' : 'Login'}
           </Button>
         </div>
 
+        <Box>
+          {props.userService.message && (
+            <Typography variant="body1" display="block" gutterBottom>
+              {props.userService.message.message}
+            </Typography>
+          )}
+        </Box>
         <Box color="error.main">
           {props.userService.error && (
             <>
