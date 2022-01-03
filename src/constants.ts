@@ -2,7 +2,7 @@ import { Order } from './types/Order'
 
 export const API_HOST: string =
   process.env.NODE_ENV === 'production'
-    ? 'https://api.marshcoop.org'
+    ? 'https://sorta-cart.vercel.app/api'
     : 'http://localhost:3000/api'
 
 export const TAX_RATE = 0.06391
