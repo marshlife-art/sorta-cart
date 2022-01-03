@@ -10,6 +10,7 @@ import { RootState } from '../redux'
 import { UserServiceProps } from '../redux/session/reducers'
 import { Order } from '../types/Order'
 import OrderDetailPanel from './OrderDetailPanel'
+import { myOrders } from '../services/orderService'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,6 +80,16 @@ function MyOrders(props: UserServiceProps & RouteComponentProps) {
           setMyOrders(response.orders || [])
         })
         .catch((err) => console.warn('onoz /member/me caught err:', err))
+
+    userService.user &&
+      myOrders(userService.user?.id)
+        .then((response) => {
+          const { orders, error } = response
+          if (!error && orders) {
+            setMyOrders((orders as Order[]) || [])
+          }
+        })
+        .catch((err) => console.warn('onoz myOrders service caught err:', err))
     userService.user && fetchStoreCredit(setStoreCredit)
   }, [userService, refetchOrders])
 

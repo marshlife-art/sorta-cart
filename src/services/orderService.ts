@@ -232,3 +232,23 @@ export async function createOrder(props: {
     resolve({ error: false, msg: 'success!' })
   })
 }
+
+export function myOrders(
+  userId?: string
+): Promise<{ error: boolean; orders?: SupaOrder[] | null }> {
+  return new Promise(async (resolve, reject) => {
+    if (!userId) {
+      reject({ error: true })
+      return
+    }
+    const { data: orders, error } = await supabase
+      .from<SupaOrder>('Orders')
+      .select()
+      .eq('UserId', userId)
+
+    if (error || !orders) {
+      reject({ error: true, orders })
+    }
+    resolve({ error: false, orders })
+  })
+}
