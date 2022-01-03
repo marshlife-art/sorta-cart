@@ -445,7 +445,7 @@ function DataTable(
 
             if (q.filters.length) {
               q.filters.forEach((filter) => {
-                console.log('zomg filter:', filter)
+                // console.log('zomg filter:', filter)
                 if (filter.column.field === 'count_on_hand') {
                   const or = `count_on_hand.${
                     filter.value === 'checked'

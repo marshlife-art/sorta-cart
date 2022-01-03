@@ -15,7 +15,7 @@ import { PreferencesServiceProps } from './redux/preferences/reducers'
 import { getPreferences } from './redux/preferences/actions'
 
 import DataTable from './components/DataTable'
-import Landing from './components/Landing'
+import ProductsGrid from './components/ProductsGrid'
 import Checkout from './components/Checkout'
 import Login from './components/Login'
 import Register from './components/Register'
@@ -57,7 +57,7 @@ export function App(
       {preferencesService.preferences && (
         <Announcements preferences={preferencesService.preferences} />
       )}
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <Switch>
           <Route path="/checkout" exact component={Checkout} />
           <Route path="/products" exact component={DataTable} />
@@ -100,7 +100,7 @@ export function App(
               <Register />
             </>
           </Route>
-          <Route path="/" component={Landing} />
+          <Route path="/" component={ProductsGrid} />
         </Switch>
       </Router>
     </ThemeProvider>

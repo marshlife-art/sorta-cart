@@ -7,7 +7,7 @@ import { Product } from '../types/Product'
 import { OrderLineItem } from '../types/Order'
 import { IDatabaseChange } from 'dexie-observable/api'
 import { API_HOST } from '../constants'
-import { SupaOrderLineItem } from '../types/SupaTypes'
+import { SupaOrderLineItem, SupaProduct } from '../types/SupaTypes'
 import { validateLineItemsService } from './orderService'
 
 const db = new AppDatabase()
@@ -40,6 +40,10 @@ const useCartService = () => {
             setResult({ status: 'error', error: e })
           })
     })
+
+    // #TODO:
+    // ugh, return some kind of cleanup to turn .off the dexie event listeners. first, figure out how to do that?
+    // return db.off
   }, [])
 
   return result
@@ -71,7 +75,10 @@ const useCartItemCount = () => {
   return itemCount
 }
 
-const addToCart = async (product: Product) => {
+const addToCart = async (product: SupaProduct) => {
+  if (!product) {
+    return
+  }
   const line_items = await db.cart.toArray()
 
   const existingLi = line_items.find(
@@ -90,13 +97,13 @@ const addToCart = async (product: Product) => {
   } else {
     let line_item: OrderLineItem = {
       quantity: 1,
-      total: +product.ws_price,
+      total: +(product?.ws_price || 0),
       selected_unit: product.unit_type,
-      price: +product.ws_price,
+      price: +(product?.ws_price || 0),
       description: `${product.name} ${product.description}`.trim(),
       kind: 'product',
       vendor: product.vendor,
-      data: { product }
+      data: { product: product as unknown as Product }
     }
 
     db.cart

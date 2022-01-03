@@ -210,7 +210,7 @@ function UserMenu(props: Props) {
           </ListItemText>
         </StyledMenuItem>
 
-        <StyledMenuItem
+        {/* <StyledMenuItem
           onClick={() => {
             openAnnouncement()
             handleClose()
@@ -228,7 +228,7 @@ function UserMenu(props: Props) {
               <AnnouncementIcon />
             </div>
           </ListItemText>
-        </StyledMenuItem>
+        </StyledMenuItem> */}
 
         <StyledMenuItem
           onClick={() => {

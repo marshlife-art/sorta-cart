@@ -23,6 +23,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.1",
     "remark-gfm": "^3.0.1",
+    "swr": "^1.1.2",
     "typescript": "4.5.4"
   },
   "scripts": {
@@ -31,6 +32,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build && cp CNAME build/",
+    "build-store": "PUBLIC_URL=/store BUILD_PATH='./store' npm run build",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {

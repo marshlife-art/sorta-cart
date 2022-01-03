@@ -2,6 +2,7 @@ import Dexie from 'dexie'
 import 'dexie-observable'
 
 import { OrderLineItem } from './types/Order'
+// import { SupaOrderLineItem } from './types/SupaTypes'
 
 export class AppDatabase extends Dexie {
   cart: Dexie.Table<OrderLineItem, number>
