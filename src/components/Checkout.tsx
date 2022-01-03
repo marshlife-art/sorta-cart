@@ -33,7 +33,7 @@ import { UserService, UserServiceProps } from '../redux/session/reducers'
 import { RootState } from '../redux'
 import SquarePayment from './SquarePayment'
 import { fetchStoreCredit } from './MyOrders'
-import { getMyMember } from '../services/orderService'
+import { createOrder, getMyMember } from '../services/orderService'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -486,17 +486,10 @@ function Payment(
     //   isFree || canPayLater ? '/store/freecheckout' : '/store/checkout'
     // const body = isFree || canPayLater ? { order } : { order, nonce }
 
-    fetch(`${API_HOST}/store/checkout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ order, nonce })
-    })
-      .then((r) => r.json())
+    createOrder({ order, nonce, isFree, canPayLater })
       .then((response) => {
         if (response.error) {
-          console.warn('/store/checkout ERROR response:', response)
+          console.warn('createOrder ERROR response:', response)
           setError(response.msg || 'onoz! could not submit your order ;(')
         } else {
           emptyCart()
@@ -504,7 +497,7 @@ function Payment(
         }
       })
       .catch((err) => {
-        console.warn('onoz! caught error /store/checkout err:', err)
+        console.warn('onoz! caught error createOrder err:', err)
         setError('onoz! could not submit your order ;(')
       })
       .finally(() => setLoading(false))

@@ -1,5 +1,12 @@
 import { supabase } from '../lib/supabaseClient'
-import { SupaMember, SupaOrderLineItem, SupaProduct } from '../types/SupaTypes'
+import { Order } from '../types/Order'
+import {
+  SupaMember,
+  SupaNewOrderLineItem,
+  SupaOrder,
+  SupaOrderLineItem,
+  SupaProduct
+} from '../types/SupaTypes'
 
 type LineItemValidation = SupaOrderLineItem & {
   invalid?: string
@@ -158,4 +165,70 @@ export async function getMyMember(userId: string) {
     .single()
 
   return member
+}
+
+export async function createOrder(props: {
+  order: Order
+  isFree: boolean
+  canPayLater: boolean
+  nonce: string
+}): Promise<{ error: boolean; msg: string }> {
+  const { isFree, canPayLater, nonce } = props
+  // #TODO:
+  // should eventually call back to the server for this.
+  // fetch(`${API_HOST}/store/checkout`, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json'
+  //   },
+  //   body: JSON.stringify({ order, nonce })
+  // })
+  return new Promise(async (resolve, reject) => {
+    const {
+      id,
+      history,
+      createdAt,
+      updatedAt,
+      OrderLineItems,
+      ...orderToInsert
+    } = props.order
+
+    if (!orderToInsert || !OrderLineItems || OrderLineItems.length === 0) {
+      reject({ error: true, msg: 'No order or OrderLineItems specified?' })
+    }
+
+    // console.log('zomg gonna orderToInsert:', orderToInsert)
+    const { data: order, error } = await supabase
+      .from<SupaOrder>('Orders')
+      .insert(orderToInsert, { returning: 'representation' })
+      .single()
+
+    if (error || !order) {
+      console.warn('new order insert error:', error, order)
+      reject({ error: true, msg: `Insert error: ${error?.message}` })
+    }
+
+    const oliz: SupaNewOrderLineItem[] = props.order.OrderLineItems.map(
+      (oli) => {
+        const { id, data, ...rest } = oli
+        return { data: JSON.stringify(data), OrderId: order?.id, ...rest }
+      }
+    )
+    const { error: oliError } = await supabase
+      .from<SupaOrderLineItem>('OrderLineItems')
+      .insert(oliz)
+
+    if (oliError) {
+      console.warn('new order line items insert error:', oliError)
+      reject({
+        error: true,
+        message: `Error creating line items: ${oliError.message}`
+      })
+    }
+
+    // if (!nonce) {
+    //   reject({ error: true, msg: 'Bad payment.' })
+    // }
+    resolve({ error: false, msg: 'success!' })
+  })
 }
