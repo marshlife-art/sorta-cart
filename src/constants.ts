@@ -37,10 +37,9 @@ export const SQUARE_PAYMENT_JS =
 // https://sandbox.web.squarecdn.com/v1/square.js
 // https://web.squarecdn.com/v1/square.js
 
-export const SQUARE_APP_ID: string =
-  process.env.NODE_ENV === 'production'
-    ? 'sq0idp-TfU74GGFyRSTe7XZYsZp-g'
-    : 'sandbox-sq0idb-JHHiCIhNvJdJH4pJxLaDzA'
+// sorta-cart sandbox-sq0idb-JHHiCIhNvJdJH4pJxLaDzA
+// marsh sandbox-sq0idb-G1XbklToIMNlwvgNoUVDCQ
+export const SQUARE_APP_ID: string = 'sandbox-sq0idb-G1XbklToIMNlwvgNoUVDCQ'
 export const SQUARE_LOCATION_ID: string =
   process.env.NODE_ENV === 'production' ? 'FY8AAVD6K7T7A' : 'D2MV0BZC6EV9Y'
 

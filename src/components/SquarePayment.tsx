@@ -22,8 +22,7 @@ interface SquarePaymentFormProps {
 function SquarePaymentForm(props: SquarePaymentFormProps) {
   const { paymentForm, amount, loading, handleNext } = props
 
-  const [nonce, setNonce] = useState('')
-
+  console.log('fffffuck SQUARE_APP_ID:', SQUARE_APP_ID)
   const appId = SQUARE_APP_ID
   const locationId = SQUARE_LOCATION_ID
 
@@ -59,6 +58,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
   async function tokenize(paymentMethod: any) {
     const tokenResult = await paymentMethod.tokenize()
     if (tokenResult.status === 'OK') {
+      console.log('okayyyy tokenResult:', tokenResult)
       return tokenResult.token
     } else {
       let errorMessage = `Tokenization failed with status: ${tokenResult.status}`
@@ -71,25 +71,15 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
   }
 
   // status is either SUCCESS or FAILURE;
-  function displayPaymentResults(status: string) {
-    if (status === 'SUCCESS') {
-      handleNext(nonce)
-    }
-
+  function displayPaymentFailResults() {
     const statusContainer = document.getElementById(
       'payment-status-container'
     ) as HTMLDivElement
     if (!statusContainer) {
       return
     }
-    if (status === 'SUCCESS') {
-      statusContainer.classList.remove('is-failure')
-      statusContainer.classList.add('is-success')
-    } else {
-      statusContainer.classList.remove('is-success')
-      statusContainer.classList.add('is-failure')
-    }
-
+    statusContainer.classList.remove('is-success')
+    statusContainer.classList.add('is-failure')
     statusContainer.style.visibility = 'visible'
   }
 
@@ -137,12 +127,15 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
 
         const token = await tokenize(paymentMethod)
         const paymentResults = await createPayment(token)
-        displayPaymentResults('SUCCESS')
 
-        console.debug('Payment Success', paymentResults)
+        console.log('zomg handlenext gonna get a nonce??', token)
+        handleNext(token)
+        // displayPaymentResults('SUCCESS')
+
+        console.log('Payment Success', paymentResults)
       } catch (e: any) {
         cardButton.disabled = false
-        displayPaymentResults('FAILURE')
+        displayPaymentFailResults()
         console.error(e.message)
       }
     }

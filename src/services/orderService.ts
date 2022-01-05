@@ -1,3 +1,4 @@
+import { API_HOST } from '../constants'
 import { supabase } from '../lib/supabaseClient'
 import { Order } from '../types/Order'
 import {
@@ -174,15 +175,6 @@ export async function createOrder(props: {
   nonce: string
 }): Promise<{ error: boolean; msg: string }> {
   const { isFree, canPayLater, nonce } = props
-  // #TODO:
-  // should eventually call back to the server for this.
-  // fetch(`${API_HOST}/store/checkout`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify({ order, nonce })
-  // })
   return new Promise(async (resolve, reject) => {
     const {
       id,
@@ -196,6 +188,17 @@ export async function createOrder(props: {
     if (!orderToInsert || !OrderLineItems || OrderLineItems.length === 0) {
       reject({ error: true, msg: 'No order or OrderLineItems specified?' })
     }
+
+    fetch(`${API_HOST}/store/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        order: { ...orderToInsert, OrderLineItems },
+        sourceId: nonce
+      })
+    })
 
     // console.log('zomg gonna orderToInsert:', orderToInsert)
     const { data: order, error } = await supabase
