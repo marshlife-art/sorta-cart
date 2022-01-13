@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
-import { ThunkDispatch } from 'redux-thunk'
-import { withRouter, RouteComponentProps, useLocation } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Container, Button, TextField } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
@@ -9,15 +8,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import { RootState } from '../redux'
 import { resetPassword } from '../redux/session/actions'
-import { UserServiceProps } from '../redux/session/reducers'
-
-interface OwnProps {}
-
-interface DispatchProps {
-  resetPassword: (regKey: string, password: string) => void
-}
-
-type Props = UserServiceProps & OwnProps & DispatchProps & RouteComponentProps
+import { UserService } from '../redux/session/reducers'
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -45,8 +36,13 @@ function useQuery() {
   return new URLSearchParams(useLocation().search)
 }
 
-function ResetPassword(props: Props) {
-  const { userService, history } = props
+export default function ResetPassword() {
+  const userService = useSelector<RootState, UserService>(
+    (state) => state.session.userService
+  )
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const classes = useStyles()
   const [error, setError] = useState('')
 
@@ -71,7 +67,7 @@ function ResetPassword(props: Props) {
       passwordEl.value === passwordConfirmEl.value &&
       regKey
     ) {
-      props.resetPassword(regKey, passwordEl.value)
+      dispatch(resetPassword(regKey, passwordEl.value))
     } else {
       setError('Please make sure password match!')
     }
@@ -81,12 +77,12 @@ function ResetPassword(props: Props) {
   useEffect(() => {
     if (userService.user && !userService.isFetching && userService.user.role) {
       // console.log('we gotta user!', userService.user)
-      history.push('/')
+      navigate('/')
     }
     // else if (userService.user && !userService.isFetching) {
     //   setError('o noz! error! ...hmm??')
     // }
-  }, [userService, history])
+  }, [userService])
 
   return (
     <Container maxWidth="sm">
@@ -116,7 +112,7 @@ function ResetPassword(props: Props) {
             fullWidth
             variant="contained"
             color="primary"
-            disabled={props.userService.isFetching}
+            disabled={userService.isFetching}
             className={classes.submit}
           >
             Reset Password
@@ -124,13 +120,13 @@ function ResetPassword(props: Props) {
         </div>
 
         <Box color="error.main">
-          {props.userService.error && (
+          {userService.error && (
             <>
               <Typography variant="overline" display="block">
                 onoz! an error!
               </Typography>
               <Typography variant="body1" display="block" gutterBottom>
-                {props.userService.error.reason}
+                {userService.error.reason}
               </Typography>
             </>
           )}
@@ -149,27 +145,3 @@ function ResetPassword(props: Props) {
     </Container>
   )
 }
-
-const mapStateToProps = (
-  states: RootState,
-  ownProps: OwnProps
-): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<{}, {}, any>,
-  ownProps: OwnProps
-): DispatchProps => {
-  return {
-    resetPassword: (regKey, password) =>
-      dispatch(resetPassword(regKey, password))
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(ResetPassword))

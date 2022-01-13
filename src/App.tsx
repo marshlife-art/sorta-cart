@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { ThunkDispatch } from 'redux-thunk'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -58,50 +58,69 @@ export function App(
         <Announcements preferences={preferencesService.preferences} />
       )}
       <Router basename={process.env.PUBLIC_URL}>
-        <Switch>
-          <Route path="/checkout" exact component={Checkout} />
-          <Route path="/products" exact component={DataTable} />
-          <Route path="/products/onhand/:onhand" exact component={DataTable} />
-          <Route path="/products/:cat/" exact component={DataTable} />
-          <Route path="/products/:cat/:subcat" component={DataTable} />
-          <Route path="/orders" exact>
-            <>
-              <NavBar />
-              <MyOrders />
-            </>
-          </Route>
-          <Route path="/order/:id" exact>
-            <>
-              <NavBar />
-              <Order />
-            </>
-          </Route>
-          <Route path="/forgotpassword" exact>
-            <>
-              <NavBar />
-              <ForgotPassword />
-            </>
-          </Route>
-          <Route path="/resetpassword" exact>
-            <>
-              <NavBar />
-              <ResetPassword />
-            </>
-          </Route>
-          <Route path="/login" exact>
-            <>
-              <NavBar />
-              <Login showTitle />
-            </>
-          </Route>
-          <Route path="/register" exact>
-            <>
-              <NavBar />
-              <Register />
-            </>
-          </Route>
-          <Route path="/" component={ProductsGrid} />
-        </Switch>
+        <Routes>
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/products" element={<DataTable />} />
+          <Route path="/products/onhand/:onhand" element={<DataTable />} />
+          <Route path="/products/:cat/" element={<DataTable />} />
+          <Route path="/products/:cat/:subcat" element={<DataTable />} />
+          <Route
+            path="/orders"
+            element={
+              <>
+                <NavBar />
+                <MyOrders />
+              </>
+            }
+          />
+          <Route
+            path="/order/:id"
+            element={
+              <>
+                <NavBar />
+                <Order />
+              </>
+            }
+          />
+          <Route
+            path="/forgotpassword"
+            element={
+              <>
+                <NavBar />
+                <ForgotPassword />
+              </>
+            }
+          />
+
+          <Route
+            path="/resetpassword"
+            element={
+              <>
+                <NavBar />
+                <ResetPassword />
+              </>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <>
+                <NavBar />
+                <Login showTitle />
+              </>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <>
+                <NavBar />
+                <Register />
+              </>
+            }
+          />
+          <Route path="/" element={<ProductsGrid />} />
+        </Routes>
       </Router>
     </ThemeProvider>
   )

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { connect } from 'react-redux'
+import { useMatch } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import { makeStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography'
 
 import { API_HOST } from '../constants'
 import { RootState } from '../redux'
-import { UserServiceProps } from '../redux/session/reducers'
+import { UserService } from '../redux/session/reducers'
 import { Order } from '../types/Order'
 import OrderDetailPanel from './OrderDetailPanel'
 import Login from './Login'
@@ -28,16 +28,18 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-function MyOrders(
-  props: UserServiceProps & RouteComponentProps<{ id?: string }>
-) {
-  const { userService } = props
+export default function MyOrders() {
+  const userService = useSelector<RootState, UserService>(
+    (state) => state.session.userService
+  )
+  const match = useMatch('/order/:id')
+
   const classes = useStyles()
   const [order, setOrder] = useState<Order>()
   const [refetchOrders, setRefetchOrders] = useState(0)
   const [error, setError] = useState('')
 
-  const orderId = props.match && props.match.params && props.match.params.id
+  const orderId = match?.params?.id
 
   useEffect(() => {
     userService.user &&
@@ -83,11 +85,3 @@ function MyOrders(
     </Paper>
   )
 }
-
-const mapStateToProps = (states: RootState): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-export default connect(mapStateToProps)(withRouter(MyOrders))

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import MaterialTable from 'material-table'
 import { formatDistance } from 'date-fns'
 
 import { API_HOST } from '../constants'
 import { RootState } from '../redux'
-import { UserServiceProps } from '../redux/session/reducers'
+import { UserService } from '../redux/session/reducers'
 import { Order } from '../types/Order'
 import OrderDetailPanel from './OrderDetailPanel'
 import { myOrders } from '../services/orderService'
@@ -42,8 +41,11 @@ export async function fetchStoreCredit(
   setStoreCredit(store_credit)
 }
 
-function MyOrders(props: UserServiceProps & RouteComponentProps) {
-  const { userService } = props
+export default function MyOrders() {
+  const userService = useSelector<RootState, UserService>(
+    (state) => state.session.userService
+  )
+
   const classes = useStyles()
   const [myorders, setMyOrders] = useState<Order[]>([])
   const [storeCredit, setStoreCredit] = useState(0)
@@ -153,11 +155,3 @@ function MyOrders(props: UserServiceProps & RouteComponentProps) {
     </div>
   )
 }
-
-const mapStateToProps = (states: RootState): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-export default connect(mapStateToProps)(withRouter(MyOrders))

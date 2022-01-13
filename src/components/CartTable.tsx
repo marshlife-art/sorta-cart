@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles'
 import Table from '@material-ui/core/Table'
@@ -86,8 +86,9 @@ interface CartTableProps {
   summary?: boolean
 }
 
-function CartTable(props: CartTableProps & RouteComponentProps) {
+export default function CartTable(props: CartTableProps) {
   const narrowWidth = useMediaQuery('(max-width:600px)')
+  const navigate = useNavigate()
   const classes = useStyles()
 
   const { checkout, summary, setOrder } = props
@@ -355,7 +356,7 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => props.history.push('/checkout')}
+                onClick={() => navigate('/checkout')}
               >
                 Checkout
               </Button>
@@ -378,5 +379,3 @@ function CartTable(props: CartTableProps & RouteComponentProps) {
     </Table>
   )
 }
-
-export default withRouter(CartTable)

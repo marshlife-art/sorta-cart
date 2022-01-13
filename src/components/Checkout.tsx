@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import Stepper from '@material-ui/core/Stepper'
 import Step from '@material-ui/core/Step'
@@ -28,7 +28,7 @@ import {
 import CartTable from './CartTable'
 import Login from './Login'
 import { Order, OrderLineItem } from '../types/Order'
-import { BLANK_ORDER, API_HOST } from '../constants'
+import { BLANK_ORDER } from '../constants'
 import { UserService, UserServiceProps } from '../redux/session/reducers'
 import { RootState } from '../redux'
 import SquarePayment from './SquarePayment'
@@ -61,12 +61,12 @@ const registrationStyles = makeStyles((theme: Theme) =>
 function Registration(
   props: {
     handleNext: () => void
-    history: any
     setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
   } & StepButtonsProps &
     UserServiceProps
 ) {
   const classes = registrationStyles()
+  const navigate = useNavigate()
   const [opt, setOpt] = useState<'login' | 'register' | 'guest' | undefined>()
 
   const {
@@ -120,10 +120,7 @@ function Registration(
               <Typography variant="body1" gutterBottom>
                 Want to become a member?
               </Typography>
-              <Button
-                color="secondary"
-                onClick={() => props.history.push('/register')}
-              >
+              <Button color="secondary" onClick={() => navigate('/register')}>
                 Join the Co-op
               </Button>
             </div>
@@ -675,9 +672,12 @@ function getSteps() {
   return ['Member Registration', 'Review Order', 'Payment']
 }
 
-function Checkout(props: UserServiceProps & RouteComponentProps) {
+export default function Checkout() {
   const classes = checkoutStyles()
-  const { userService, history } = props
+
+  const userService = useSelector<RootState, UserService>(
+    (state) => state.session.userService
+  )
 
   const [activeStep, setActiveStep] = useState(0)
   const [canGoToNextStep, setCanGoToNextStep] = useState(false)
@@ -739,7 +739,6 @@ function Checkout(props: UserServiceProps & RouteComponentProps) {
                   nextDisabled={!canGoToNextStep || activeStep === 0}
                   nextText={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                   userService={userService}
-                  history={history}
                 />
               )}
               {activeStep === 1 && (
@@ -773,11 +772,3 @@ function Checkout(props: UserServiceProps & RouteComponentProps) {
     </>
   )
 }
-
-const mapStateToProps = (states: RootState): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-export default connect(mapStateToProps)(withRouter(Checkout))

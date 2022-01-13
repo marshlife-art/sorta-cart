@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import { ThunkDispatch } from 'redux-thunk'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Container from '@material-ui/core/Container'
 import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
@@ -22,7 +22,7 @@ import { Slider } from '@material-ui/core'
 import { Member } from '../types/Member'
 import { User } from '../types/User'
 import { RootState } from '../redux'
-import { UserServiceProps } from '../redux/session/reducers'
+import { UserService, UserServiceProps } from '../redux/session/reducers'
 import { register } from '../redux/session/actions'
 import { API_HOST } from '../constants'
 
@@ -81,20 +81,25 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-interface OwnProps {}
+// interface OwnProps {}
 
-interface DispatchProps {
-  register: (
-    user: Partial<User>,
-    member: Partial<Member>,
-    nonce: string
-  ) => void
-}
+// interface DispatchProps {
+//   register: (
+//     user: Partial<User>,
+//     member: Partial<Member>,
+//     nonce: string
+//   ) => void
+// }
 
-type Props = RouteComponentProps & UserServiceProps & DispatchProps
+// type Props = RouteComponentProps & UserServiceProps & DispatchProps
 
-function Register(props: Props) {
-  const { history, userService } = props
+export default function Register() {
+  const userService = useSelector<RootState, UserService>(
+    (state) => state.session.userService
+  )
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const classes = useStyles()
   // const [error, setError] = useState('')
   const [purchaseshare, setPurchaseshare] = useState('')
@@ -124,10 +129,12 @@ function Register(props: Props) {
     //   nonce
     // )
 
-    props.register(
-      userData,
-      { ...member, data: memberData, fees_paid: registrationFee },
-      nonce
+    dispatch(
+      register(
+        userData,
+        { ...member, data: memberData, fees_paid: registrationFee },
+        nonce
+      )
     )
   }
 
@@ -536,7 +543,7 @@ function Register(props: Props) {
           </Typography>
           <div className={classes.continueWrapper}>
             <Button
-              onClick={() => history.push('/')}
+              onClick={() => navigate('/')}
               variant="outlined"
               size="large"
             >
@@ -548,25 +555,3 @@ function Register(props: Props) {
     </Container>
   )
 }
-
-const mapStateToProps = (states: RootState): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<{}, {}, any>,
-  ownProps: OwnProps
-): DispatchProps => {
-  return {
-    register: (user, member, nonce) => dispatch(register(user, member, nonce))
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(Register))
-
-// export default withRouter(Register)

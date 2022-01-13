@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   makeStyles,
   Theme,
@@ -43,7 +43,8 @@ const styles = makeStyles((theme: Theme) =>
   })
 )
 
-function UserLoginPrompt(props: RouteComponentProps) {
+export default function UserLoginPrompt() {
+  const navigate = useNavigate()
   const classes = styles()
   const [doLogin, setDoLogin] = useState(false)
 
@@ -75,10 +76,7 @@ function UserLoginPrompt(props: RouteComponentProps) {
             <Typography variant="body1">Want to become a member?</Typography>
           </div>
           <div className={classes.optItem}>
-            <Button
-              color="secondary"
-              onClick={() => props.history.push('/register')}
-            >
+            <Button color="secondary" onClick={() => navigate('/register')}>
               Join the Co-op
             </Button>
           </div>
@@ -95,5 +93,3 @@ function UserLoginPrompt(props: RouteComponentProps) {
     </div>
   )
 }
-
-export default withRouter(UserLoginPrompt)

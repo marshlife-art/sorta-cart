@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { useMatch, useNavigate } from 'react-router-dom'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import MaterialTable, {
   Action,
@@ -77,13 +77,13 @@ function renderCodes(codes: string) {
     )
 }
 
-interface TableBodyProps extends MaterialTableProps<any>, ListProps {
-  tableHeight: number
-  headerHeight: number
-  tableWidth: number
-  scrollIndex: number
-  renderData: any
-}
+// interface TableBodyProps extends MaterialTableProps<any>, ListProps {
+//   tableHeight: number
+//   headerHeight: number
+//   tableWidth: number
+//   scrollIndex: number
+//   renderData: any
+// }
 
 // const Row = React.memo<ListChildComponentProps>(({ data, index, style }) => {
 
@@ -181,11 +181,12 @@ interface TableBodyProps extends MaterialTableProps<any>, ListProps {
 //   // )
 // }
 
-function DataTable(
-  props: RouteComponentProps<{ cat?: string; subcat?: string; onhand?: string }>
-) {
+export default function DataTable() {
   const narrowWidth = useMediaQuery('(max-width:600px)')
   const itemCount = useCartItemCount()
+  const navigate = useNavigate()
+  // RouteComponentProps<{ cat?: string; subcat?: string; onhand?: string }>
+  const match = useMatch('/products/:cat/:subcat')
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
   const [userMenuAnchorEl, setUserMenuAnchorEl] =
@@ -243,32 +244,19 @@ function DataTable(
 
   const [catDefaultFilter, setCatDefaultFilter] = useState<
     '' | string[] | undefined
-  >(
-    () =>
-      props.match &&
-      props.match.params &&
-      props.match.params.cat && [decodeURIComponent(props.match.params.cat)]
-  )
+  >(() => match?.params?.cat && [decodeURIComponent(match.params.cat)])
   const [subCatDefaultFilter, setSubCatDefaultFilter] = useState<
     '' | string[] | undefined
-  >(
-    () =>
-      props.match &&
-      props.match.params &&
-      props.match.params.subcat && [
-        decodeURIComponent(props.match.params.subcat)
-      ]
-  )
+  >(() => match?.params?.subcat && [decodeURIComponent(match.params.subcat)])
 
-  const [onHandDefaultFilter] = useState<string | undefined>(() =>
-    !!(
-      props.match &&
-      props.match.params &&
-      props.match.params.onhand &&
-      decodeURIComponent(props.match.params.onhand)
-    )
-      ? 'checked'
-      : undefined
+  const [onHandDefaultFilter] = useState<string | undefined>(
+    () => undefined
+    // !!(
+    //   match?.params?.onhand &&
+    //   decodeURIComponent(match.params.onhand)
+    // )
+    //   ? 'checked'
+    //   : undefined
   )
 
   async function setSelectedCatsFromQuery(query: Query<any>) {
@@ -501,11 +489,7 @@ function DataTable(
           })
         }
         title={
-          <Button
-            variant="text"
-            size="large"
-            onClick={() => props.history.push('/')}
-          >
+          <Button variant="text" size="large" onClick={() => navigate('/')}>
             {narrowWidth ? (
               <BackIcon />
             ) : (
@@ -531,5 +515,3 @@ function DataTable(
     </>
   )
 }
-
-export default withRouter(DataTable)
