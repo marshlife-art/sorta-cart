@@ -7,12 +7,12 @@ import Paper from '@material-ui/core/Paper'
 import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 
-import { API_HOST } from '../constants'
 import { RootState } from '../redux'
 import { UserService } from '../redux/session/reducers'
 import { Order } from '../types/Order'
 import OrderDetailPanel from './OrderDetailPanel'
 import Login from './Login'
+import { myOrder } from '../services/orderService'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,20 +44,12 @@ export default function MyOrders() {
   useEffect(() => {
     userService.user &&
       orderId &&
-      fetch(`${API_HOST}/getorder`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ OrderId: orderId })
-      })
-        .then((r) => r.json())
+      userService.user &&
+      myOrder(orderId, userService.user)
         .then((response) => {
-          if (response && response.order) {
-            setOrder(response.order)
-          } else {
-            setError('Order not found!')
+          const { order, error } = response
+          if (!error && order) {
+            setOrder(order as Order)
           }
         })
         .catch((err) => setError('Order not found!'))

@@ -8,6 +8,7 @@ import {
   SupaOrderLineItem,
   SupaProduct
 } from '../types/SupaTypes'
+import { User } from '../types/User'
 
 type LineItemValidation = SupaOrderLineItem & {
   invalid?: string
@@ -254,4 +255,114 @@ export function myOrders(
     }
     resolve({ error: false, orders })
   })
+}
+
+export function myOrder(
+  orderId?: string,
+  user?: User
+): Promise<{ error: boolean; order?: SupaOrder | null }> {
+  return new Promise(async (resolve, reject) => {
+    if (!orderId) {
+      reject({ error: true })
+      return
+    }
+    const { data: order, error } = await supabase
+      .from<SupaOrder>('Orders')
+      .select('*, OrderLineItems ( * )')
+      // #TODO: maybe use something else than `email` to match this order?
+      //memail: user?.email
+      .match({ id: orderId, UserId: user?.id })
+      .single()
+
+    if (error || !order) {
+      reject({ error: true, order })
+    }
+    resolve({ error: false, order })
+  })
+}
+
+async function getMemberCreditsAdjustmentsSums(MemberId: string | number) {
+  if (MemberId === undefined) {
+    return {
+      credits_sum: 0,
+      adjustments_sum: 0,
+      credits: [],
+      adjustments: [],
+      store_credit: 0
+    }
+  }
+
+  const { data: orders, error } = await supabase
+    .from<SupaOrder>('Orders')
+    .select('id')
+    .eq('MemberId', MemberId)
+
+  if (error || !orders) {
+    console.warn(
+      '[getMemberCreditsAdjustmentsSums] selecting Orders got error:',
+      error
+    )
+    return {
+      credits_sum: 0,
+      adjustments_sum: 0,
+      credits: [],
+      adjustments: [],
+      store_credit: 0
+    }
+  }
+
+  const orderIds = orders.map((o) => o.id)
+
+  const { data: credits } = await supabase
+    .from<SupaOrderLineItem>('OrderLineItems')
+    .select()
+    .eq('kind', 'credit')
+    .in('OrderId', orderIds)
+
+  const { data: adjustments } = await supabase
+    .from<SupaOrderLineItem>('OrderLineItems')
+    .select()
+    .eq('kind', 'adjustment')
+    .in('OrderId', orderIds)
+    .ilike('description', '%store credit%')
+
+  const credits_sum = credits
+    ? credits
+        .map(({ total }) => (total ? total : 0))
+        .reduce((sum, i) => sum + i, 0)
+    : 0
+
+  const adjustments_sum = adjustments
+    ? adjustments
+        .map(({ total }) => (total ? total : 0))
+        .reduce((sum, i) => sum + i, 0)
+    : 0
+
+  const store_credit = +(credits_sum + Math.abs(adjustments_sum)).toFixed(2)
+
+  return { credits_sum, adjustments_sum, credits, adjustments, store_credit }
+}
+
+export async function getStoreCreditForUser(UserId: number | string) {
+  if (UserId === undefined) {
+    return 0
+  }
+
+  const { data, error } = await supabase
+    .from('Member')
+    .select('id')
+    .eq('UserId', UserId)
+    .single()
+  if (error || !data) {
+    return 0
+  }
+  const MemberId = data.id
+
+  if (!MemberId) {
+    return 0
+  }
+
+  const { store_credit } = await getMemberCreditsAdjustmentsSums(MemberId)
+
+  return store_credit
 }

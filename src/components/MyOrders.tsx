@@ -6,10 +6,10 @@ import { formatDistance } from 'date-fns'
 
 import { API_HOST } from '../constants'
 import { RootState } from '../redux'
-import { UserService } from '../redux/session/reducers'
+import { userService, UserService } from '../redux/session/reducers'
 import { Order } from '../types/Order'
 import OrderDetailPanel from './OrderDetailPanel'
-import { myOrders } from '../services/orderService'
+import { getStoreCreditForUser, myOrders } from '../services/orderService'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,22 +22,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export async function fetchStoreCredit(
-  setStoreCredit: React.Dispatch<React.SetStateAction<number>>
+async function fetchStoreCredit(
+  setStoreCredit: React.Dispatch<React.SetStateAction<number>>,
+  userService?: UserService
 ) {
-  const store_credit = await fetch(`${API_HOST}/store_credit`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    credentials: 'include'
-  })
-    .then((response: any) => response.json())
-    .then((response) =>
-      response && response.store_credit ? response.store_credit : 0
-    )
-    .catch((err: any) => 0)
-
+  if (!userService?.user?.id) {
+    return
+  }
+  const store_credit = await getStoreCreditForUser(userService.user.id)
   setStoreCredit(store_credit)
 }
 
@@ -70,20 +62,6 @@ export default function MyOrders() {
 
   useEffect(() => {
     userService.user &&
-      fetch(`${API_HOST}/myorders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      })
-        .then((r) => r.json())
-        .then((response) => {
-          setMyOrders(response.orders || [])
-        })
-        .catch((err) => console.warn('onoz /member/me caught err:', err))
-
-    userService.user &&
       myOrders(userService.user?.id)
         .then((response) => {
           const { orders, error } = response
@@ -92,7 +70,7 @@ export default function MyOrders() {
           }
         })
         .catch((err) => console.warn('onoz myOrders service caught err:', err))
-    userService.user && fetchStoreCredit(setStoreCredit)
+    userService.user && fetchStoreCredit(setStoreCredit, userService)
   }, [userService, refetchOrders])
 
   return (

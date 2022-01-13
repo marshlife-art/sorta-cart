@@ -32,8 +32,11 @@ import { BLANK_ORDER } from '../constants'
 import { UserService, UserServiceProps } from '../redux/session/reducers'
 import { RootState } from '../redux'
 import SquarePayment from './SquarePayment'
-import { fetchStoreCredit } from './MyOrders'
-import { createOrder, getMyMember } from '../services/orderService'
+import {
+  createOrder,
+  getMyMember,
+  getStoreCreditForUser
+} from '../services/orderService'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,6 +60,17 @@ const registrationStyles = makeStyles((theme: Theme) =>
     }
   })
 )
+
+async function fetchStoreCredit(
+  setStoreCredit: React.Dispatch<React.SetStateAction<number>>,
+  userService?: UserService
+) {
+  if (!userService?.user?.id) {
+    return
+  }
+  const store_credit = await getStoreCreditForUser(userService.user.id)
+  setStoreCredit(store_credit)
+}
 
 function Registration(
   props: {
@@ -243,7 +257,7 @@ function ReviewCart(
 
   useEffect(() => {
     userService.user && getMemberInfo()
-    userService.user && fetchStoreCredit(setStoreCredit)
+    userService.user && fetchStoreCredit(setStoreCredit, userService)
   }, [userService])
 
   useEffect(() => {
