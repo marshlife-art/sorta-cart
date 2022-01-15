@@ -22,7 +22,6 @@ interface SquarePaymentFormProps {
 function SquarePaymentForm(props: SquarePaymentFormProps) {
   const { paymentForm, amount, loading, handleNext } = props
 
-  console.log('fffffuck SQUARE_APP_ID:', SQUARE_APP_ID)
   const appId = SQUARE_APP_ID
   const locationId = SQUARE_LOCATION_ID
 
@@ -58,7 +57,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
   async function tokenize(paymentMethod: any) {
     const tokenResult = await paymentMethod.tokenize()
     if (tokenResult.status === 'OK') {
-      console.log('okayyyy tokenResult:', tokenResult)
+      // console.log('okayyyy tokenResult:', tokenResult)
       return tokenResult.token
     } else {
       let errorMessage = `Tokenization failed with status: ${tokenResult.status}`
@@ -128,11 +127,11 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
         const token = await tokenize(paymentMethod)
         const paymentResults = await createPayment(token)
 
-        console.log('zomg handlenext gonna get a nonce??', token)
+        // console.log('zomg handlenext gonna get a nonce??', token)
         handleNext(token)
         // displayPaymentResults('SUCCESS')
 
-        console.log('Payment Success', paymentResults)
+        // console.log('Payment Success', paymentResults)
       } catch (e: any) {
         cardButton.disabled = false
         displayPaymentFailResults()

@@ -4,6 +4,7 @@ import { AnyAction } from 'redux'
 import { User, LoginError, LoginMessage } from '../../types/User'
 import { supabase } from '../../lib/supabaseClient'
 import { Member } from '../../types/Member'
+import { registerMember } from '../../services/memberService'
 
 export interface SetAction {
   type: 'SET'
@@ -131,6 +132,28 @@ export const register = (
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
     return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
+
+      registerMember({ user, member, nonce })
+        .then((response) => {
+          if (response.msg === 'ok' && response.user) {
+            dispatch(set(response.user))
+          } else {
+            dispatch(setError({ error: 'error', reason: response.msg }))
+          }
+        })
+        .catch((e) => {
+          console.warn('register error:', e)
+          dispatch(
+            setError({
+              error: 'error',
+              reason: 'unable to register right now :('
+            })
+          )
+        })
+        .finally(() => {
+          dispatch(isFetching(false))
+          resolve()
+        })
 
       // #TODO: FIX THIS
       dispatch(

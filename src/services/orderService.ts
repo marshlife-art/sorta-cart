@@ -324,6 +324,7 @@ async function getMemberCreditsAdjustmentsSums(MemberId: string | number) {
     .select()
     .eq('kind', 'adjustment')
     .in('OrderId', orderIds)
+    // #TODO: there could be a better way to tag these store credit order line items :/
     .ilike('description', '%store credit%')
 
   const credits_sum = credits

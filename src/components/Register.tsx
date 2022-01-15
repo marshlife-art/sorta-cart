@@ -25,6 +25,7 @@ import { RootState } from '../redux'
 import { UserService, UserServiceProps } from '../redux/session/reducers'
 import { register } from '../redux/session/actions'
 import { API_HOST } from '../constants'
+import { checkIfEamilExists } from '../services/memberService'
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -81,17 +82,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-// interface OwnProps {}
-
-// interface DispatchProps {
-//   register: (
-//     user: Partial<User>,
-//     member: Partial<Member>,
-//     nonce: string
-//   ) => void
-// }
-
-// type Props = RouteComponentProps & UserServiceProps & DispatchProps
+interface MemberData {
+  workerOwner?: boolean
+  producer?: boolean
+  kitchenExperience?: boolean
+  farmingGardeningExperience?: boolean
+  otherexpExplain?: string
+}
 
 export default function Register() {
   const userService = useSelector<RootState, UserService>(
@@ -104,12 +101,12 @@ export default function Register() {
   // const [error, setError] = useState('')
   const [purchaseshare, setPurchaseshare] = useState('')
   const [understandBylaws, setUnderstandBylaws] = useState(false)
-  const [registrationFee, setRegistrationFee] = useState(100)
+  const [registrationFee, setRegistrationFee] = useState(0)
   const [subsityAmount, setSubsityAmount] = useState(99)
   const [otherexpexplain, setOtherexpexplain] = useState(false)
   const [userData, setUserData] = useState<Partial<User>>({})
   const [member, setMember] = useState<Partial<Member>>({})
-  const [memberData, setMemberData] = useState<object>({})
+  const [memberData, setMemberData] = useState<MemberData>()
 
   const [valid, setValid] = useState(false)
   const [validEmail, setValidEmail] = useState<boolean | undefined>(undefined)
@@ -184,22 +181,9 @@ export default function Register() {
   function checkValidEmail(event: any) {
     // console.log('checkValidEmail!! userData.email:', userData.email)
     if (userData.email && userData.email.length) {
+      checkIfEamilExists(userData.email).then((resp) => setValidEmail(resp))
+
       // console.log('checkValidEmail checking email..')
-      fetch(`${API_HOST}/register/check`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: userData.email
-        })
-      })
-        .then((r) => r.json())
-        .then((response) => {
-          // console.log('/register/check response:', response)
-          setValidEmail(!!response && response.valid)
-        })
-        .catch((err) => console.warn('onoz! register/check err:', err))
     } else {
       setValidEmail(undefined)
     }
@@ -211,7 +195,7 @@ export default function Register() {
         purchaseshare &&
         understandBylaws &&
         userData.email &&
-        userData.password &&
+        // userData.password &&
         member.name &&
         member.phone
       )
@@ -232,7 +216,11 @@ export default function Register() {
             name="email"
             type="text"
             helperText={
-              validEmail === false ? 'that email is already taken!' : 'Required'
+              validEmail === false
+                ? 'that email is already taken!'
+                : validEmail === undefined
+                ? 'Required'
+                : ''
             }
             onChange={handleUserDataChange}
             onBlur={checkValidEmail}
@@ -240,20 +228,20 @@ export default function Register() {
             required
             autoFocus
           />
-          <TextField
+          {/* <TextField
             label="password"
             name="password"
             type="password"
-            helperText="Required"
+            helperText={userData.password ? '' : 'Required'}
             onChange={handleUserDataChange}
             fullWidth
             required
-          />
+          /> */}
           <TextField
             label="name"
             name="name"
             type="text"
-            helperText="Required"
+            helperText={member?.name ? '' : 'Required'}
             onChange={handleMemberChange}
             fullWidth
             required
@@ -262,7 +250,7 @@ export default function Register() {
             label="phone"
             name="phone"
             type="phone"
-            helperText="Required"
+            helperText={member?.phone ? '' : 'Required'}
             onChange={handleMemberChange}
             fullWidth
             required
@@ -370,7 +358,7 @@ export default function Register() {
                 />
               )}
             </RadioGroup>
-            <FormHelperText>Required</FormHelperText>
+            <FormHelperText>{registrationFee ? '' : 'Required'}</FormHelperText>
           </FormControl>
 
           <FormControl component="fieldset" className={classes.formControl}>
@@ -495,7 +483,9 @@ export default function Register() {
             co-op and its members."
               />
             </FormGroup>
-            <FormHelperText>Required</FormHelperText>
+            <FormHelperText>
+              {understandBylaws ? '' : 'Required'}
+            </FormHelperText>
           </FormControl>
 
           <div className={classes.paymentContainer}>
