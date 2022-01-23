@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles'
 import Table from '@material-ui/core/Table'
@@ -16,7 +17,10 @@ import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
 import ClearIcon from '@material-ui/icons/Clear'
 
-import { updateLineItem, removeItemFromCart } from '../services/useCartService'
+import {
+  updateLineItem,
+  removeItemFromCart
+} from '../services/useCartService'
 import { Order, OrderLineItem } from '../types/Order'
 import { TAX_RATE, TAX_RATE_STRING } from '../constants'
 
@@ -88,8 +92,8 @@ interface CartTableProps {
 
 export default function CartTable(props: CartTableProps) {
   const narrowWidth = useMediaQuery('(max-width:600px)')
-  const navigate = useNavigate()
   const classes = useStyles()
+  const navigate = useNavigate()
 
   const { checkout, summary, setOrder } = props
   const invoiceSubtotal = subtotal(props.line_items)
@@ -356,7 +360,9 @@ export default function CartTable(props: CartTableProps) {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => navigate('/checkout')}
+                onClick={() => {
+                  navigate('/checkout')
+                }}
               >
                 Checkout
               </Button>

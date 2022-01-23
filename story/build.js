@@ -12,5 +12,8 @@ await esbuild.build({
     })
   ],
   bundle: true,
-  loader: { '.js': 'jsx', '.tsx': 'tsx' }
+  loader: { '.js': 'jsx', '.tsx': 'tsx' },
+  watch: !!process.env.STORY_WATCH,
+  platform: 'browser',
+  external: ['fs', 'path']
 })

@@ -190,17 +190,6 @@ export async function createOrder(props: {
       reject({ error: true, msg: 'No order or OrderLineItems specified?' })
     }
 
-    fetch(`${API_HOST}/store/checkout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        order: { ...orderToInsert, OrderLineItems },
-        sourceId: nonce
-      })
-    })
-
     // console.log('zomg gonna orderToInsert:', orderToInsert)
     const { data: order, error } = await supabase
       .from<SupaOrder>('Orders')
@@ -229,6 +218,17 @@ export async function createOrder(props: {
         message: `Error creating line items: ${oliError.message}`
       })
     }
+
+    fetch(`${API_HOST}/store/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        order: { ...orderToInsert, OrderLineItems },
+        sourceId: nonce
+      })
+    })
 
     // if (!nonce) {
     //   reject({ error: true, msg: 'Bad payment.' })

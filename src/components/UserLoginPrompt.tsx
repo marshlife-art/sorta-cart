@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   makeStyles,
   Theme,
@@ -9,9 +8,11 @@ import {
   IconButton,
   Tooltip
 } from '@material-ui/core'
-import BackIcon from '@material-ui/icons/ArrowBack'
+
+import Icon from '@mui/material/Icon'
 
 import Login from './Login'
+import { useNavigate } from 'react-router-dom'
 
 const styles = makeStyles((theme: Theme) =>
   createStyles({
@@ -53,7 +54,7 @@ export default function UserLoginPrompt() {
       {doLogin && (
         <Tooltip aria-label="back" title="back">
           <IconButton onClick={() => setDoLogin(false)}>
-            <BackIcon />
+            <Icon>back</Icon>
           </IconButton>
         </Tooltip>
       )}
@@ -76,7 +77,12 @@ export default function UserLoginPrompt() {
             <Typography variant="body1">Want to become a member?</Typography>
           </div>
           <div className={classes.optItem}>
-            <Button color="secondary" onClick={() => navigate('/register')}>
+            <Button
+              color="secondary"
+              onClick={() => {
+                navigate('/register')
+              }}
+            >
               Join the Co-op
             </Button>
           </div>

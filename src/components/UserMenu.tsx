@@ -6,12 +6,12 @@ import Menu, { MenuProps } from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Switch from '@material-ui/core/Switch'
-import AnnouncementIcon from '@material-ui/icons/Notifications'
+// import AnnouncementIcon from '@material-ui/icons/Notifications'
 
 import { RootState } from '../redux'
 import { setPreferences } from '../redux/preferences/actions'
 import { logout } from '../redux/session/actions'
-import { openAnnouncement } from '../redux/announcement/actions'
+// import { openAnnouncement } from '../redux/announcement/actions'
 
 const StyledMenu = withStyles({
   paper: {
