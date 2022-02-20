@@ -489,15 +489,15 @@ function Payment(
     setCanGoToNextStep(false)
   }, [setCanGoToNextStep])
 
-  function handleNext(nonce: string) {
+  function handleNext(sourceId: string) {
     setError('')
     setLoading(true)
 
     // const path =
     //   isFree || canPayLater ? '/store/freecheckout' : '/store/checkout'
-    // const body = isFree || canPayLater ? { order } : { order, nonce }
+    // const body = isFree || canPayLater ? { order } : { order, sourceId }
 
-    createOrder({ order, nonce, isFree, canPayLater })
+    createOrder({ order, sourceId, isFree, canPayLater })
       .then((response) => {
         if (response.error) {
           console.warn('createOrder ERROR response:', response)

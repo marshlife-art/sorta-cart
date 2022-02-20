@@ -99,7 +99,7 @@ function PaymentDialog(props: PaymentDialogProps) {
     setOpen(false)
   }
 
-  function handleNext(nonce: string) {
+  function handleNext(sourceId: string) {
     setLoading(true)
     setError('')
     fetch(`${API_HOST}/store/payment`, {
@@ -108,7 +108,7 @@ function PaymentDialog(props: PaymentDialogProps) {
         'Content-Type': 'application/json'
       },
       credentials: 'include',
-      body: JSON.stringify({ order, amount, description, nonce })
+      body: JSON.stringify({ order, amount, description, sourceId })
     })
       .then((r) => r.json())
       .then((response) => {

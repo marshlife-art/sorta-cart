@@ -1,18 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react'
-import useSWR from 'swr'
-import { createStyles, Theme, makeStyles } from '@material-ui/core/styles'
-
 import {
+  Product,
   getCategories,
-  getSubCategories,
-  Product
+  getSubCategories
 } from '../services/productsService'
+import React, { useEffect, useRef, useState } from 'react'
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
+import { addToCart, removeItemFromCart } from '../services/useCartService'
+
+import ProductsGridNav from './ProductsGridNav'
 // import { supabase } from '../services/supabase/supabase'
 import styles from '../styles/Grid.module.css'
 import { supabase } from '../lib/supabaseClient'
-import ProductsGridNav from './ProductsGridNav'
-
-import { addToCart, removeItemFromCart } from '../services/useCartService'
+import useSWR from 'swr'
 
 const COLORS = [
   ['lightblue', 'peachpuff'],
@@ -23,7 +22,7 @@ const COLORS = [
   ['lightgreen', 'wheat'],
   ['lightgrey', 'palegreen'],
   ['lightpink', 'palegoldenrod'],
-  ['lightsalmon', 'lemonchiffon'],
+  // ['lightsalmon', 'lemonchiffon'],
   ['lightseagreen', 'papayawhip'],
   ['lightskyblue', 'coral'],
   ['oldlace', 'skyblue'],
@@ -240,14 +239,18 @@ const ProductCard = (props: {
   const clickAwayRef = useRef<HTMLDivElement>(null)
   useClickAwayListener(clickAwayRef, () => setSelected(false))
 
-  const handleContainerClick = (event: any) => {
+  const sizeBackdropFilter = () => {
     if (cardRef.current) {
       const clientRect = cardRef.current.getBoundingClientRect()
       setSelectedStyles({
-        height: clientRect.height - 3,
-        width: clientRect.width - 3
+        height: clientRect.height - 2,
+        width: clientRect.width - 2
       })
     }
+  }
+
+  const handleContainerClick = (event: any) => {
+    sizeBackdropFilter()
     if (!selected) {
       setSelected(true)
     }
@@ -256,9 +259,10 @@ const ProductCard = (props: {
   const incrementCount = (direction: '-' | '+') => {
     if (direction === '-') {
       setCount((prev) => (prev - 1 < 0 ? 0 : prev - 1))
-      return
+    } else {
+      setCount((prev) => prev + 1)
     }
-    setCount((prev) => prev + 1)
+    setTimeout(() => sizeBackdropFilter(), 1)
   }
 
   useEffect(() => {
@@ -279,16 +283,16 @@ const ProductCard = (props: {
           style={selectedStyles}
           ref={clickAwayRef}
         >
-          <div onClick={() => incrementCount('-')}>-</div>
+          {/* <div onClick={() => incrementCount('-')}>-</div>
 
           <input
             type="number"
             value={count}
             onChange={(ev) => setCount(ev.target.valueAsNumber)}
             min={0}
-          />
+          /> */}
 
-          <div onClick={() => incrementCount('+')}>+</div>
+          <div onClick={() => incrementCount('+')}>Add to Cart</div>
         </div>
       )}
       <div>
@@ -309,15 +313,27 @@ const ProductCard = (props: {
   )
 }
 
+const catColorMap: { [index: string]: string } = {}
+
+function getCatColorMap(cat: string, sub_cat: string) {
+  if (!catColorMap[`${cat}${sub_cat}`]) {
+    catColorMap[`${cat}${sub_cat}`] =
+      COLORS[Math.floor(Math.random() * COLORS.length)][1]
+  }
+  return catColorMap[`${cat}${sub_cat}`]
+}
+
 interface ProductGroupProps {
   cat: string
   subCat: string
   groupedProducts: ProductsGrouped
 }
 function ProductGroup(props: ProductGroupProps) {
-  const color = COLORS[Math.floor(Math.random() * COLORS.length)][1]
-  const classes = useStyles({ color })
   const { cat, subCat: sub_cat, groupedProducts } = props
+
+  const color = getCatColorMap(cat, sub_cat)
+
+  const classes = useStyles({ color })
 
   return (
     <div key={sub_cat} className={styles.grid}>

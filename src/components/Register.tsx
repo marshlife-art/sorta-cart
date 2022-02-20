@@ -112,7 +112,7 @@ export default function Register() {
   const [validEmail, setValidEmail] = useState<boolean | undefined>(undefined)
   const [complete, setComplete] = useState(false)
 
-  const doRegister = (nonce: string) => {
+  const doRegister = (sourceId: string) => {
     // console.log(
     //   'doRegister understandBylaws:',
     //   understandBylaws,
@@ -122,15 +122,15 @@ export default function Register() {
     //   member,
     //   ' memberData:',
     //   memberData,
-    //   ' nonce:',
-    //   nonce
+    //   ' sourceId:',
+    //   sourceId
     // )
 
     dispatch(
       register(
         userData,
         { ...member, data: memberData, fees_paid: registrationFee },
-        nonce
+        sourceId
       )
     )
   }

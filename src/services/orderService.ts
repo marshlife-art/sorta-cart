@@ -173,9 +173,9 @@ export async function createOrder(props: {
   order: Order
   isFree: boolean
   canPayLater: boolean
-  nonce: string
+  sourceId: string
 }): Promise<{ error: boolean; msg: string }> {
-  const { isFree, canPayLater, nonce } = props
+  const { isFree, canPayLater, sourceId } = props
   return new Promise(async (resolve, reject) => {
     const {
       id,
@@ -189,6 +189,11 @@ export async function createOrder(props: {
     if (!orderToInsert || !OrderLineItems || OrderLineItems.length === 0) {
       reject({ error: true, msg: 'No order or OrderLineItems specified?' })
     }
+
+    // hmm, i suppose granting users insert rls to Orders and OrderLineItems table
+    // could work. then just send the order's generate api_key prop to api
+    // and then the api can finish the payment, complete order, and send email.
+    // otherwise just ship the entire order to the api for inserting...
 
     // console.log('zomg gonna orderToInsert:', orderToInsert)
     const { data: order, error } = await supabase
@@ -225,12 +230,18 @@ export async function createOrder(props: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        order: { ...orderToInsert, OrderLineItems },
-        sourceId: nonce
+        // order: { ...orderToInsert, OrderLineItems },
+        api_key: order?.api_key,
+        sourceId: sourceId
       })
     })
+      .then((r) => r.json())
+      .then((r) => {
+        // #TODO
+        console.log('store/checkout api response:', r)
+      })
 
-    // if (!nonce) {
+    // if (!sourceId) {
     //   reject({ error: true, msg: 'Bad payment.' })
     // }
     resolve({ error: false, msg: 'success!' })

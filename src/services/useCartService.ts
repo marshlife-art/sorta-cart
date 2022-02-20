@@ -1,13 +1,13 @@
+import { SupaOrderLineItem, SupaProduct } from '../types/SupaTypes'
 import { useEffect, useState } from 'react'
 
-import { AppDatabase } from '../appDatabase'
-import { Service } from '../types/Service'
-import { Cart } from '../types/Cart'
-import { Product } from '../types/Product'
-import { OrderLineItem } from '../types/Order'
-import { IDatabaseChange } from 'dexie-observable/api'
 import { API_HOST } from '../constants'
-import { SupaOrderLineItem, SupaProduct } from '../types/SupaTypes'
+import { AppDatabase } from '../appDatabase'
+import { Cart } from '../types/Cart'
+import { IDatabaseChange } from 'dexie-observable/api'
+import { OrderLineItem } from '../types/Order'
+import { Product } from '../types/Product'
+import { Service } from '../types/Service'
 import { validateLineItemsService } from './orderService'
 
 const db = new AppDatabase()

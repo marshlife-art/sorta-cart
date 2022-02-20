@@ -14,7 +14,7 @@ declare const Square: any
 
 interface SquarePaymentFormProps {
   paymentForm: any
-  handleNext: (nonce: string) => void
+  handleNext: (sourceId: string) => void
   amount: number
   loading: boolean
 }
@@ -127,7 +127,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
         const token = await tokenize(paymentMethod)
         const paymentResults = await createPayment(token)
 
-        // console.log('zomg handlenext gonna get a nonce??', token)
+        // console.log('zomg handlenext gonna get a sourceId??', token)
         handleNext(token)
         // displayPaymentResults('SUCCESS')
 
@@ -176,7 +176,7 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
  */
 
 interface SquarePaymentProps {
-  handleNext: (nonce: string) => void
+  handleNext: (sourceId: string) => void
   amount: number
   loading: boolean
 }

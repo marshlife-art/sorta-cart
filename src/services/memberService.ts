@@ -30,7 +30,7 @@ export interface RegisterMemberResponse {
 export function registerMember(props: {
   user: Partial<User>
   member: Partial<Member>
-  nonce: string
+  sourceId: string
 }): Promise<RegisterMemberResponse> {
   return new Promise(async (resolve, reject) => {
     try {

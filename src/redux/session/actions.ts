@@ -127,13 +127,13 @@ export const logout = (): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
 export const register = (
   user: Partial<User>,
   member: Partial<Member>,
-  nonce: string
+  sourceId: string
 ): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
     return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
 
-      registerMember({ user, member, nonce })
+      registerMember({ user, member, sourceId })
         .then((response) => {
           if (response.msg === 'ok' && response.user) {
             dispatch(set(response.user))
