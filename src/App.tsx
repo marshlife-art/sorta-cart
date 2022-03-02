@@ -1,30 +1,28 @@
 import React, { useEffect } from 'react'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import { connect } from 'react-redux'
-import { ThunkDispatch } from 'redux-thunk'
-import CssBaseline from '@material-ui/core/CssBaseline'
-import { ThemeProvider } from '@material-ui/core/styles'
-
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import { darkTheme, lightTheme } from './theme'
-import { RootState } from './redux'
 
+import Announcements from './components/Announcements'
+import Checkout from './components/Checkout'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import DataTable from './components/DataTable'
+import ForgotPassword from './components/ForgotPassword'
+import Login from './components/Login'
+import MyOrders from './components/MyOrders'
+import NavBar from './components/NavBar'
+import Order from './components/Order'
+import { PreferencesServiceProps } from './redux/preferences/reducers'
+import ProductsGrid from './components/ProductsGrid'
+import Register from './components/Register'
+import ResetPassword from './components/ResetPassword'
+import { RootState } from './redux'
+import { ThemeProvider } from '@material-ui/core/styles'
+import { ThunkDispatch } from 'redux-thunk'
 import { UserServiceProps } from './redux/session/reducers'
 import { checkSession } from './redux/session/actions'
-
-import { PreferencesServiceProps } from './redux/preferences/reducers'
+import { connect } from 'react-redux'
 import { getPreferences } from './redux/preferences/actions'
-
-import DataTable from './components/DataTable'
-import ProductsGrid from './components/ProductsGrid'
-import Checkout from './components/Checkout'
-import Login from './components/Login'
-import Register from './components/Register'
-import NavBar from './components/NavBar'
-import ForgotPassword from './components/ForgotPassword'
-import ResetPassword from './components/ResetPassword'
-import MyOrders from './components/MyOrders'
-import Order from './components/Order'
-import Announcements from './components/Announcements'
+import { supabase } from './lib/supabaseClient'
 
 interface DispatchProps {
   checkSession: () => void
@@ -41,7 +39,12 @@ export function App(
   }, [getPreferences])
 
   useEffect(() => {
-    checkSession && checkSession()
+    checkSession()
+
+    const sub = supabase.auth.onAuthStateChange((event, session) => {
+      checkSession()
+    })
+    return () => sub?.data?.unsubscribe()
   }, [checkSession])
 
   const theme =

@@ -1,6 +1,3 @@
-import { API_HOST } from '../constants'
-import { supabase } from '../lib/supabaseClient'
-import { Order } from '../types/Order'
 import {
   SupaMember,
   SupaNewOrderLineItem,
@@ -8,7 +5,11 @@ import {
   SupaOrderLineItem,
   SupaProduct
 } from '../types/SupaTypes'
+
+import { API_HOST } from '../constants'
+import { Order } from '../types/Order'
 import { User } from '../types/User'
+import { supabase } from '../lib/supabaseClient'
 
 type LineItemValidation = SupaOrderLineItem & {
   invalid?: string
@@ -191,8 +192,8 @@ export async function createOrder(props: {
     }
 
     // hmm, i suppose granting users insert rls to Orders and OrderLineItems table
-    // could work. then just send the order's generate api_key prop to api
-    // and then the api can finish the payment, complete order, and send email.
+    // could work. then just send the order's generated api_key prop to the api
+    // and then the server can finish the payment, complete order, and send email.
     // otherwise just ship the entire order to the api for inserting...
 
     // console.log('zomg gonna orderToInsert:', orderToInsert)
