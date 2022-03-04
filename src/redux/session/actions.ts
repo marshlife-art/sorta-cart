@@ -1,10 +1,10 @@
+import { LoginError, LoginMessage, User } from '../../types/User'
 import { ThunkAction, ThunkDispatch } from 'redux-thunk'
-import { AnyAction } from 'redux'
 
-import { User, LoginError, LoginMessage } from '../../types/User'
-import { supabase } from '../../lib/supabaseClient'
+import { AnyAction } from 'redux'
 import { Member } from '../../types/Member'
 import { registerMember } from '../../services/memberService'
+import { supabase } from '../../lib/supabaseClient'
 
 export interface SetAction {
   type: 'SET'
@@ -77,8 +77,15 @@ export const login = (
       dispatch(isFetching(true))
 
       supabase.auth
-        // { redirectTo: window.location.href.split("#")[0] }
-        .signIn({ email, password }, { redirectTo: 'http://localhost:3001' })
+        .signIn(
+          { email, password },
+          {
+            redirectTo:
+              process.env.NODE_ENV === 'production'
+                ? 'https://sorta-cart.vercel.app/store' // this could live elsewhere :/
+                : `${window.location.origin}`
+          }
+        )
         .then((response) => {
           if (response.user && response.user.id) {
             dispatch(set({ ...response.user, role: 'admin' })) // #TODO: don't hard-code admin role :/
