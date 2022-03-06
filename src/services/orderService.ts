@@ -114,6 +114,7 @@ export async function validateLineItemsService(lineItems: SupaOrderLineItem[]) {
       ? 0
       : parseInt(`${li.quantity}`) * caseMultiplier
 
+    // check if there's only some left of a product that has no_backorder
     if (product.count_on_hand && eaQty > product.count_on_hand) {
       if (product.no_backorder === true) {
         li.invalid = undefined
@@ -128,9 +129,18 @@ export async function validateLineItemsService(lineItems: SupaOrderLineItem[]) {
         invalidLineItems.push(li)
         continue
       }
-      // else {
-      //   continue
-      // }
+    }
+
+    // if no_backorder and no count_on_hand then invalidate this li
+    if (
+      product.no_backorder === true &&
+      (product.count_on_hand === undefined || product.count_on_hand < 1)
+    ) {
+      li.invalid = 'product no longer available'
+      li.quantity = 0
+      li.total = 0
+      invalidLineItems.push(li)
+      continue
     }
 
     const liPrice =
@@ -210,7 +220,15 @@ export async function createOrder(props: {
     const oliz: SupaNewOrderLineItem[] = props.order.OrderLineItems.map(
       (oli) => {
         const { id, data, ...rest } = oli
-        return { data: JSON.stringify(data), OrderId: order?.id, ...rest }
+        const status = oli.data?.product?.count_on_hand
+          ? 'on_hand'
+          : 'backorder'
+        return {
+          data: JSON.stringify(data),
+          OrderId: order?.id,
+          status,
+          ...rest
+        }
       }
     )
     const { error: oliError } = await supabase
