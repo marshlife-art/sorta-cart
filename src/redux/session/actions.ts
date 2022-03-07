@@ -142,7 +142,17 @@ export const register = (
 
       registerMember({ user, member, sourceId })
         .then((response) => {
+          // console.log('zomg registerMember response:', response)
           if (response.msg === 'ok' && response.user) {
+            supabase.auth.signIn(
+              { email: response.user.email },
+              {
+                redirectTo:
+                  process.env.NODE_ENV === 'production'
+                    ? 'https://sorta-cart.vercel.app/store' // this could live elsewhere :/
+                    : `${window.location.origin}`
+              }
+            )
             dispatch(set(response.user))
           } else {
             dispatch(setError({ error: 'error', reason: response.msg }))

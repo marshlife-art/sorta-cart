@@ -1,31 +1,31 @@
 import React, { useEffect, useState } from 'react'
+import { UserService, UserServiceProps } from '../redux/session/reducers'
 import { connect, useDispatch, useSelector } from 'react-redux'
-import { ThunkDispatch } from 'redux-thunk'
-import { useNavigate } from 'react-router-dom'
-import Container from '@material-ui/core/Container'
+
+import { API_HOST } from '../constants'
 import Box from '@material-ui/core/Box'
-import Typography from '@material-ui/core/Typography'
+import Button from '@material-ui/core/Button'
+import Checkbox from '@material-ui/core/Checkbox'
+import Container from '@material-ui/core/Container'
+import FormControl from '@material-ui/core/FormControl'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import FormGroup from '@material-ui/core/FormGroup'
+import FormHelperText from '@material-ui/core/FormHelperText'
+import FormLabel from '@material-ui/core/FormLabel'
+import { Member } from '../types/Member'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
-import FormHelperText from '@material-ui/core/FormHelperText'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import FormControl from '@material-ui/core/FormControl'
-import FormLabel from '@material-ui/core/FormLabel'
-import FormGroup from '@material-ui/core/FormGroup'
-import Checkbox from '@material-ui/core/Checkbox'
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import { makeStyles } from '@material-ui/core/styles'
-
-import SquarePayment from './SquarePayment'
-import { Slider } from '@material-ui/core'
-import { Member } from '../types/Member'
-import { User } from '../types/User'
 import { RootState } from '../redux'
-import { UserService, UserServiceProps } from '../redux/session/reducers'
-import { register } from '../redux/session/actions'
-import { API_HOST } from '../constants'
+import { Slider } from '@material-ui/core'
+import SquarePayment from './SquarePayment'
+import TextField from '@material-ui/core/TextField'
+import { ThunkDispatch } from 'redux-thunk'
+import Typography from '@material-ui/core/Typography'
+import { User } from '../types/User'
 import { checkIfEamilExists } from '../services/memberService'
+import { makeStyles } from '@material-ui/core/styles'
+import { register } from '../redux/session/actions'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -136,7 +136,7 @@ export default function Register() {
   }
 
   useEffect(() => {
-    if (userService.user && !userService.isFetching && userService.user.role) {
+    if (userService.user && !userService.isFetching && userService.user.id) {
       // console.log('we gotta user!', userService.user)
       setComplete(true)
     } else {
