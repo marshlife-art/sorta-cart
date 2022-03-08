@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { UserService, UserServiceProps } from '../redux/session/reducers'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { API_HOST } from '../constants'
 import Box from '@material-ui/core/Box'
-import Button from '@material-ui/core/Button'
 import Checkbox from '@material-ui/core/Checkbox'
 import Container from '@material-ui/core/Container'
 import FormControl from '@material-ui/core/FormControl'
@@ -12,6 +9,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import FormGroup from '@material-ui/core/FormGroup'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import FormLabel from '@material-ui/core/FormLabel'
+import Loading from './Loading'
 import { Member } from '../types/Member'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
@@ -19,9 +17,9 @@ import { RootState } from '../redux'
 import { Slider } from '@material-ui/core'
 import SquarePayment from './SquarePayment'
 import TextField from '@material-ui/core/TextField'
-import { ThunkDispatch } from 'redux-thunk'
 import Typography from '@material-ui/core/Typography'
 import { User } from '../types/User'
+import { UserService } from '../redux/session/reducers'
 import { checkIfEamilExists } from '../services/memberService'
 import { makeStyles } from '@material-ui/core/styles'
 import { register } from '../redux/session/actions'
@@ -98,7 +96,6 @@ export default function Register() {
   const navigate = useNavigate()
 
   const classes = useStyles()
-  // const [error, setError] = useState('')
   const [purchaseshare, setPurchaseshare] = useState('')
   const [understandBylaws, setUnderstandBylaws] = useState(false)
   const [registrationFee, setRegistrationFee] = useState(0)
@@ -111,6 +108,7 @@ export default function Register() {
   const [valid, setValid] = useState(false)
   const [validEmail, setValidEmail] = useState<boolean | undefined>(undefined)
   const [complete, setComplete] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const doRegister = (sourceId: string) => {
     // console.log(
@@ -126,6 +124,7 @@ export default function Register() {
     //   sourceId
     // )
 
+    setLoading(true)
     dispatch(
       register(
         userData,
@@ -138,6 +137,7 @@ export default function Register() {
   useEffect(() => {
     if (userService.user && !userService.isFetching && userService.user.id) {
       // console.log('we gotta user!', userService.user)
+      setLoading(false)
       setComplete(true)
     } else {
       setComplete(false)
@@ -195,7 +195,6 @@ export default function Register() {
         purchaseshare &&
         understandBylaws &&
         userData.email &&
-        // userData.password &&
         member.name &&
         member.phone
       )
@@ -281,7 +280,6 @@ export default function Register() {
             <RadioGroup
               aria-label="purchaseshare"
               name="purchaseshare"
-              // value={value}
               onChange={handlePurchaseShareChange}
             >
               <FormControlLabel
@@ -508,38 +506,17 @@ export default function Register() {
               </Box>
             )}
           </div>
-
-          {/* <Box color="error.main">
-            {error && (
-            <>
-              <Typography variant="overline" display="block">
-                onoz! an error!
-              </Typography>
-              <Typography variant="body1" display="block" gutterBottom>
-                {error}
-              </Typography>
-            </>
-          )}
-          </Box> */}
+          {loading && <Loading />}
         </form>
       ) : (
         <Box>
           <Typography variant="overline" display="block" gutterBottom>
-            Thank you!
+            Registration complete. Thank you!
           </Typography>
           <Typography variant="body2" display="block" gutterBottom>
-            Registration complete. Please check your email for a confirmation
-            link.
+            Please check your email for a confirmation link to complete
+            registration.
           </Typography>
-          <div className={classes.continueWrapper}>
-            <Button
-              onClick={() => navigate('/')}
-              variant="outlined"
-              size="large"
-            >
-              Continue to the store
-            </Button>
-          </div>
         </Box>
       )}
     </Container>
