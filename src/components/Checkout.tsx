@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import React, { useState, useEffect, useCallback } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import Stepper from '@material-ui/core/Stepper'
 import Step from '@material-ui/core/Step'
@@ -28,11 +28,15 @@ import {
 import CartTable from './CartTable'
 import Login from './Login'
 import { Order, OrderLineItem } from '../types/Order'
-import { BLANK_ORDER, API_HOST } from '../constants'
+import { BLANK_ORDER } from '../constants'
 import { UserService, UserServiceProps } from '../redux/session/reducers'
 import { RootState } from '../redux'
 import SquarePayment from './SquarePayment'
-import { fetchStoreCredit } from './MyOrders'
+import {
+  createOrder,
+  getMyMember,
+  getStoreCreditForUser
+} from '../services/orderService'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,15 +61,26 @@ const registrationStyles = makeStyles((theme: Theme) =>
   })
 )
 
+async function fetchStoreCredit(
+  setStoreCredit: React.Dispatch<React.SetStateAction<number>>,
+  userService?: UserService
+) {
+  if (!userService?.user?.id) {
+    return
+  }
+  const store_credit = await getStoreCreditForUser(userService.user.id)
+  setStoreCredit(store_credit)
+}
+
 function Registration(
   props: {
     handleNext: () => void
-    history: any
     setCanGoToNextStep: React.Dispatch<React.SetStateAction<boolean>>
   } & StepButtonsProps &
     UserServiceProps
 ) {
   const classes = registrationStyles()
+  const navigate = useNavigate()
   const [opt, setOpt] = useState<'login' | 'register' | 'guest' | undefined>()
 
   const {
@@ -119,10 +134,7 @@ function Registration(
               <Typography variant="body1" gutterBottom>
                 Want to become a member?
               </Typography>
-              <Button
-                color="secondary"
-                onClick={() => props.history.push('/register')}
-              >
+              <Button color="secondary" onClick={() => navigate('/register')}>
                 Join the Co-op
               </Button>
             </div>
@@ -197,9 +209,8 @@ function ReviewCart(
   const [address, setAddress] = useState('')
   const [notes, setNotes] = useState('')
   const [storeCredit, setStoreCredit] = useState(0)
-  const [applyStoreCreditDisabled, setApplyStoreCreditDisabled] = useState(
-    false
-  )
+  const [applyStoreCreditDisabled, setApplyStoreCreditDisabled] =
+    useState(false)
 
   useEffect(() => {
     if (
@@ -222,40 +233,32 @@ function ReviewCart(
     }
   }, [cartResult])
 
+  const getMemberInfo = useCallback(async () => {
+    if (userService.user && userService.user.id) {
+      const member = await getMyMember(userService.user.id)
+      if (member) {
+        member.name && setName(member.name)
+        member.phone && setPhone(member.phone)
+        member.address && setAddress(member.address)
+      }
+      setEmail(
+        userService.user && userService.user.email ? userService.user.email : ''
+      )
+      setOrder((prevOrder) => ({
+        ...prevOrder,
+        UserId:
+          userService.user && userService.user.id
+            ? userService.user.id
+            : undefined,
+        MemberId: member && member.id ? member.id : undefined
+      }))
+    }
+  }, [userService])
+
   useEffect(() => {
-    userService.user &&
-      fetch(`${API_HOST}/member/me`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      })
-        .then((r) => r.json())
-        .then((response) => {
-          const member = response.member
-          if (member) {
-            member.name && setName(member.name)
-            member.phone && setPhone(member.phone)
-            member.address && setAddress(member.address)
-          }
-          setEmail(
-            userService.user && userService.user.email
-              ? userService.user.email
-              : ''
-          )
-          setOrder((prevOrder) => ({
-            ...prevOrder,
-            UserId:
-              userService.user && userService.user.id
-                ? userService.user.id
-                : undefined,
-            MemberId: member && member.id ? member.id : undefined
-          }))
-        })
-        .catch((err) => console.warn('onoz /member/me caught err:', err))
-    userService.user && fetchStoreCredit(setStoreCredit)
-  }, [setOrder, userService])
+    userService.user && getMemberInfo()
+    userService.user && fetchStoreCredit(setStoreCredit, userService)
+  }, [userService])
 
   useEffect(() => {
     setCanGoToNextStep && setCanGoToNextStep(!!(email && phone && name))
@@ -486,26 +489,18 @@ function Payment(
     setCanGoToNextStep(false)
   }, [setCanGoToNextStep])
 
-  function handleNext(nonce: string) {
+  function handleNext(sourceId: string) {
     setError('')
     setLoading(true)
 
-    const path =
-      isFree || canPayLater ? '/store/freecheckout' : '/store/checkout'
-    const body = isFree || canPayLater ? { order } : { order, nonce }
+    // const path =
+    //   isFree || canPayLater ? '/store/freecheckout' : '/store/checkout'
+    // const body = isFree || canPayLater ? { order } : { order, sourceId }
 
-    fetch(`${API_HOST}${path}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify(body)
-    })
-      .then((r) => r.json())
+    createOrder({ order, sourceId, isFree, canPayLater })
       .then((response) => {
         if (response.error) {
-          console.warn('/store/checkout ERROR response:', response)
+          console.warn('createOrder ERROR response:', response)
           setError(response.msg || 'onoz! could not submit your order ;(')
         } else {
           emptyCart()
@@ -513,7 +508,7 @@ function Payment(
         }
       })
       .catch((err) => {
-        console.warn('onoz! caught error /store/checkout err:', err)
+        console.warn('onoz! caught error createOrder err:', err)
         setError('onoz! could not submit your order ;(')
       })
       .finally(() => setLoading(false))
@@ -691,9 +686,12 @@ function getSteps() {
   return ['Member Registration', 'Review Order', 'Payment']
 }
 
-function Checkout(props: UserServiceProps & RouteComponentProps) {
+export default function Checkout() {
   const classes = checkoutStyles()
-  const { userService, history } = props
+
+  const userService = useSelector<RootState, UserService>(
+    (state) => state.session.userService
+  )
 
   const [activeStep, setActiveStep] = useState(0)
   const [canGoToNextStep, setCanGoToNextStep] = useState(false)
@@ -755,7 +753,6 @@ function Checkout(props: UserServiceProps & RouteComponentProps) {
                   nextDisabled={!canGoToNextStep || activeStep === 0}
                   nextText={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                   userService={userService}
-                  history={history}
                 />
               )}
               {activeStep === 1 && (
@@ -789,11 +786,3 @@ function Checkout(props: UserServiceProps & RouteComponentProps) {
     </>
   )
 }
-
-const mapStateToProps = (states: RootState): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-export default connect(mapStateToProps)(withRouter(Checkout))

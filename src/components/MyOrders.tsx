@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import MaterialTable from 'material-table'
 import { formatDistance } from 'date-fns'
 
 import { API_HOST } from '../constants'
 import { RootState } from '../redux'
-import { UserServiceProps } from '../redux/session/reducers'
+import { userService, UserService } from '../redux/session/reducers'
 import { Order } from '../types/Order'
 import OrderDetailPanel from './OrderDetailPanel'
+import { getStoreCreditForUser, myOrders } from '../services/orderService'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,27 +22,22 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export async function fetchStoreCredit(
-  setStoreCredit: React.Dispatch<React.SetStateAction<number>>
+async function fetchStoreCredit(
+  setStoreCredit: React.Dispatch<React.SetStateAction<number>>,
+  userService?: UserService
 ) {
-  const store_credit = await fetch(`${API_HOST}/store_credit`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    credentials: 'include'
-  })
-    .then((response: any) => response.json())
-    .then((response) =>
-      response && response.store_credit ? response.store_credit : 0
-    )
-    .catch((err: any) => 0)
-
+  if (!userService?.user?.id) {
+    return
+  }
+  const store_credit = await getStoreCreditForUser(userService.user.id)
   setStoreCredit(store_credit)
 }
 
-function MyOrders(props: UserServiceProps & RouteComponentProps) {
-  const { userService } = props
+export default function MyOrders() {
+  const userService = useSelector<RootState, UserService>(
+    (state) => state.session.userService
+  )
+
   const classes = useStyles()
   const [myorders, setMyOrders] = useState<Order[]>([])
   const [storeCredit, setStoreCredit] = useState(0)
@@ -67,19 +62,15 @@ function MyOrders(props: UserServiceProps & RouteComponentProps) {
 
   useEffect(() => {
     userService.user &&
-      fetch(`${API_HOST}/myorders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      })
-        .then((r) => r.json())
+      myOrders(userService.user?.id)
         .then((response) => {
-          setMyOrders(response.orders || [])
+          const { orders, error } = response
+          if (!error && orders) {
+            setMyOrders((orders as Order[]) || [])
+          }
         })
-        .catch((err) => console.warn('onoz /member/me caught err:', err))
-    userService.user && fetchStoreCredit(setStoreCredit)
+        .catch((err) => console.warn('onoz myOrders service caught err:', err))
+    userService.user && fetchStoreCredit(setStoreCredit, userService)
   }, [userService, refetchOrders])
 
   return (
@@ -142,11 +133,3 @@ function MyOrders(props: UserServiceProps & RouteComponentProps) {
     </div>
   )
 }
-
-const mapStateToProps = (states: RootState): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-export default connect(mapStateToProps)(withRouter(MyOrders))

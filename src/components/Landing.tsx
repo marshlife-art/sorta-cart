@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 // import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
@@ -58,8 +58,9 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function Landing(props: RouteComponentProps) {
+export default function Landing() {
   const classes = useStyles()
+  const navigate = useNavigate()
 
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCat, setSelectedCat] = useState('')
@@ -191,7 +192,7 @@ function Landing(props: RouteComponentProps) {
                   className={classes.gridBtn}
                   variant="outlined"
                   size="large"
-                  onClick={() => props.history.push('/products/onhand/marsh')}
+                  onClick={() => navigate('/products/onhand/marsh')}
                 >
                   <Typography variant="h5" className={classes.catBtn}>
                     MARSH ON HAND
@@ -211,7 +212,7 @@ function Landing(props: RouteComponentProps) {
                   className={classes.gridBtn}
                   variant="outlined"
                   size="large"
-                  onClick={() => props.history.push('/products')}
+                  onClick={() => navigate('/products')}
                 >
                   <Typography variant="h5" className={classes.catBtn}>
                     See Everything
@@ -237,7 +238,7 @@ function Landing(props: RouteComponentProps) {
                   size="large"
                   key={`lb${idx}`}
                   onClick={() =>
-                    props.history.push(
+                    navigate(
                       `/products/${encodeURIComponent(
                         selectedCat
                       )}/${encodeURIComponent(subCat.name)}`
@@ -265,9 +266,7 @@ function Landing(props: RouteComponentProps) {
                 variant="outlined"
                 size="large"
                 onClick={() =>
-                  props.history.push(
-                    `/products/${encodeURIComponent(selectedCat)}`
-                  )
+                  navigate(`/products/${encodeURIComponent(selectedCat)}`)
                 }
               >
                 <Typography variant="h5" className={classes.catBtn}>
@@ -282,5 +281,3 @@ function Landing(props: RouteComponentProps) {
     </>
   )
 }
-
-export default withRouter(Landing)

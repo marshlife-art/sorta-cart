@@ -1,7 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import React, { useState, useEffect, useCallback } from 'react'
+import { useMatch, useNavigate } from 'react-router-dom'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
-import MaterialTable, { Action, Query } from 'material-table'
+import MaterialTable, {
+  Action,
+  Query,
+  MTableBodyRow,
+  MTableFilterRow,
+  MaterialTableProps,
+  // MTableEditRow,
+  MTableBody
+} from 'material-table'
 import Chip from '@material-ui/core/Chip'
 import Badge from '@material-ui/core/Badge'
 import IconButton from '@material-ui/core/IconButton'
@@ -18,7 +26,14 @@ import BackIcon from '@material-ui/icons/ArrowBack'
 import UserMenu from './UserMenu'
 import CartDrawer from './CartDrawer'
 import { useCartItemCount, addToCart } from '../services/useCartService'
-import { API_HOST } from '../constants'
+import { supabase } from '../lib/supabaseClient'
+import {
+  FixedSizeList as List,
+  ListProps,
+  ListChildComponentProps,
+  areEqual
+} from 'react-window'
+import { getCategories, getSubCategories } from '../lib/productsService'
 
 const PROPERTY_MAP: { [index: string]: string } = {
   a: 'Artificial ingredients',
@@ -43,6 +58,9 @@ const PROPERTY_MAP: { [index: string]: string } = {
 }
 
 function renderCodes(codes: string) {
+  if (!codes) {
+    return ''
+  }
   return codes
     .split(', ')
     .map((code, idx) =>
@@ -59,17 +77,120 @@ function renderCodes(codes: string) {
     )
 }
 
-function DataTable(
-  props: RouteComponentProps<{ cat?: string; subcat?: string; onhand?: string }>
-) {
+// interface TableBodyProps extends MaterialTableProps<any>, ListProps {
+//   tableHeight: number
+//   headerHeight: number
+//   tableWidth: number
+//   scrollIndex: number
+//   renderData: any
+// }
+
+// const Row = React.memo<ListChildComponentProps>(({ data, index, style }) => {
+
+//   // Data passed to List as "itemData" is available as props.data
+//   const { items, toggleItemActive } = data;
+//   const item = items[index];
+
+//   return (
+//     <div
+//       onClick={() => toggleItemActive(index)}
+//       style={style}
+//     >
+//       {item.label} is {item.isActive ? 'active' : 'inactive'}
+//     </div>
+//   );
+// }, areEqual);
+
+// const TableBody = (props: TableBodyProps) => {
+//   console.log('jebb TableBody props', props)
+//   const Row = (listProps: ListChildComponentProps) => {
+//     const { data, index, style } = listProps
+//     console.log('jebb TableBody Row props', listProps)
+//     // return (
+//     //   <MTableBody
+//     //     {...props}
+//     //     components={{
+//     //       Row: (rowProps: any) => (
+//     //         // <div
+//     //         //   key={index}
+//     //         //   style={{ ...style, display: 'table', tableLayout: 'fixed' }}
+//     //         // >
+//     //         <MTableBodyRow {...rowProps} />
+//     //         // </div>
+//     //       )
+//     //     }}
+//     //   />
+//     // )
+
+//     return (
+//       <div
+//         key={index}
+//         style={{ ...style, display: 'table', tableLayout: 'fixed' }}
+//       >
+//         {/* {props.components?.Row} */}
+
+//         <MTableBodyRow
+//           {...props}
+//           data={{ ...props.renderData, tableData: { editCellList: undefined } }}
+//         />
+//         {/* <MTableBodyRow
+//           // key={key}
+//           index={index}
+//           data={data[index]}
+//           options={props.options}
+//           // onToggleDetailPanel={props.onToggleDetailPanel}
+//           icons={props.icons}
+//           actions={props.actions}
+//           components={props.components}
+//           columns={props.columns}
+//           // getFieldValue={props.getFieldValue}
+//           onRowClick={props.onRowClick}
+//         /> */}
+//       </div>
+//     )
+//   }
+
+//   //   <MTableBody
+//   //   {...props}
+//   //   components={{
+//   //     ...props.components,
+//   //     Row: MTableBodyRow
+//   //   }}
+//   // />
+
+//   return (
+//     <tbody>
+//       {props.options?.filtering && <MTableFilterRow props={props} />}
+//       <List
+//         height={window.innerHeight - 300}
+//         itemCount={props?.renderData?.length || 0}
+//         itemData={props.renderData}
+//         itemSize={50}
+//         // itemSize={parseInt(`${props.height || 100}`)}
+//         width={window.innerWidth}
+//       >
+//         {Row}
+//       </List>
+//     </tbody>
+//   )
+//   // return (
+//   //   <tbody>
+//   //     {props.options?.filtering && <MTableFilterRow props={props} />}
+
+//   //   </tbody>
+//   // )
+// }
+
+export default function DataTable() {
   const narrowWidth = useMediaQuery('(max-width:600px)')
   const itemCount = useCartItemCount()
+  const navigate = useNavigate()
+  // RouteComponentProps<{ cat?: string; subcat?: string; onhand?: string }>
+  const match = useMatch('/products/:cat/:subcat')
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
-  const [
-    userMenuAnchorEl,
-    setUserMenuAnchorEl
-  ] = React.useState<null | HTMLElement>(null)
+  const [userMenuAnchorEl, setUserMenuAnchorEl] =
+    React.useState<null | HTMLElement>(null)
 
   const handleUserMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setUserMenuAnchorEl(event.currentTarget)
@@ -114,50 +235,31 @@ function DataTable(
   }, [itemCount, cartDrawerOpen]) // note: adding 'cartAction' and 'userAction' to dep array is not pleasant :/
 
   const [categoryLookup, setCategoryLookup] = useState<object>(() => {
-    fetch(`${API_HOST}/categories`)
-      .then((response) => response.json())
-      .then((result) => setCategoryLookup(result))
-      .catch(console.warn)
+    getCategories().then((result) => setCategoryLookup(result))
   })
 
   const [subCategoryLookup, setSubCategoryLookup] = useState<object>(() => {
-    fetch(`${API_HOST}/sub_categories`)
-      .then((response) => response.json())
-      .then((result) => setSubCategoryLookup(result))
-      .catch(console.warn)
+    getSubCategories('').then((result) => setSubCategoryLookup(result))
   })
 
   const [catDefaultFilter, setCatDefaultFilter] = useState<
     '' | string[] | undefined
-  >(
-    () =>
-      props.match &&
-      props.match.params &&
-      props.match.params.cat && [decodeURIComponent(props.match.params.cat)]
-  )
+  >(() => match?.params?.cat && [decodeURIComponent(match.params.cat)])
   const [subCatDefaultFilter, setSubCatDefaultFilter] = useState<
     '' | string[] | undefined
-  >(
-    () =>
-      props.match &&
-      props.match.params &&
-      props.match.params.subcat && [
-        decodeURIComponent(props.match.params.subcat)
-      ]
+  >(() => match?.params?.subcat && [decodeURIComponent(match.params.subcat)])
+
+  const [onHandDefaultFilter] = useState<string | undefined>(
+    () => undefined
+    // !!(
+    //   match?.params?.onhand &&
+    //   decodeURIComponent(match.params.onhand)
+    // )
+    //   ? 'checked'
+    //   : undefined
   )
 
-  const [onHandDefaultFilter] = useState<string | undefined>(() =>
-    !!(
-      props.match &&
-      props.match.params &&
-      props.match.params.onhand &&
-      decodeURIComponent(props.match.params.onhand)
-    )
-      ? 'checked'
-      : undefined
-  )
-
-  function setSelectedCatsFromQuery(query: Query<any>) {
+  async function setSelectedCatsFromQuery(query: Query<any>) {
     try {
       const categories = query.filters
         .filter((f) => f.column.field === 'category')
@@ -175,23 +277,19 @@ function DataTable(
         return
       }
 
-      fetch(`${API_HOST}/sub_categories`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ categories })
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          setCatDefaultFilter(categories)
-          setSubCategoryLookup(result)
-          setSubCatDefaultFilter(subCatz)
-        })
-        .catch((err) => {
-          console.warn('onoz, caught err:', err)
-          // setSubCategories([])
-        })
+      let newSubCatz = {}
+
+      for await (const cat of categories) {
+        const result = await getSubCategories(cat)
+        newSubCatz = {
+          ...newSubCatz,
+          ...result
+        }
+      }
+
+      setCatDefaultFilter(categories)
+      setSubCategoryLookup(newSubCatz)
+      setSubCatDefaultFilter(subCatz)
     } catch (e) {
       console.warn('onoz caught err:', e)
     }
@@ -221,10 +319,11 @@ function DataTable(
             title: 'description',
             field: 'description',
             type: 'string',
-            filterPlaceholder: 'filter',
-            filterCellStyle: {
-              paddingTop: '32px'
-            },
+            filtering: false,
+            // filterPlaceholder: 'filter',
+            // filterCellStyle: {
+            //   paddingTop: '32px'
+            // },
             render: (row) => {
               if (row.name) {
                 return `${row.name} -- ${row.description}`
@@ -313,32 +412,84 @@ function DataTable(
           // { title: 'unf', field: 'unf', type: 'string' },
           { title: 'id', field: 'id', type: 'string', hidden: true }
         ]}
-        data={(query) =>
-          new Promise((resolve, reject) => {
-            setSelectedCatsFromQuery(query)
-            fetch(`${API_HOST}/products`, {
-              method: 'post',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(query)
-            })
-              .then((response) => response.json())
-              .then((result) => {
-                resolve(result)
+        // components={{
+        //   Body: (props) => (
+        //     <TableBody
+        //       {...props}
+        //       headerHeight={50}
+        //       tableWidth={props.scrollWidth}
+        //       tableHeight={100}
+        //       scrollIndex={0}
+        //     />
+        //   )
+        // }}
+        data={(q) =>
+          new Promise(async (resolve, reject) => {
+            setSelectedCatsFromQuery(q)
+
+            let query = supabase
+              .from('products')
+              .select('*', { count: 'exact' })
+
+            if (q.filters.length) {
+              q.filters.forEach((filter) => {
+                // console.log('zomg filter:', filter)
+                if (filter.column.field === 'count_on_hand') {
+                  const or = `count_on_hand.${
+                    filter.value === 'checked'
+                      ? 'gt.0'
+                      : 'is.null,count_on_hand.lte.0'
+                  }`
+                  query = query.or(or)
+                } else if (filter.column.field && filter.value) {
+                  if (filter.value instanceof Array && filter.value.length) {
+                    const or = filter.value
+                      .map((v) => `${String(filter.column.field)}.eq."${v}"`)
+                      .join(',')
+                    query = query.or(or)
+                  } else if (filter.value.length) {
+                    query = query.or(
+                      `${String(filter.column.field)}.eq."${filter.value}"`
+                    )
+                  }
+                }
               })
-              .catch((err) => {
-                console.warn('onoz, caught err:', err)
-                return resolve({ data: [], page: 0, totalCount: 0 })
+            }
+            if (q.search) {
+              // #todo consider q.search.split(' ')
+              query = query.or(
+                ['name', 'description']
+                  .map((f) => `${f}.ilike."%${q.search}%"`)
+                  .join(',')
+              )
+            }
+            if (q.page) {
+              query = query.range(
+                q.pageSize * q.page,
+                q.pageSize * q.page + q.pageSize
+              )
+            }
+            if (q.pageSize) {
+              query = query.limit(q.pageSize)
+            }
+            if (q.orderBy && q.orderBy.field) {
+              query = query.order(q.orderBy.field, {
+                ascending: q.orderDirection === 'asc'
               })
+            }
+
+            const { data, error, count } = await query
+
+            // console.log('orders count:', count, ' q:', q, 'data:', data)
+            if (!data || error) {
+              resolve({ data: [], page: 0, totalCount: 0 })
+            } else {
+              resolve({ data, page: q.page, totalCount: count || 0 })
+            }
           })
         }
         title={
-          <Button
-            variant="text"
-            size="large"
-            onClick={() => props.history.push('/')}
-          >
+          <Button variant="text" size="large" onClick={() => navigate('/')}>
             {narrowWidth ? (
               <BackIcon />
             ) : (
@@ -364,5 +515,3 @@ function DataTable(
     </>
   )
 }
-
-export default withRouter(DataTable)

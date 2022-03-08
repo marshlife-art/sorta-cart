@@ -9,7 +9,7 @@ export interface AnnouncementServiceProps {
   announcementService: AnnouncementService
 }
 
-const announcementService = (
+export const announcementService = (
   state: AnnouncementService = { open: false },
   action: Action
 ): AnnouncementService => {

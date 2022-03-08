@@ -99,29 +99,30 @@ export default function Announcements(props: { preferences: Preferences }) {
   }, [open])
 
   useEffect(() => {
-    fetch(`${API_HOST}/page/latest`)
-      .then((response) => response.json())
-      .then((result) => {
-        setAnnouncement(result)
+    console.log('#TODO deal with announcementz')
+    // fetch(`${API_HOST}/page/latest`)
+    //   .then((response) => response.json())
+    //   .then((result) => {
+    //     setAnnouncement(result)
 
-        // check if need to show this announcement
-        if (!isNaN(parseInt(last_seen_announcement))) {
-          if (result.id <= parseInt(last_seen_announcement)) {
-            return
-          }
-        }
+    //     // check if need to show this announcement
+    //     if (!isNaN(parseInt(last_seen_announcement))) {
+    //       if (result.id <= parseInt(last_seen_announcement)) {
+    //         return
+    //       }
+    //     }
 
-        if (result && result.slug && result.content) {
-          dispatch(openAnnouncement())
-          dispatch(
-            setPreferences({
-              ...preferences,
-              last_seen_announcement: `${result.id}`
-            })
-          )
-        }
-      })
-      .catch(console.warn)
+    //     if (result && result.slug && result.content) {
+    //       dispatch(openAnnouncement())
+    //       dispatch(
+    //         setPreferences({
+    //           ...preferences,
+    //           last_seen_announcement: `${result.id}`
+    //         })
+    //       )
+    //     }
+    //   })
+    //   .catch(console.warn)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [last_seen_announcement])
 
@@ -138,7 +139,7 @@ export default function Announcements(props: { preferences: Preferences }) {
       </ADialogTitle>
 
       <DialogContent dividers={true}>
-        <ReactMarkdown plugins={[gfm]} renderers={renderers}>
+        <ReactMarkdown plugins={[gfm]}>
           {announcement ? announcement.content : ''}
         </ReactMarkdown>
       </DialogContent>

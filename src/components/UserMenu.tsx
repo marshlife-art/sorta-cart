@@ -1,27 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { connect } from 'react-redux'
-import { ThunkDispatch } from 'redux-thunk'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { withStyles } from '@material-ui/core/styles'
 import Menu, { MenuProps } from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Switch from '@material-ui/core/Switch'
-import AnnouncementIcon from '@material-ui/icons/Notifications'
+// import AnnouncementIcon from '@material-ui/icons/Notifications'
 
 import { RootState } from '../redux'
-import { PreferencesServiceProps } from '../redux/preferences/reducers'
 import { setPreferences } from '../redux/preferences/actions'
-import { Preferences } from '../types/Preferences'
 import { logout } from '../redux/session/actions'
-import { UserServiceProps } from '../redux/session/reducers'
-import { openAnnouncement } from '../redux/announcement/actions'
-
-interface DispatchProps {
-  setPreferences: (preferences: Preferences) => void
-  logout: () => void
-  openAnnouncement: () => void
-}
+// import { openAnnouncement } from '../redux/announcement/actions'
 
 const StyledMenu = withStyles({
   paper: {
@@ -58,24 +48,21 @@ interface UserMenuProps {
   anchorEl: HTMLElement | null
   setAnchorEl: React.Dispatch<React.SetStateAction<HTMLElement | null>>
 }
-type Props = PreferencesServiceProps &
-  DispatchProps &
-  RouteComponentProps &
-  UserMenuProps &
-  UserServiceProps
 
-function UserMenu(props: Props) {
+export default function UserMenu(props: UserMenuProps) {
   // const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const {
-    anchorEl,
-    setAnchorEl,
-    preferencesService,
-    setPreferences,
-    userService,
-    logout,
-    openAnnouncement,
-    history
-  } = props
+  const { anchorEl, setAnchorEl } = props
+
+  const navigate = useNavigate()
+
+  const preferencesService = useSelector(
+    (state: RootState) => state.preferences.preferencesService
+  )
+  const userService = useSelector(
+    (state: RootState) => state.session.userService
+  )
+
+  const dispatch = useDispatch()
 
   const [useDarkTheme, setUseDarkTheme] = useState<null | boolean>(null)
 
@@ -98,10 +85,12 @@ function UserMenu(props: Props) {
       (preferencesService.preferences.dark_mode === 'true' ? true : false) !==
         useDarkTheme
     ) {
-      setPreferences({
-        ...preferencesService.preferences,
-        dark_mode: useDarkTheme ? 'true' : 'false'
-      })
+      dispatch(
+        setPreferences({
+          ...preferencesService.preferences,
+          dark_mode: useDarkTheme ? 'true' : 'false'
+        })
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useDarkTheme])
@@ -146,7 +135,7 @@ function UserMenu(props: Props) {
         {hasUser && (
           <StyledMenuItem
             onClick={() => {
-              history.push('/orders')
+              navigate('/orders')
               handleClose()
             }}
           >
@@ -157,7 +146,7 @@ function UserMenu(props: Props) {
         {hasUser && (
           <StyledMenuItem
             onClick={() => {
-              logout()
+              dispatch(logout())
               handleClose()
             }}
           >
@@ -168,7 +157,7 @@ function UserMenu(props: Props) {
         {!hasUser && (
           <StyledMenuItem
             onClick={() => {
-              history.push('/login')
+              navigate('/login')
               handleClose()
             }}
           >
@@ -179,7 +168,7 @@ function UserMenu(props: Props) {
         {!hasUser && (
           <StyledMenuItem
             onClick={() => {
-              history.push('/register')
+              navigate('/register')
               handleClose()
             }}
           >
@@ -210,9 +199,9 @@ function UserMenu(props: Props) {
           </ListItemText>
         </StyledMenuItem>
 
-        <StyledMenuItem
+        {/* <StyledMenuItem
           onClick={() => {
-            openAnnouncement()
+            dispatch(openAnnouncement())
             handleClose()
           }}
         >
@@ -228,7 +217,7 @@ function UserMenu(props: Props) {
               <AnnouncementIcon />
             </div>
           </ListItemText>
-        </StyledMenuItem>
+        </StyledMenuItem> */}
 
         <StyledMenuItem
           onClick={() => {
@@ -242,28 +231,3 @@ function UserMenu(props: Props) {
     </>
   )
 }
-
-const mapStateToProps = (
-  states: RootState
-): PreferencesServiceProps & UserServiceProps => {
-  return {
-    preferencesService: states.preferences.preferencesService,
-    userService: states.session.userService
-  }
-}
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<{}, {}, any>
-): DispatchProps => {
-  return {
-    setPreferences: (preferences: Preferences) =>
-      dispatch(setPreferences(preferences)),
-    logout: () => dispatch(logout()),
-    openAnnouncement: () => dispatch(openAnnouncement())
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(UserMenu))

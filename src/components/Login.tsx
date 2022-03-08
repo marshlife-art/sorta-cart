@@ -1,26 +1,19 @@
+import { Button, Container, Link, TextField } from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
-import { ThunkDispatch } from 'redux-thunk'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { Container, Button, TextField } from '@material-ui/core'
+import { useDispatch, useSelector } from 'react-redux'
+
 import Box from '@material-ui/core/Box'
-import Typography from '@material-ui/core/Typography'
-import { makeStyles } from '@material-ui/core/styles'
-
 import { RootState } from '../redux'
+import Typography from '@material-ui/core/Typography'
+import { UserService } from '../redux/session/reducers'
 import { login } from '../redux/session/actions'
-import { UserServiceProps } from '../redux/session/reducers'
+import { makeStyles } from '@material-ui/core/styles'
+import { useNavigate } from 'react-router-dom'
 
-interface OwnProps {
+interface Props {
   onLoginFn?: () => void
   showTitle?: boolean
 }
-
-interface DispatchProps {
-  login: (email: string, password: string) => void
-}
-
-type Props = UserServiceProps & OwnProps & DispatchProps & RouteComponentProps
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -39,42 +32,45 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2)
   },
-  forgotpassword: {
-    marginTop: theme.spacing(3)
+  passwordlogin: {
+    marginTop: theme.spacing(2)
   }
 }))
 
-function Login(props: Props) {
+export default function Login(props: Props) {
+  const { showTitle, onLoginFn } = props
+
+  const navigate = useNavigate()
+  const userService = useSelector<RootState, UserService>(
+    (state) => state.session.userService
+  )
+  const dispatch = useDispatch()
+
+  const [email, setEmail] = useState('')
+  const [usePasswordLogin, setUsePasswordLogin] = useState(false)
+  const [password, setPassword] = useState('')
   const doLogin = (event: React.FormEvent) => {
     event.preventDefault()
     setError('')
-    const target = event.currentTarget as HTMLFormElement
-    const emailEl = target.elements.namedItem('email') as HTMLInputElement
-    const passwordEl = target.elements.namedItem('password') as HTMLInputElement
-
-    if (
-      emailEl &&
-      emailEl.value.length > 0 &&
-      passwordEl &&
-      passwordEl.value.length > 0
-    ) {
-      props.login(emailEl.value, passwordEl.value)
+    if (email && !usePasswordLogin) {
+      dispatch(login(email))
+    } else if (usePasswordLogin && password && email) {
+      dispatch(login(email, password))
     }
   }
 
-  const { userService, showTitle, onLoginFn, history } = props
   const classes = useStyles()
   const [error, setError] = useState('')
 
   // when userService changes, figure out if the page should redirect if a user is already logged in.
   useEffect(() => {
     if (userService.user && !userService.isFetching && userService.user.role) {
-      onLoginFn ? onLoginFn() : history.push('/')
+      onLoginFn ? onLoginFn() : navigate('/')
     }
     // else if (userService.user && !userService.isFetching) {
     //   setError('o noz! error! ...hmm??')
     // }
-  }, [userService, onLoginFn, history])
+  }, [userService, onLoginFn])
 
   return (
     <Container maxWidth="sm">
@@ -90,17 +86,36 @@ function Login(props: Props) {
           label="email"
           name="email"
           type="text"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           autoFocus
           fullWidth
           required
         />
-        <TextField
-          label="password"
-          name="password"
-          type="password"
-          fullWidth
-          required
-        />
+        {usePasswordLogin ? (
+          <>
+            <TextField
+              label="password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+              required
+            />
+            <div className={classes.passwordlogin}>
+              <Link color="primary" onClick={() => setUsePasswordLogin(false)}>
+                Use Email Login...
+              </Link>
+            </div>
+          </>
+        ) : (
+          <div className={classes.passwordlogin}>
+            <Link color="primary" onClick={() => setUsePasswordLogin(true)}>
+              Use Password Login...
+            </Link>
+          </div>
+        )}
 
         <div>
           <Button
@@ -108,21 +123,28 @@ function Login(props: Props) {
             fullWidth
             variant="contained"
             color="primary"
-            disabled={props.userService.isFetching}
+            disabled={userService.isFetching}
             className={classes.submit}
           >
-            Login
+            {!usePasswordLogin ? 'Email Magic Link' : 'Login'}
           </Button>
         </div>
 
+        <Box>
+          {userService.message && (
+            <Typography variant="body1" display="block" gutterBottom>
+              {userService.message.message}
+            </Typography>
+          )}
+        </Box>
         <Box color="error.main">
-          {props.userService.error && (
+          {userService.error && (
             <>
               <Typography variant="overline" display="block">
                 onoz! an error!
               </Typography>
               <Typography variant="body1" display="block" gutterBottom>
-                {props.userService.error.reason}
+                {userService.error.reason}
               </Typography>
             </>
           )}
@@ -137,38 +159,7 @@ function Login(props: Props) {
             </>
           )}
         </Box>
-
-        <Box className={classes.forgotpassword}>
-          <Button
-            fullWidth
-            // variant="contained"
-            // color="primary"
-            onClick={() => props.history.push('/forgotpassword')}
-          >
-            <i>Forgot Password?</i>
-          </Button>
-        </Box>
       </form>
     </Container>
   )
 }
-
-const mapStateToProps = (
-  states: RootState,
-  ownProps: OwnProps
-): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<{}, {}, any>,
-  ownProps: OwnProps
-): DispatchProps => {
-  return {
-    login: (email, password) => dispatch(login(email, password))
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Login))

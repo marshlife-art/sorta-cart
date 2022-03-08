@@ -1,277 +1,182 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Button from '@material-ui/core/Button'
 
 import '../sq-payment-form.css'
 import {
+  API_HOST,
   SQUARE_APP_ID,
   SQUARE_LOCATION_ID,
   SQUARE_PAYMENT_JS
 } from '../constants'
 import Loading from './Loading'
 
-declare const SqPaymentForm: any
-
-const styles: { [key: string]: React.CSSProperties } = {
-  name: {
-    verticalAlign: 'top',
-    display: 'none',
-    margin: 0,
-    border: 'none',
-    fontSize: '16px',
-    fontFamily: 'Helvetica Neue',
-    padding: '16px',
-    color: '#373F4A',
-    backgroundColor: 'transparent',
-    lineHeight: '1.15em'
-  },
-  leftCenter: {
-    float: 'left',
-    textAlign: 'center'
-  },
-  blockRight: {
-    display: 'block',
-    float: 'right'
-  },
-  center: {
-    textAlign: 'center'
-  },
-  error: {
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: '1.25rem',
-    whiteSpace: 'pre-wrap',
-    color: 'red'
-  }
-}
+declare const Square: any
 
 interface SquarePaymentFormProps {
   paymentForm: any
-  handleNext: (nonce: string) => void
+  handleNext: (sourceId: string) => void
   amount: number
   loading: boolean
 }
+
 function SquarePaymentForm(props: SquarePaymentFormProps) {
-  const [cardBrand, setCardBrand] = useState('')
-  const [googlePay, setGooglePay] = useState(false)
-  const [applePay, setApplePay] = useState(false)
-  const [masterpass, setMasterpass] = useState(false)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(true)
-  const config = {
-    applicationId: SQUARE_APP_ID,
-    locationId: SQUARE_LOCATION_ID,
-    inputClass: 'sq-input',
-    autoBuild: false,
-    inputStyles: [
-      {
-        fontSize: '16px',
-        fontFamily: 'Helvetica Neue',
-        padding: '16px',
-        color: '#373F4A',
-        backgroundColor: 'transparent',
-        lineHeight: '1.15em'
+  const { paymentForm, amount, loading, handleNext } = props
+
+  const appId = SQUARE_APP_ID
+  const locationId = SQUARE_LOCATION_ID
+
+  async function initializeCard(payments: any) {
+    const card = await payments.card()
+    await card.attach('#card-container')
+
+    return card
+  }
+
+  async function createPayment(token: string) {
+    const body = JSON.stringify({
+      locationId,
+      sourceId: token
+    })
+
+    const paymentResponse = await fetch(`${API_HOST}/square/payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body
+    })
+
+    if (paymentResponse.ok) {
+      return paymentResponse.json()
+    }
+
+    const errorBody = await paymentResponse.text()
+    throw new Error(errorBody)
+  }
+
+  async function tokenize(paymentMethod: any) {
+    const tokenResult = await paymentMethod.tokenize()
+    if (tokenResult.status === 'OK') {
+      // console.log('okayyyy tokenResult:', tokenResult)
+      return tokenResult.token
+    } else {
+      let errorMessage = `Tokenization failed with status: ${tokenResult.status}`
+      if (tokenResult.errors) {
+        errorMessage += ` and errors: ${JSON.stringify(tokenResult.errors)}`
       }
-    ],
-    applePay: {
-      elementId: 'sq-apple-pay'
-    },
-    masterpass: {
-      elementId: 'sq-masterpass'
-    },
-    googlePay: {
-      elementId: 'sq-google-pay'
-    },
-    cardNumber: {
-      elementId: 'sq-card-number',
-      placeholder: '• • • •  • • • •  • • • •  • • • •'
-    },
-    cvv: {
-      elementId: 'sq-cvv',
-      placeholder: 'CVV'
-    },
-    expirationDate: {
-      elementId: 'sq-expiration-date',
-      placeholder: 'MM/YY'
-    },
-    postalCode: {
-      elementId: 'sq-postal-code',
-      placeholder: 'Zip'
-    },
-    callbacks: {
-      methodsSupported: (methods: any) => {
-        if (methods.googlePay) {
-          setGooglePay(true)
-        }
-        if (methods.applePay) {
-          setApplePay(true)
-        }
-        if (methods.masterpass) {
-          setMasterpass(true)
-        }
-        return
-      },
-      createPaymentRequest: () => {
-        return {
-          requestShippingAddress: false,
-          requestBillingInfo: true,
-          currencyCode: 'USD',
-          countryCode: 'US',
-          total: {
-            label: 'MARSH COOP',
-            amount: props.amount,
-            pending: false
-          },
-          lineItems: [
-            {
-              label: 'Subtotal',
-              amount: props.amount,
-              pending: false
-            }
-          ]
-        }
-      },
-      cardNonceResponseReceived: (errors: any, nonce: any, cardData: any) => {
-        if (errors) {
-          // Log errors from nonce generation to the Javascript console
-          console.warn('Encountered errors:')
-          errors.forEach(function (error: any) {
-            console.warn('  ' + error.message)
-          })
-          setError(
-            `Encountered errors:\n${errors
-              .map((e: any) => e.message)
-              .join('\n')}`
-          )
-          return
-        }
-        // console.log('cardNonceResponseReceived nonce:', nonce)
-        props.handleNext(nonce)
-      },
-      unsupportedBrowserDetected: () => {},
-      inputEventReceived: (inputEvent: any) => {
-        switch (inputEvent.eventType) {
-          case 'focusClassAdded':
-            break
-          case 'focusClassRemoved':
-            break
-          case 'errorClassAdded':
-            setError('Please fix card information errors before continuing.')
-            break
-          case 'errorClassRemoved':
-            setError('')
-            break
-          case 'cardBrandChanged':
-            if (inputEvent.cardBrand !== 'unknown') {
-              setCardBrand(inputEvent.cardBrand)
-            } else {
-              setCardBrand('')
-            }
-            break
-          case 'postalCodeChanged':
-            break
-          default:
-            break
-        }
-      },
-      paymentFormLoaded: function () {
-        // console.log('paymentFormLoaded!')
-        setLoading(false)
-        // document.getElementById('name').style.display = "inline-flex";
-      }
+
+      throw new Error(errorMessage)
     }
   }
 
-  const paymentFormRef = useRef(new props.paymentForm(config))
-
-  function requestCardNonce() {
-    // console.log(
-    //   'requestCardNonce paymentFormRef:',
-    //   paymentFormRef.current.requestCardNonce,
-    //   ' props.paymentForm:',
-    //   props.paymentForm.requestCardNonce
-    // )
-    paymentFormRef.current.requestCardNonce &&
-      paymentFormRef.current.requestCardNonce()
-    // props.paymentForm.requestCardNonce()
+  // status is either SUCCESS or FAILURE;
+  function displayPaymentFailResults() {
+    const statusContainer = document.getElementById(
+      'payment-status-container'
+    ) as HTMLDivElement
+    if (!statusContainer) {
+      return
+    }
+    statusContainer.classList.remove('is-success')
+    statusContainer.classList.add('is-failure')
+    statusContainer.style.visibility = 'visible'
   }
 
+  const init = useCallback(async () => {
+    if (!paymentForm) {
+      // throw new Error('Square.js failed to load properly');
+      console.warn('onoz no paymentForm!')
+    }
+
+    let payments
+    try {
+      payments = paymentForm.payments(appId, locationId)
+    } catch {
+      const statusContainer = document.getElementById(
+        'payment-status-container'
+      ) as HTMLDivElement
+      if (!statusContainer) {
+        return
+      }
+      statusContainer.className = 'missing-credentials'
+      statusContainer.style.visibility = 'visible'
+      return
+    }
+
+    let card: any
+    try {
+      card = await initializeCard(payments)
+    } catch (e) {
+      console.error('Initializing Card failed', e)
+      return
+    }
+
+    // Checkpoint 2.
+    async function handlePaymentMethodSubmission(
+      event: any,
+      paymentMethod: any
+    ) {
+      event.preventDefault()
+
+      try {
+        // disable the submit button as we await tokenization and make a payment request.
+        if (cardButton) {
+          cardButton.disabled = true
+        }
+
+        const token = await tokenize(paymentMethod)
+        const paymentResults = await createPayment(token)
+
+        // console.log('zomg handlenext gonna get a sourceId??', token)
+        handleNext(token)
+        // displayPaymentResults('SUCCESS')
+
+        // console.log('Payment Success', paymentResults)
+      } catch (e: any) {
+        cardButton.disabled = false
+        displayPaymentFailResults()
+        console.error(e.message)
+      }
+    }
+
+    const cardButton = document.getElementById(
+      'card-button'
+    ) as HTMLButtonElement
+    cardButton &&
+      cardButton.addEventListener('click', async function (event) {
+        await handlePaymentMethodSubmission(event, card)
+      })
+  }, [paymentForm])
+
   useEffect(() => {
-    // console.log(
-    //   '!!! SquarePaymentForm !!! fx, gonna paymentFormRef.current.build() !!!'
-    // )
-    paymentFormRef.current.build()
-    // paymentFormRef && paymentFormRef.current && paymentFormRef.current.build()
+    init()
   }, [])
 
   return (
-    <>
-      {loading && <Loading />}
-      <div style={{ display: loading ? 'hidden' : 'block', margin: '1em' }}>
-        <div className="container">
-          <div id="form-container">
-            <div id="sq-walletbox">
-              <button
-                style={{ display: applePay ? 'inherit' : 'none' }}
-                className="button-apple-pay"
-                id="sq-apple-pay"
-              ></button>
-              <button
-                style={{ display: masterpass ? 'block' : 'none' }}
-                className="button-masterpass"
-                id="sq-masterpass"
-              ></button>
-              <button
-                style={{ display: googlePay ? 'inherit' : 'none' }}
-                className="button-google-pay"
-                id="sq-google-pay"
-              ></button>
-
-              <div className="sq-wallet-divider">
-                <span className="sq-wallet-divider__text">Or</span>
-              </div>
-            </div>
-
-            <div id="sq-ccbox">
-              <p>
-                <span style={styles.leftCenter}>Enter Card Info Below </span>
-                <span style={styles.blockRight}>{cardBrand.toUpperCase()}</span>
-              </p>
-              <div id="cc-field-wrapper">
-                <div id="sq-card-number"></div>
-                <input type="hidden" id="card-nonce" name="nonce" />
-                <div id="sq-expiration-date"></div>
-                <div id="sq-cvv"></div>
-              </div>
-              <input
-                id="name"
-                style={styles.name}
-                type="text"
-                placeholder="Name"
-              />
-              <div id="sq-postal-code"></div>
-            </div>
-
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={requestCardNonce}
-              fullWidth
-              disabled={props.loading}
-            >
-              Pay ${(props.amount / 100).toFixed(2)}
-            </Button>
-          </div>
-          <p style={styles.error} id="error">
-            {error}
-          </p>
-        </div>
-      </div>
-    </>
+    <div>
+      <form id="payment-form">
+        <div id="card-container"></div>
+        <Button
+          id="card-button"
+          variant="contained"
+          color="primary"
+          // onClick={requestCardNonce}
+          fullWidth
+          disabled={loading}
+        >
+          Pay ${(amount / 100).toFixed(2)}
+        </Button>
+      </form>
+      <div id="payment-status-container"></div>
+    </div>
   )
 }
 
+/*
+ */
+
 interface SquarePaymentProps {
-  handleNext: (nonce: string) => void
+  handleNext: (sourceId: string) => void
   amount: number
   loading: boolean
 }
@@ -290,7 +195,7 @@ export default function SquarePayment(props: SquarePaymentProps) {
 
   return jsloaded ? (
     <SquarePaymentForm
-      paymentForm={SqPaymentForm}
+      paymentForm={Square}
       handleNext={props.handleNext}
       amount={props.amount || 0}
       loading={props.loading}

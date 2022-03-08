@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import IconButton from '@material-ui/core/IconButton'
@@ -82,11 +82,13 @@ interface NavBarProps {
   children?: React.ReactNode
 }
 
-function NavBar(props: NavBarProps & RouteComponentProps) {
+export default function NavBar(props: NavBarProps) {
+  const { showCart } = props
+
+  const navigate = useNavigate()
   const classes = useStyles()
   const itemCount = useCartItemCount()
 
-  const { showCart } = props
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(
     null
@@ -105,7 +107,7 @@ function NavBar(props: NavBarProps & RouteComponentProps) {
               variant="text"
               size="large"
               onClick={() => {
-                props.history.push('/')
+                navigate('/')
                 props.onBrandBtnClick && props.onBrandBtnClick()
               }}
             >
@@ -159,5 +161,3 @@ function NavBar(props: NavBarProps & RouteComponentProps) {
     </AppBar>
   )
 }
-
-export default withRouter(NavBar)

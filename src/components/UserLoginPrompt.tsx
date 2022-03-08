@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
 import {
   makeStyles,
   Theme,
@@ -9,9 +8,11 @@ import {
   IconButton,
   Tooltip
 } from '@material-ui/core'
-import BackIcon from '@material-ui/icons/ArrowBack'
+
+import Icon from '@mui/material/Icon'
 
 import Login from './Login'
+import { useNavigate } from 'react-router-dom'
 
 const styles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,7 +44,8 @@ const styles = makeStyles((theme: Theme) =>
   })
 )
 
-function UserLoginPrompt(props: RouteComponentProps) {
+export default function UserLoginPrompt() {
+  const navigate = useNavigate()
   const classes = styles()
   const [doLogin, setDoLogin] = useState(false)
 
@@ -52,7 +54,7 @@ function UserLoginPrompt(props: RouteComponentProps) {
       {doLogin && (
         <Tooltip aria-label="back" title="back">
           <IconButton onClick={() => setDoLogin(false)}>
-            <BackIcon />
+            <Icon>back</Icon>
           </IconButton>
         </Tooltip>
       )}
@@ -77,7 +79,9 @@ function UserLoginPrompt(props: RouteComponentProps) {
           <div className={classes.optItem}>
             <Button
               color="secondary"
-              onClick={() => props.history.push('/register')}
+              onClick={() => {
+                navigate('/register')
+              }}
             >
               Join the Co-op
             </Button>
@@ -95,5 +99,3 @@ function UserLoginPrompt(props: RouteComponentProps) {
     </div>
   )
 }
-
-export default withRouter(UserLoginPrompt)

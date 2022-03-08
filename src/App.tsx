@@ -1,30 +1,26 @@
 import React, { useEffect } from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-import { connect } from 'react-redux'
-import { ThunkDispatch } from 'redux-thunk'
-import CssBaseline from '@material-ui/core/CssBaseline'
-import { ThemeProvider } from '@material-ui/core/styles'
-
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import { darkTheme, lightTheme } from './theme'
-import { RootState } from './redux'
 
+import Announcements from './components/Announcements'
+import Checkout from './components/Checkout'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import DataTable from './components/DataTable'
+import Login from './components/Login'
+import MyOrders from './components/MyOrders'
+import NavBar from './components/NavBar'
+import Order from './components/Order'
+import { PreferencesServiceProps } from './redux/preferences/reducers'
+import ProductsGrid from './components/ProductsGrid'
+import Register from './components/Register'
+import { RootState } from './redux'
+import { ThemeProvider } from '@material-ui/core/styles'
+import { ThunkDispatch } from 'redux-thunk'
 import { UserServiceProps } from './redux/session/reducers'
 import { checkSession } from './redux/session/actions'
-
-import { PreferencesServiceProps } from './redux/preferences/reducers'
+import { connect } from 'react-redux'
 import { getPreferences } from './redux/preferences/actions'
-
-import DataTable from './components/DataTable'
-import Landing from './components/Landing'
-import Checkout from './components/Checkout'
-import Login from './components/Login'
-import Register from './components/Register'
-import NavBar from './components/NavBar'
-import ForgotPassword from './components/ForgotPassword'
-import ResetPassword from './components/ResetPassword'
-import MyOrders from './components/MyOrders'
-import Order from './components/Order'
-import Announcements from './components/Announcements'
+import { supabase } from './lib/supabaseClient'
 
 interface DispatchProps {
   checkSession: () => void
@@ -41,7 +37,12 @@ export function App(
   }, [getPreferences])
 
   useEffect(() => {
-    checkSession && checkSession()
+    checkSession()
+
+    const sub = supabase.auth.onAuthStateChange((event, session) => {
+      checkSession()
+    })
+    return () => sub?.data?.unsubscribe()
   }, [checkSession])
 
   const theme =
@@ -57,51 +58,52 @@ export function App(
       {preferencesService.preferences && (
         <Announcements preferences={preferencesService.preferences} />
       )}
-      <Router>
-        <Switch>
-          <Route path="/checkout" exact component={Checkout} />
-          <Route path="/products" exact component={DataTable} />
-          <Route path="/products/onhand/:onhand" exact component={DataTable} />
-          <Route path="/products/:cat/" exact component={DataTable} />
-          <Route path="/products/:cat/:subcat" component={DataTable} />
-          <Route path="/orders" exact>
-            <>
-              <NavBar />
-              <MyOrders />
-            </>
-          </Route>
-          <Route path="/order/:id" exact>
-            <>
-              <NavBar />
-              <Order />
-            </>
-          </Route>
-          <Route path="/forgotpassword" exact>
-            <>
-              <NavBar />
-              <ForgotPassword />
-            </>
-          </Route>
-          <Route path="/resetpassword" exact>
-            <>
-              <NavBar />
-              <ResetPassword />
-            </>
-          </Route>
-          <Route path="/login" exact>
-            <>
-              <NavBar />
-              <Login showTitle />
-            </>
-          </Route>
-          <Route path="/register" exact>
-            <>
-              <NavBar />
-              <Register />
-            </>
-          </Route>
-          <Route path="/" component={Landing} />
-        </Switch>
+      <Router basename={process.env.PUBLIC_URL}>
+        <Routes>
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/products" element={<DataTable />} />
+          <Route path="/products/onhand/:onhand" element={<DataTable />} />
+          <Route path="/products/:cat/" element={<DataTable />} />
+          <Route path="/products/:cat/:subcat" element={<DataTable />} />
+          <Route
+            path="/orders"
+            element={
+              <>
+                <NavBar />
+                <MyOrders />
+              </>
+            }
+          />
+          <Route
+            path="/order/:id"
+            element={
+              <>
+                <NavBar />
+                <Order />
+              </>
+            }
+          />
+
+          <Route
+            path="/login"
+            element={
+              <>
+                <NavBar />
+                <Login showTitle />
+              </>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <>
+                <NavBar />
+                <Register />
+              </>
+            }
+          />
+          <Route path="/" element={<ProductsGrid />} />
+        </Routes>
       </Router>
     </ThemeProvider>
   )

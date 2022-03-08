@@ -1,30 +1,29 @@
 import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
-import { ThunkDispatch } from 'redux-thunk'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import Container from '@material-ui/core/Container'
+import { useDispatch, useSelector } from 'react-redux'
+
 import Box from '@material-ui/core/Box'
-import Typography from '@material-ui/core/Typography'
+import Checkbox from '@material-ui/core/Checkbox'
+import Container from '@material-ui/core/Container'
+import FormControl from '@material-ui/core/FormControl'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import FormGroup from '@material-ui/core/FormGroup'
+import FormHelperText from '@material-ui/core/FormHelperText'
+import FormLabel from '@material-ui/core/FormLabel'
+import Loading from './Loading'
+import { Member } from '../types/Member'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
-import FormHelperText from '@material-ui/core/FormHelperText'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import FormControl from '@material-ui/core/FormControl'
-import FormLabel from '@material-ui/core/FormLabel'
-import FormGroup from '@material-ui/core/FormGroup'
-import Checkbox from '@material-ui/core/Checkbox'
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import { makeStyles } from '@material-ui/core/styles'
-
-import SquarePayment from './SquarePayment'
-import { Slider } from '@material-ui/core'
-import { Member } from '../types/Member'
-import { User } from '../types/User'
 import { RootState } from '../redux'
-import { UserServiceProps } from '../redux/session/reducers'
+import { Slider } from '@material-ui/core'
+import SquarePayment from './SquarePayment'
+import TextField from '@material-ui/core/TextField'
+import Typography from '@material-ui/core/Typography'
+import { User } from '../types/User'
+import { UserService } from '../redux/session/reducers'
+import { checkIfEamilExists } from '../services/memberService'
+import { makeStyles } from '@material-ui/core/styles'
 import { register } from '../redux/session/actions'
-import { API_HOST } from '../constants'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -81,36 +80,37 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-interface OwnProps {}
-
-interface DispatchProps {
-  register: (
-    user: Partial<User>,
-    member: Partial<Member>,
-    nonce: string
-  ) => void
+interface MemberData {
+  workerOwner?: boolean
+  producer?: boolean
+  kitchenExperience?: boolean
+  farmingGardeningExperience?: boolean
+  otherexpExplain?: string
 }
 
-type Props = RouteComponentProps & UserServiceProps & DispatchProps
+export default function Register() {
+  const userService = useSelector<RootState, UserService>(
+    (state) => state.session.userService
+  )
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
-function Register(props: Props) {
-  const { history, userService } = props
   const classes = useStyles()
-  // const [error, setError] = useState('')
   const [purchaseshare, setPurchaseshare] = useState('')
   const [understandBylaws, setUnderstandBylaws] = useState(false)
-  const [registrationFee, setRegistrationFee] = useState(100)
+  const [registrationFee, setRegistrationFee] = useState(0)
   const [subsityAmount, setSubsityAmount] = useState(99)
   const [otherexpexplain, setOtherexpexplain] = useState(false)
   const [userData, setUserData] = useState<Partial<User>>({})
   const [member, setMember] = useState<Partial<Member>>({})
-  const [memberData, setMemberData] = useState<object>({})
+  const [memberData, setMemberData] = useState<MemberData>()
 
   const [valid, setValid] = useState(false)
   const [validEmail, setValidEmail] = useState<boolean | undefined>(undefined)
   const [complete, setComplete] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const doRegister = (nonce: string) => {
+  const doRegister = (sourceId: string) => {
     // console.log(
     //   'doRegister understandBylaws:',
     //   understandBylaws,
@@ -120,20 +120,24 @@ function Register(props: Props) {
     //   member,
     //   ' memberData:',
     //   memberData,
-    //   ' nonce:',
-    //   nonce
+    //   ' sourceId:',
+    //   sourceId
     // )
 
-    props.register(
-      userData,
-      { ...member, data: memberData, fees_paid: registrationFee },
-      nonce
+    setLoading(true)
+    dispatch(
+      register(
+        userData,
+        { ...member, data: memberData, fees_paid: registrationFee },
+        sourceId
+      )
     )
   }
 
   useEffect(() => {
-    if (userService.user && !userService.isFetching && userService.user.role) {
+    if (userService.user && !userService.isFetching && userService.user.id) {
       // console.log('we gotta user!', userService.user)
+      setLoading(false)
       setComplete(true)
     } else {
       setComplete(false)
@@ -177,22 +181,9 @@ function Register(props: Props) {
   function checkValidEmail(event: any) {
     // console.log('checkValidEmail!! userData.email:', userData.email)
     if (userData.email && userData.email.length) {
+      checkIfEamilExists(userData.email).then((resp) => setValidEmail(resp))
+
       // console.log('checkValidEmail checking email..')
-      fetch(`${API_HOST}/register/check`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: userData.email
-        })
-      })
-        .then((r) => r.json())
-        .then((response) => {
-          // console.log('/register/check response:', response)
-          setValidEmail(!!response && response.valid)
-        })
-        .catch((err) => console.warn('onoz! register/check err:', err))
     } else {
       setValidEmail(undefined)
     }
@@ -204,7 +195,6 @@ function Register(props: Props) {
         purchaseshare &&
         understandBylaws &&
         userData.email &&
-        userData.password &&
         member.name &&
         member.phone
       )
@@ -225,7 +215,11 @@ function Register(props: Props) {
             name="email"
             type="text"
             helperText={
-              validEmail === false ? 'that email is already taken!' : 'Required'
+              validEmail === false
+                ? 'that email is already taken!'
+                : validEmail === undefined
+                ? 'Required'
+                : ''
             }
             onChange={handleUserDataChange}
             onBlur={checkValidEmail}
@@ -233,20 +227,20 @@ function Register(props: Props) {
             required
             autoFocus
           />
-          <TextField
+          {/* <TextField
             label="password"
             name="password"
             type="password"
-            helperText="Required"
+            helperText={userData.password ? '' : 'Required'}
             onChange={handleUserDataChange}
             fullWidth
             required
-          />
+          /> */}
           <TextField
             label="name"
             name="name"
             type="text"
-            helperText="Required"
+            helperText={member?.name ? '' : 'Required'}
             onChange={handleMemberChange}
             fullWidth
             required
@@ -255,7 +249,7 @@ function Register(props: Props) {
             label="phone"
             name="phone"
             type="phone"
-            helperText="Required"
+            helperText={member?.phone ? '' : 'Required'}
             onChange={handleMemberChange}
             fullWidth
             required
@@ -286,7 +280,6 @@ function Register(props: Props) {
             <RadioGroup
               aria-label="purchaseshare"
               name="purchaseshare"
-              // value={value}
               onChange={handlePurchaseShareChange}
             >
               <FormControlLabel
@@ -363,7 +356,7 @@ function Register(props: Props) {
                 />
               )}
             </RadioGroup>
-            <FormHelperText>Required</FormHelperText>
+            <FormHelperText>{registrationFee ? '' : 'Required'}</FormHelperText>
           </FormControl>
 
           <FormControl component="fieldset" className={classes.formControl}>
@@ -488,7 +481,9 @@ function Register(props: Props) {
             co-op and its members."
               />
             </FormGroup>
-            <FormHelperText>Required</FormHelperText>
+            <FormHelperText>
+              {understandBylaws ? '' : 'Required'}
+            </FormHelperText>
           </FormControl>
 
           <div className={classes.paymentContainer}>
@@ -511,62 +506,19 @@ function Register(props: Props) {
               </Box>
             )}
           </div>
-
-          {/* <Box color="error.main">
-            {error && (
-            <>
-              <Typography variant="overline" display="block">
-                onoz! an error!
-              </Typography>
-              <Typography variant="body1" display="block" gutterBottom>
-                {error}
-              </Typography>
-            </>
-          )}
-          </Box> */}
+          {loading && <Loading />}
         </form>
       ) : (
         <Box>
           <Typography variant="overline" display="block" gutterBottom>
-            Thank you!
+            Registration complete. Thank you!
           </Typography>
           <Typography variant="body2" display="block" gutterBottom>
-            Registration complete. Please check your email for a confirmation
-            link.
+            Please check your email for a confirmation link to complete
+            registration.
           </Typography>
-          <div className={classes.continueWrapper}>
-            <Button
-              onClick={() => history.push('/')}
-              variant="outlined"
-              size="large"
-            >
-              Continue to the store
-            </Button>
-          </div>
         </Box>
       )}
     </Container>
   )
 }
-
-const mapStateToProps = (states: RootState): UserServiceProps => {
-  return {
-    userService: states.session.userService
-  }
-}
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<{}, {}, any>,
-  ownProps: OwnProps
-): DispatchProps => {
-  return {
-    register: (user, member, nonce) => dispatch(register(user, member, nonce))
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(Register))
-
-// export default withRouter(Register)

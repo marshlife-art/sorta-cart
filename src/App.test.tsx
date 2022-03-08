@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-
+import { MemoryRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
 import configureMockStore from 'redux-mock-store'
@@ -16,18 +16,18 @@ const initialState: RootState = {
       isFetching: false,
       preferences: { dark_mode: 'true', last_seen_announcement: '0' }
     }
-  }
+  },
+  announcement: { announcementService: { open: false } }
 }
 const mockStore = configureMockStore([thunk])
 const store = mockStore(initialState)
 
 it('renders without crashing', () => {
   const div = document.createElement('div')
-  ReactDOM.render(
-    <Provider store={store}>
-      <App />
-    </Provider>,
-    div
-  )
+  ReactDOM.render(<Provider store={store}>
+    <MemoryRouter>
+    {/* <App/> */}
+    </MemoryRouter>
+    </Provider>, div)
   ReactDOM.unmountComponentAtNode(div)
 })
