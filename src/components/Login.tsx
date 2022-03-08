@@ -1,14 +1,14 @@
+import { Button, Container, Link, TextField } from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { Container, Button, TextField, Link } from '@material-ui/core'
-import Box from '@material-ui/core/Box'
-import Typography from '@material-ui/core/Typography'
-import { makeStyles } from '@material-ui/core/styles'
 
+import Box from '@material-ui/core/Box'
 import { RootState } from '../redux'
-import { login } from '../redux/session/actions'
+import Typography from '@material-ui/core/Typography'
 import { UserService } from '../redux/session/reducers'
+import { login } from '../redux/session/actions'
+import { makeStyles } from '@material-ui/core/styles'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
   onLoginFn?: () => void
@@ -31,9 +31,6 @@ const useStyles = makeStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2)
-  },
-  forgotpassword: {
-    marginTop: theme.spacing(3)
   },
   passwordlogin: {
     marginTop: theme.spacing(2)
@@ -96,15 +93,22 @@ export default function Login(props: Props) {
           required
         />
         {usePasswordLogin ? (
-          <TextField
-            label="password"
-            name="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-            required
-          />
+          <>
+            <TextField
+              label="password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+              required
+            />
+            <div className={classes.passwordlogin}>
+              <Link color="primary" onClick={() => setUsePasswordLogin(false)}>
+                Use Email Login...
+              </Link>
+            </div>
+          </>
         ) : (
           <div className={classes.passwordlogin}>
             <Link color="primary" onClick={() => setUsePasswordLogin(true)}>
@@ -154,17 +158,6 @@ export default function Login(props: Props) {
               </Typography>
             </>
           )}
-        </Box>
-
-        <Box className={classes.forgotpassword}>
-          <Button
-            fullWidth
-            // variant="contained"
-            // color="primary"
-            onClick={() => navigate('/forgotpassword')}
-          >
-            <i>Forgot Password?</i>
-          </Button>
         </Box>
       </form>
     </Container>

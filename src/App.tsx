@@ -6,7 +6,6 @@ import Announcements from './components/Announcements'
 import Checkout from './components/Checkout'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import DataTable from './components/DataTable'
-import ForgotPassword from './components/ForgotPassword'
 import Login from './components/Login'
 import MyOrders from './components/MyOrders'
 import NavBar from './components/NavBar'
@@ -14,7 +13,6 @@ import Order from './components/Order'
 import { PreferencesServiceProps } from './redux/preferences/reducers'
 import ProductsGrid from './components/ProductsGrid'
 import Register from './components/Register'
-import ResetPassword from './components/ResetPassword'
 import { RootState } from './redux'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { ThunkDispatch } from 'redux-thunk'
@@ -85,25 +83,7 @@ export function App(
               </>
             }
           />
-          <Route
-            path="/forgotpassword"
-            element={
-              <>
-                <NavBar />
-                <ForgotPassword />
-              </>
-            }
-          />
 
-          <Route
-            path="/resetpassword"
-            element={
-              <>
-                <NavBar />
-                <ResetPassword />
-              </>
-            }
-          />
           <Route
             path="/login"
             element={

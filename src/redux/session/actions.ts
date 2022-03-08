@@ -184,24 +184,3 @@ export const register = (
     })
   }
 }
-
-export const resetPassword = (
-  regKey: string,
-  password: string
-): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
-  return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
-    return new Promise<void>((resolve) => {
-      dispatch(isFetching(true))
-
-      // #TODO: fix this!
-      dispatch(
-        setError({
-          error: 'error',
-          reason: 'unable to reset password right now :('
-        })
-      )
-      dispatch(isFetching(false))
-      resolve()
-    })
-  }
-}
