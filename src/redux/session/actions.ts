@@ -3,8 +3,8 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk'
 
 import { AnyAction } from 'redux'
 import { Member } from '../../types/Member'
+import { auth } from '../../services/auth'
 import { registerMember } from '../../services/memberService'
-import { supabase } from '../../lib/supabaseClient'
 
 export interface SetAction {
   type: 'SET'
@@ -54,7 +54,7 @@ export const checkSession = (): ThunkAction<
     return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
 
-      const session = supabase.auth.session()
+      const session = auth.getSession()
       // console.log('zomg session:', session)
       if (session?.user) {
         dispatch(set({ ...session.user, role: 'admin' })) // #TODO: don't hard-code admin role :/
@@ -76,16 +76,8 @@ export const login = (
     return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
 
-      supabase.auth
-        .signIn(
-          { email, password },
-          {
-            redirectTo:
-              process.env.NODE_ENV === 'production'
-                ? 'https://sorta-cart.vercel.app/store' // this could live elsewhere :/
-                : `${window.location.origin}`
-          }
-        )
+      auth
+        .signIn(email, password)
         .then((response) => {
           if (response.user && response.user.id) {
             dispatch(set({ ...response.user, role: 'admin' })) // #TODO: don't hard-code admin role :/
@@ -119,7 +111,7 @@ export const logout = (): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
     return new Promise<void>((resolve) => {
       dispatch(isFetching(true))
 
-      supabase.auth
+      auth
         .signOut()
         .catch(console.warn)
         .finally(() => {
@@ -143,16 +135,8 @@ export const register = (
       registerMember({ user, member, sourceId })
         .then((response) => {
           // console.log('zomg registerMember response:', response)
-          if (response.msg === 'ok' && response.user) {
-            supabase.auth.signIn(
-              { email: response.user.email },
-              {
-                redirectTo:
-                  process.env.NODE_ENV === 'production'
-                    ? 'https://sorta-cart.vercel.app/store' // this could live elsewhere :/
-                    : `${window.location.origin}`
-              }
-            )
+          if (response.msg === 'ok' && response.user && response.user.email) {
+            auth.signIn(response.user.email)
             dispatch(set(response.user))
           } else {
             dispatch(setError({ error: 'error', reason: response.msg }))
@@ -172,7 +156,7 @@ export const register = (
           resolve()
         })
 
-      // #TODO: FIX THIS
+      // #TODO: FIX THIS (should never happen!?)
       dispatch(
         setError({
           error: 'error',
