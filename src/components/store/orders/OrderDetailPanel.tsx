@@ -1,15 +1,15 @@
-import React from 'react'
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
+
 import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
+import { Order } from '../../../types/Order'
+import PaymentDialog from './PaymentDialog'
+import React from 'react'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
-
-import { Order } from '../types/Order'
-import PaymentDialog from './PaymentDialog'
+import Typography from '@material-ui/core/Typography'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

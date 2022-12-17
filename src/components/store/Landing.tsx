@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
+
+import { API_HOST } from '../../constants'
+import Button from '@material-ui/core/Button'
+import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+import Fade from '@material-ui/core/Fade'
+import Grid from '@material-ui/core/Grid'
+import NavBar from './NavBar'
 // import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
-import Fade from '@material-ui/core/Fade'
 import Zoom from '@material-ui/core/Zoom'
-import ChevronRightIcon from '@material-ui/icons/ChevronRight'
-import { createStyles, Theme, makeStyles } from '@material-ui/core/styles'
-
-import NavBar from './NavBar'
-import { API_HOST } from '../constants'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

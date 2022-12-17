@@ -11,7 +11,7 @@ import {
 
 import Icon from '@mui/material/Icon'
 
-import Login from './Login'
+import Login from '../../Login'
 import { useNavigate } from 'react-router-dom'
 
 const styles = makeStyles((theme: Theme) =>

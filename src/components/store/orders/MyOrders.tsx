@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
-import { makeStyles } from '@material-ui/core/styles'
-import MaterialTable from 'material-table'
-import { formatDistance } from 'date-fns'
+import React, { useEffect, useState } from 'react'
+import { UserService, userService } from '../../../redux/session/reducers'
+import { getStoreCreditForUser, myOrders } from '../../../services/orderService'
 
-import { API_HOST } from '../constants'
-import { RootState } from '../redux'
-import { userService, UserService } from '../redux/session/reducers'
-import { Order } from '../types/Order'
+import MaterialTable from 'material-table'
+import { Order } from '../../../types/Order'
 import OrderDetailPanel from './OrderDetailPanel'
-import { getStoreCreditForUser, myOrders } from '../services/orderService'
+import { RootState } from '../../../redux'
+import { formatDistance } from 'date-fns'
+import { makeStyles } from '@material-ui/core/styles'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
   root: {

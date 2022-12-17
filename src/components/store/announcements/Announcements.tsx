@@ -1,29 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
-  createStyles,
   Theme,
-  withStyles,
-  WithStyles
+  WithStyles,
+  createStyles,
+  withStyles
 } from '@material-ui/core/styles'
+import {
+  closeAnnouncement,
+  openAnnouncement
+} from '../../../redux/announcement/actions'
+import { useDispatch, useSelector } from 'react-redux'
+
+import CloseIcon from '@material-ui/icons/Close'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import IconButton from '@material-ui/core/IconButton'
-import CloseIcon from '@material-ui/icons/Close'
-import Typography from '@material-ui/core/Typography'
+import { Preferences } from '../../../types/Preferences'
 import ReactMarkdown from 'react-markdown'
+import { RootState } from '../../../redux'
+import Typography from '@material-ui/core/Typography'
 import gfm from 'remark-gfm'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { setPreferences } from '../redux/preferences/actions'
-import { API_HOST } from '../constants'
 import renderers from './renderers'
-import { Preferences } from '../types/Preferences'
-import { RootState } from '../redux'
-import {
-  openAnnouncement,
-  closeAnnouncement
-} from '../redux/announcement/actions'
+import { setPreferences } from '../../../redux/preferences/actions'
 
 interface Announcement {
   id: number

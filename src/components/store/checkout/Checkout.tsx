@@ -1,42 +1,42 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
-import Stepper from '@material-ui/core/Stepper'
-import Step from '@material-ui/core/Step'
-import StepLabel from '@material-ui/core/StepLabel'
-import Button from '@material-ui/core/Button'
-import Tooltip from '@material-ui/core/Tooltip'
-import IconButton from '@material-ui/core/IconButton'
-import Typography from '@material-ui/core/Typography'
-import Grid from '@material-ui/core/Grid'
-import Paper from '@material-ui/core/Paper'
-import TextField from '@material-ui/core/TextField'
-import InputAdornment from '@material-ui/core/InputAdornment'
-import Box from '@material-ui/core/Box'
-import BackIcon from '@material-ui/icons/ArrowBack'
-import Link from '@material-ui/core/Link'
-
-import NavBar from './NavBar'
+import { Order, OrderLineItem } from '../../../types/Order'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
+import { UserService, UserServiceProps } from '../../../redux/session/reducers'
 import {
-  useCartService,
-  emptyCart,
   addStoreCreditToCart,
-  validateLineItems,
-  setDonationAmount
-} from '../services/useCartService'
-import CartTable from './CartTable'
-import Login from './Login'
-import { Order, OrderLineItem } from '../types/Order'
-import { BLANK_ORDER } from '../constants'
-import { UserService, UserServiceProps } from '../redux/session/reducers'
-import { RootState } from '../redux'
-import SquarePayment from './SquarePayment'
+  emptyCart,
+  setDonationAmount,
+  useCartService,
+  validateLineItems
+} from '../../../services/useCartService'
 import {
   createOrder,
   getMyMember,
   getStoreCreditForUser
-} from '../services/orderService'
+} from '../../../services/orderService'
+
+import { BLANK_ORDER } from '../../../constants'
+import BackIcon from '@material-ui/icons/ArrowBack'
+import Box from '@material-ui/core/Box'
+import Button from '@material-ui/core/Button'
+import CartTable from '../cart/CartTable'
+import Grid from '@material-ui/core/Grid'
+import IconButton from '@material-ui/core/IconButton'
+import InputAdornment from '@material-ui/core/InputAdornment'
+import Link from '@material-ui/core/Link'
+import Login from '../../Login'
+import NavBar from '../NavBar'
+import Paper from '@material-ui/core/Paper'
+import { RootState } from '../../../redux'
+import SquarePayment from '../square/SquarePayment'
+import Step from '@material-ui/core/Step'
+import StepLabel from '@material-ui/core/StepLabel'
+import Stepper from '@material-ui/core/Stepper'
+import TextField from '@material-ui/core/TextField'
+import Tooltip from '@material-ui/core/Tooltip'
+import Typography from '@material-ui/core/Typography'
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({

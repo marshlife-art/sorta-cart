@@ -1,25 +1,25 @@
-import React from 'react'
 import {
-  createStyles,
   Theme,
-  withStyles,
   WithStyles,
-  makeStyles
+  createStyles,
+  makeStyles,
+  withStyles
 } from '@material-ui/core/styles'
-import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import MuiDialogTitle from '@material-ui/core/DialogTitle'
-import MuiDialogContent from '@material-ui/core/DialogContent'
-import IconButton from '@material-ui/core/IconButton'
-import CloseIcon from '@material-ui/icons/Close'
-import PaymentIcon from '@material-ui/icons/AttachMoney'
-import Typography from '@material-ui/core/Typography'
-import Box from '@material-ui/core/Box'
 
-import { Order } from '../types/Order'
-import { API_HOST } from '../constants'
-import SquarePayment from './SquarePayment'
-import Loading from './Loading'
+import { API_HOST } from '../../../constants'
+import Box from '@material-ui/core/Box'
+import Button from '@material-ui/core/Button'
+import CloseIcon from '@material-ui/icons/Close'
+import Dialog from '@material-ui/core/Dialog'
+import IconButton from '@material-ui/core/IconButton'
+import Loading from '../../Loading'
+import MuiDialogContent from '@material-ui/core/DialogContent'
+import MuiDialogTitle from '@material-ui/core/DialogTitle'
+import { Order } from '../../../types/Order'
+import PaymentIcon from '@material-ui/icons/AttachMoney'
+import React from 'react'
+import SquarePayment from '../square/SquarePayment'
+import Typography from '@material-ui/core/Typography'
 
 const styles = (theme: Theme) =>
   createStyles({

@@ -1,20 +1,20 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Theme, createStyles, fade, makeStyles } from '@material-ui/core/styles'
+
 import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import IconButton from '@material-ui/core/IconButton'
-import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
-import Fade from '@material-ui/core/Fade'
 import Badge from '@material-ui/core/Badge'
-import { createStyles, fade, Theme, makeStyles } from '@material-ui/core/styles'
-import TagFacesIcon from '@material-ui/icons/TagFaces'
+import Button from '@material-ui/core/Button'
+import CartDrawer from './cart/CartDrawer'
+import Fade from '@material-ui/core/Fade'
+import IconButton from '@material-ui/core/IconButton'
 // import SearchIcon from '@material-ui/icons/Search'
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
-
-import UserMenu from './UserMenu'
-import { useCartItemCount } from '../services/useCartService'
-import CartDrawer from './CartDrawer'
+import TagFacesIcon from '@material-ui/icons/TagFaces'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import UserMenu from '../UserMenu'
+import { useCartItemCount } from '../../services/useCartService'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react'
-import { useSelector } from 'react-redux'
-import Drawer from '@material-ui/core/Drawer'
-
-import { RootState } from '../redux'
-import { UserService } from '../redux/session/reducers'
 import {
-  useCartService,
   emptyCart,
+  useCartService,
   validateLineItems
-} from '../services/useCartService'
+} from '../../../services/useCartService'
+
 import CartTable from './CartTable'
+import Drawer from '@material-ui/core/Drawer'
+import { RootState } from '../../../redux'
 import UserLoginPrompt from './UserLoginPrompt'
+import { UserService } from '../../../redux/session/reducers'
+import { useSelector } from 'react-redux'
 
 interface CartDrawerProps {
   open: boolean

@@ -2,15 +2,15 @@ import {
   Product,
   getCategories,
   getSubCategories
-} from '../services/productsService'
+} from '../../../services/productsService'
 import React, { useEffect, useRef, useState } from 'react'
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
-import { addToCart, removeItemFromCart } from '../services/useCartService'
+import { addToCart, removeItemFromCart } from '../../../services/useCartService'
 
 import ProductsGridNav from './ProductsGridNav'
 // import { supabase } from '../services/supabase/supabase'
-import styles from '../styles/Grid.module.css'
-import { supabase } from '../lib/supabaseClient'
+import styles from '../../../styles/Grid.module.css'
+import { supabase } from '../../../lib/supabaseClient'
 import useSWR from 'swr'
 
 const COLORS = [

@@ -1,39 +1,38 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useMatch, useNavigate } from 'react-router-dom'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
+import {
+  FixedSizeList as List,
+  ListChildComponentProps,
+  ListProps,
+  areEqual
+} from 'react-window'
 import MaterialTable, {
   Action,
-  Query,
+  MTableBody,
   MTableBodyRow,
   MTableFilterRow,
   MaterialTableProps,
-  // MTableEditRow,
-  MTableBody
+  Query
 } from 'material-table'
-import Chip from '@material-ui/core/Chip'
+import React, { useCallback, useEffect, useState } from 'react'
+import { addToCart, useCartItemCount } from '../../../services/useCartService'
+import { getCategories, getSubCategories } from '../../../lib/productsService'
+import { useMatch, useNavigate } from 'react-router-dom'
+
+import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart'
+import BackIcon from '@material-ui/icons/ArrowBack'
 import Badge from '@material-ui/core/Badge'
+import Button from '@material-ui/core/Button'
+import CartDrawer from '../cart/CartDrawer'
+import Chip from '@material-ui/core/Chip'
+import DeleteSweepIcon from '@material-ui/icons/DeleteSweep'
 import IconButton from '@material-ui/core/IconButton'
+import RemoveShoppingCartIcon from '@material-ui/icons/RemoveShoppingCart'
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
+import TagFacesIcon from '@material-ui/icons/TagFaces'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
-import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart'
-import RemoveShoppingCartIcon from '@material-ui/icons/RemoveShoppingCart'
-import TagFacesIcon from '@material-ui/icons/TagFaces'
-import DeleteSweepIcon from '@material-ui/icons/DeleteSweep'
-import BackIcon from '@material-ui/icons/ArrowBack'
-
-import UserMenu from './UserMenu'
-import CartDrawer from './CartDrawer'
-import { useCartItemCount, addToCart } from '../services/useCartService'
-import { supabase } from '../lib/supabaseClient'
-import {
-  FixedSizeList as List,
-  ListProps,
-  ListChildComponentProps,
-  areEqual
-} from 'react-window'
-import { getCategories, getSubCategories } from '../lib/productsService'
+import UserMenu from '../../UserMenu'
+import { supabase } from '../../../lib/supabaseClient'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 
 const PROPERTY_MAP: { [index: string]: string } = {
   a: 'Artificial ingredients',

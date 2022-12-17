@@ -1,14 +1,13 @@
 import React, { useState } from 'react'
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
 
-import IconButton from '@material-ui/core/IconButton'
 import Badge from '@material-ui/core/Badge'
-import { createStyles, Theme, makeStyles } from '@material-ui/core/styles'
-import TagFacesIcon from '@material-ui/icons/TagFaces'
+import CartDrawer from '../cart/CartDrawer'
+import IconButton from '@material-ui/core/IconButton'
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
-
-import UserMenu from './UserMenu'
-import { useCartItemCount } from '../services/useCartService'
-import CartDrawer from './CartDrawer'
+import TagFacesIcon from '@material-ui/icons/TagFaces'
+import UserMenu from '../../UserMenu'
+import { useCartItemCount } from '../../../services/useCartService'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

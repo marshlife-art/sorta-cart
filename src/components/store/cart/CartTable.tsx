@@ -1,28 +1,27 @@
+import { Order, OrderLineItem } from '../../../types/Order'
 import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { TAX_RATE, TAX_RATE_STRING } from '../../../constants'
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
+import {
+  removeItemFromCart,
+  updateLineItem
+} from '../../../services/useCartService'
 
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import { createStyles, Theme, makeStyles } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
+import ClearIcon from '@material-ui/icons/Clear'
+import IconButton from '@material-ui/core/IconButton'
+import MenuItem from '@material-ui/core/MenuItem'
+import Select from '@material-ui/core/Select'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
+import TableFooter from '@material-ui/core/TableFooter'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
-import TableFooter from '@material-ui/core/TableFooter'
-import Tooltip from '@material-ui/core/Tooltip'
-import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
-import IconButton from '@material-ui/core/IconButton'
-import ClearIcon from '@material-ui/icons/Clear'
-
-import {
-  updateLineItem,
-  removeItemFromCart
-} from '../services/useCartService'
-import { Order, OrderLineItem } from '../types/Order'
-import { TAX_RATE, TAX_RATE_STRING } from '../constants'
+import Tooltip from '@material-ui/core/Tooltip'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

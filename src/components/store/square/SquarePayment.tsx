@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Button from '@material-ui/core/Button'
 
-import '../sq-payment-form.css'
+import './sq-payment-form.css'
 import {
   API_HOST,
   SQUARE_APP_ID,
   SQUARE_LOCATION_ID,
   SQUARE_PAYMENT_JS
-} from '../constants'
-import Loading from './Loading'
+} from '../../../constants'
+import Loading from '../../Loading'
 
 declare const Square: any
 
