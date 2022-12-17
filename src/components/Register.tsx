@@ -182,8 +182,6 @@ export default function Register() {
     // console.log('checkValidEmail!! userData.email:', userData.email)
     if (userData.email && userData.email.length) {
       checkIfEamilExists(userData.email).then((resp) => setValidEmail(resp))
-
-      // console.log('checkValidEmail checking email..')
     } else {
       setValidEmail(undefined)
     }
@@ -216,7 +214,7 @@ export default function Register() {
             type="text"
             helperText={
               validEmail === false
-                ? 'that email is already taken!'
+                ? 'that email is already registered!'
                 : validEmail === undefined
                 ? 'Required'
                 : ''
@@ -497,7 +495,7 @@ export default function Register() {
               <Box color="error.main" className={classes.natValid}>
                 <Typography variant="overline" display="block" gutterBottom>
                   {validEmail === false
-                    ? 'Oh noz! That email is already registered'
+                    ? 'Oh noz! That email is either already registered or invalid :('
                     : 'Please fill out all the required fields to complete registration.'}
                 </Typography>
                 <Typography variant="body1" display="block" gutterBottom>

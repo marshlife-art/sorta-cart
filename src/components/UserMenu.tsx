@@ -124,8 +124,8 @@ export default function UserMenu(props: UserMenuProps) {
         {isAdmin && (
           <StyledMenuItem
             onClick={() => {
+              navigate('/admin')
               handleClose()
-              window.location.assign('https://admin.marshcoop.org/')
             }}
           >
             <ListItemText primary="ADMIN" />
