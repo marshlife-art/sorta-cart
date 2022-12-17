@@ -76,7 +76,7 @@ export default function Members() {
           variant="contained"
           color="primary"
           onClick={(event: any) => {
-            navigate('/members')
+            navigate('/admin/members')
           }}
         >
           ALL MEMBERS

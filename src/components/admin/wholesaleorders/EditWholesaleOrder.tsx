@@ -263,7 +263,7 @@ export default function EditWholesaleOrder(props: EditWholesaleOrderProps) {
       setSnackMsg(deleteError.message)
       setSnackOpen(true)
     } else {
-      navigate('/wholesaleorders')
+      navigate('/admin/wholesaleorders')
     }
   }
 

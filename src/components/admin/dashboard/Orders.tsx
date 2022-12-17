@@ -87,7 +87,7 @@ export default function Orders() {
           variant="contained"
           color="primary"
           onClick={(event: any) => {
-            navigate('/orders')
+            navigate('/admin/orders')
           }}
         >
           ALL ORDERS

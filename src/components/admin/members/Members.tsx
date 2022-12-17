@@ -27,7 +27,7 @@ export default function Members() {
     icon: 'add',
     tooltip: 'add new member',
     isFreeAction: true,
-    onClick: () => navigate('/members/new')
+    onClick: () => navigate('/admin/members/new')
   }
 
   const deleteAction = {

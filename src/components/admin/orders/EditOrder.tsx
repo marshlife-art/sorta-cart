@@ -601,7 +601,7 @@ export default function EditOrder() {
                   <Tooltip title="BACK TO ORDERS">
                     <IconButton
                       aria-label="back to orders"
-                      onClick={() => navigate('/orders')}
+                      onClick={() => navigate('/admin/orders')}
                     >
                       <Icon>arrow_back</Icon>
                     </IconButton>

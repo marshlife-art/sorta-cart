@@ -89,7 +89,7 @@ export default function WholesaleOrders() {
           variant="contained"
           color="primary"
           onClick={(event: any) => {
-            navigate('/wholesaleorders')
+            navigate('/admin/wholesaleorders')
           }}
         >
           SEE MORE

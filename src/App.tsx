@@ -21,8 +21,7 @@ import { checkSession } from './redux/session/actions'
 import { connect } from 'react-redux'
 import { getPreferences } from './redux/preferences/actions'
 import { supabase } from './lib/supabaseClient'
-import AdminRoute from './components/admin/AdminRoute'
-import Dashboard from './components/admin/dashboard/Dashboard'
+import Admin from './components/admin/Index'
 
 interface DispatchProps {
   checkSession: () => void
@@ -62,10 +61,7 @@ export function App(
       )}
       <Router basename={process.env.PUBLIC_URL}>
         <Routes>
-          <Route
-            path="/admin"
-            element={<AdminRoute path="/admin" element={<Dashboard />} />}
-          />
+          <Route path="/admin/*" element={<Admin />} />
 
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/products" element={<DataTable />} />

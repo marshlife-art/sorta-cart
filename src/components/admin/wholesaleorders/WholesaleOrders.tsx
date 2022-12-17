@@ -152,7 +152,7 @@ export default function WholesaleOrders(props: Props) {
   }
 
   function addWholesaleOrder() {
-    navigate('/wholesaleorders/edit/new')
+    navigate('/admin/wholesaleorders/edit/new')
     setSnackOpen(true)
   }
 
@@ -188,10 +188,10 @@ export default function WholesaleOrders(props: Props) {
             <div className={classes.title}>
               <MUILink
                 color="textPrimary"
-                href="/wholesaleorders"
+                href="/admin/wholesaleorders"
                 onClick={(e: any) => {
                   e.preventDefault()
-                  navigate('/wholesaleorders')
+                  navigate('/admin/wholesaleorders')
                 }}
                 className={classes.titleText}
               >
