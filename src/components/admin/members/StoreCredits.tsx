@@ -134,7 +134,9 @@ export default function StoreCredits() {
               >
                 <div className={classes.row}>
                   <Tooltip title="edit member">
-                    <Button onClick={() => navigate(`/members/${member.id}`)}>
+                    <Button
+                      onClick={() => navigate(`/admin/members/${member.id}`)}
+                    >
                       {member.name}
                     </Button>
                   </Tooltip>
@@ -178,7 +180,7 @@ export default function StoreCredits() {
                           <Tooltip title="edit order">
                             <Button
                               onClick={() =>
-                                navigate(`/orders/edit/${li.OrderId}`)
+                                navigate(`/admin/orders/edit/${li.OrderId}`)
                               }
                             >
                               #{li.OrderId}
@@ -212,7 +214,7 @@ export default function StoreCredits() {
                           <Tooltip title="edit order">
                             <Button
                               onClick={() =>
-                                navigate(`/orders/edit/${li.OrderId}`)
+                                navigate(`/admin/orders/edit/${li.OrderId}`)
                               }
                             >
                               #{li.OrderId}

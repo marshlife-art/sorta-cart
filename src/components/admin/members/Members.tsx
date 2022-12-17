@@ -64,7 +64,7 @@ export default function Members() {
       } else {
         member = members
       }
-      member.id && navigate(`/members/${member.id}`)
+      member.id && navigate(`/admin/members/${member.id}`)
     }
   }
 

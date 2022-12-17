@@ -92,7 +92,7 @@ async function fetchMemberOrders(
 
 export default function EditMember() {
   const navigate = useNavigate()
-  const match = useMatch('/members/:id')
+  const match = useMatch('/admin/members/:id')
   const classes = useStyles()
   const [loadingMember, setLoadingMember] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -177,7 +177,7 @@ export default function EditMember() {
               <Tooltip title="BACK TO MEMBERS">
                 <IconButton
                   aria-label="back to members"
-                  onClick={() => navigate('/members')}
+                  onClick={() => navigate('/admin/members')}
                 >
                   <Icon>arrow_back</Icon>
                 </IconButton>
@@ -408,8 +408,8 @@ export default function EditMember() {
                   <ListItem
                     key={order.id}
                     button
-                    href={`/orders/edit/${order.id}`}
-                    onClick={() => navigate(`/orders/edit/${order.id}`)}
+                    href={`/admin/orders/edit/${order.id}`}
+                    onClick={() => navigate(`/admin/orders/edit/${order.id}`)}
                   >
                     <ListItemText
                       primary={`#${order.id} $${order.total} (${order.item_count})`}

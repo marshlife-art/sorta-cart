@@ -117,7 +117,7 @@ interface Props {
 
 export default function WholesaleOrders(props: Props) {
   const navigate = useNavigate()
-  const match = useMatch('/wholesaleorders/edit/:id')
+  const match = useMatch('/admin/wholesaleorders/edit/:id')
   const userService = useSelector<RootState, UserService>(
     (state) => state.session.userService
   )
@@ -243,12 +243,14 @@ export default function WholesaleOrders(props: Props) {
                                   : undefined
                               }
                               component="a"
-                              href={`/wholesaleorders/edit/${order.id}`}
+                              href={`/admin/wholesaleorders/edit/${order.id}`}
                               onClick={(
                                 event: React.MouseEvent<HTMLAnchorElement>
                               ) => {
                                 event.preventDefault()
-                                navigate(`/wholesaleorders/edit/${order.id}`)
+                                navigate(
+                                  `/admin/wholesaleorders/edit/${order.id}`
+                                )
                               }}
                             >
                               <ListItemText

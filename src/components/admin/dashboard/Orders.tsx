@@ -60,7 +60,7 @@ export default function Orders() {
             <TableRow
               key={order.id}
               className={classes.rowHover}
-              onClick={() => navigate(`/orders/edit/${order.id}`)}
+              onClick={() => navigate(`/admin/orders/edit/${order.id}`)}
             >
               <TableCell
                 title={

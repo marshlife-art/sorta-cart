@@ -137,7 +137,7 @@ function tryNumber(input?: string | number): number {
 
 export default function EditOrder() {
   const navigate = useNavigate()
-  const match = useMatch('/orders/edit/:id')
+  const match = useMatch('/admin/orders/edit/:id')
   const userService = useSelector<RootState, UserService>(
     (state) => state.session.userService
   )
@@ -470,7 +470,7 @@ export default function EditOrder() {
       setSnackMsg('Saved order!')
       setSaving(false)
       if (result && result.id) {
-        navigate(`/orders/edit/${result.id}`)
+        navigate(`/admin/orders/edit/${result.id}`)
       }
     } else {
       const result = await updateOrder(o, orderLineItems as SupaOrderLineItem[])

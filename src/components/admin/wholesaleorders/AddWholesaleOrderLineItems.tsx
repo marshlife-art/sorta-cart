@@ -172,10 +172,10 @@ export default function AddWholesaleOrderLineItems(
             render: (row) => (
               <Link
                 color="secondary"
-                href={`/orders/edit/${row.OrderId}`}
+                href={`/admin/orders/edit/${row.OrderId}`}
                 onClick={(e: any) => {
                   e.preventDefault()
-                  navigate(`/orders/edit/${row.OrderId}`)
+                  navigate(`/admin/orders/edit/${row.OrderId}`)
                 }}
               >
                 Order #{row.OrderId}

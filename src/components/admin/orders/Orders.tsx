@@ -55,7 +55,7 @@ export default function Orders() {
     icon: 'add',
     tooltip: 'NEW ORDER',
     isFreeAction: true,
-    onClick: () => navigate('/orders/create')
+    onClick: () => navigate('/admin/orders/create')
   }
 
   const printAction = {
@@ -81,7 +81,7 @@ export default function Orders() {
     tooltip: 'EDIT',
     icon: 'edit',
     onClick: (e: any, data: Order[]) => {
-      data[0] && data[0].id && navigate(`/orders/edit/${data[0].id}`)
+      data[0] && data[0].id && navigate(`/admin/orders/edit/${data[0].id}`)
     }
   }
 

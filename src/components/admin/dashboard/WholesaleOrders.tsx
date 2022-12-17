@@ -61,7 +61,9 @@ export default function WholesaleOrders() {
             <TableRow
               key={order.id}
               className={classes.rowHover}
-              onClick={() => navigate(`/wholesaleorders/edit/${order.id}`)}
+              onClick={() =>
+                navigate(`/admin/wholesaleorders/edit/${order.id}`)
+              }
             >
               <TableCell
                 title={

@@ -345,10 +345,10 @@ export default function WholesaleOrderLineItems(props: {
                     {li.OrderId ? (
                       <Link
                         color="secondary"
-                        href={`/orders/edit/${li.OrderId}`}
+                        href={`/admin/orders/edit/${li.OrderId}`}
                         onClick={(e: any) => {
                           e.preventDefault()
-                          navigate(`/orders/edit/${li.OrderId}`)
+                          navigate(`/admin/orders/edit/${li.OrderId}`)
                         }}
                       >
                         Order #{li.OrderId}

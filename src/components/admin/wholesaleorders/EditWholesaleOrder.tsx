@@ -81,7 +81,7 @@ interface EditWholesaleOrderProps {
 
 export default function EditWholesaleOrder(props: EditWholesaleOrderProps) {
   const navigate = useNavigate()
-  const match = useMatch('wholesaleorders/edit/:id')
+  const match = useMatch('/admin/wholesaleorders/edit/:id')
   const classes = useStyles()
 
   const [wholesaleOrderId, setWholesaleOrderId] = useState('')

@@ -51,7 +51,7 @@ export default function Members() {
             <TableRow
               key={member.id}
               className={classes.rowHover}
-              onClick={() => navigate(`/members/${member.id}`)}
+              onClick={() => navigate(`/admin/members/${member.id}`)}
             >
               <TableCell
                 title={
