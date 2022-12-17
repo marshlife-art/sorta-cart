@@ -1,5 +1,5 @@
 export interface Product {
-  id: number
+  id: any // ;(
   unf?: string
   upc_code?: string
   category: string
@@ -9,10 +9,10 @@ export interface Product {
   pk: number
   size: string
   unit_type: string
-  ws_price: string
-  u_price: string
-  ws_price_cost?: string
-  u_price_cost?: string
+  ws_price: any // ;(
+  u_price: any // ;(
+  ws_price_cost?: any // ;(
+  u_price_cost?: any // ;(
   codes?: string
   import_tag?: string
   vendor: string

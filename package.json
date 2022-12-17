@@ -5,18 +5,33 @@
   "homepage": "https://www.marshcoop.org/",
   "repository": "github:marshlife-art/sorta-cart",
   "type": "module",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build && cp CNAME build/",
+    "build-store": "PUBLIC_URL=/store BUILD_PATH='./store' npm run build",
+    "deploy": "gh-pages -d build",
+    "story:build": "node story/build.js",
+    "story:watch": "STORY_WATCH=yesplz node story/build.js",
+    "story:server": "python3 -m http.server -d story/build/"
+  },
   "dependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.60",
     "@mui/icons-material": "^5.2.5",
     "@mui/material": "^5.2.8",
     "@supabase/supabase-js": "^1.29.1",
     "date-fns": "^2.28.0",
     "dexie": "^3.2.0",
     "dexie-observable": "^3.0.0-beta.11",
+    "json2csv": "^5.0.7",
     "material-table": "^1.69.3",
+    "papaparse": "^5.3.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-markdown": "^7.1.2",
@@ -30,20 +45,24 @@
     "swr": "^1.1.2",
     "typescript": "4.5.4"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build && cp CNAME build/",
-    "build-store": "PUBLIC_URL=/store BUILD_PATH='./store' npm run build",
-    "deploy": "gh-pages -d build",
-    "story:build": "node story/build.js",
-    "story:watch": "STORY_WATCH=yesplz node story/build.js",
-    "story:server": "python3 -m http.server -d story/build/"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
+  "devDependencies": {
+    "@mdx-js/esbuild": "^2.0.0-rc.2",
+    "@reduxjs/toolkit": "^1.7.1",
+    "@types/date-fns": "^2.6.0",
+    "@types/jest": "27.4.0",
+    "@types/json2csv": "^5.0.3",
+    "@types/node": "17.0.8",
+    "@types/papaparse": "^5.3.1",
+    "@types/react": "17.0.38",
+    "@types/react-dom": "17.0.11",
+    "@types/react-redux": "^7.1.22",
+    "@types/react-window": "^1.8.5",
+    "@types/redux-mock-store": "^1.0.3",
+    "fake-indexeddb": "^3.1.7",
+    "gh-pages": "^3.2.3",
+    "jest": "^27.4.7",
+    "redux-mock-store": "^1.5.4",
+    "remark-gfm": "^3.0.1"
   },
   "browserslist": {
     "production": [
@@ -57,22 +76,8 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "@mdx-js/esbuild": "^2.0.0-rc.2",
-    "@reduxjs/toolkit": "^1.7.1",
-    "@types/date-fns": "^2.6.0",
-    "@types/jest": "27.4.0",
-    "@types/node": "17.0.8",
-    "@types/react": "17.0.38",
-    "@types/react-dom": "17.0.11",
-    "@types/react-redux": "^7.1.22",
-    "@types/react-window": "^1.8.5",
-    "@types/redux-mock-store": "^1.0.3",
-    "fake-indexeddb": "^3.1.7",
-    "gh-pages": "^3.2.3",
-    "jest": "^27.4.7",
-    "redux-mock-store": "^1.5.4",
-    "remark-gfm": "^3.0.1"
+  "eslintConfig": {
+    "extends": "react-app"
   },
   "prettier": {
     "trailingComma": "none",

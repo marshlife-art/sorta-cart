@@ -1,3 +1,6 @@
+import { OrderStatus, PaymentStatus, ShipmentStatus } from './types/Order'
+import { SquareStatus } from './types/WholesaleOrder'
+
 import { Order } from './types/Order'
 
 export const API_HOST: string =
@@ -44,3 +47,43 @@ export const SQUARE_LOCATION_ID: string =
   process.env.NODE_ENV === 'production' ? 'FY8AAVD6K7T7A' : 'D2MV0BZC6EV9Y'
 
 // export const SQUARE_ACCESS_TOKEN: string = 'D2MV0BZC6EV9Y'
+
+type OrderStatusLookup = { [key in OrderStatus]: string }
+export const ORDER_STATUSES: OrderStatusLookup = {
+  new: 'new',
+  needs_review: 'needs review',
+  pending: 'pending',
+  complete: 'complete',
+  void: 'void',
+  archived: 'archived'
+}
+
+type OrderPaymentStatusLookup = { [key in PaymentStatus]: string }
+export const PAYMENT_STATUSES: OrderPaymentStatusLookup = {
+  balance_due: 'balance due',
+  paid: 'paid',
+  credit_owed: 'credit owed',
+  failed: 'failed',
+  void: 'void'
+}
+
+type OrderShipmentStatusLookup = { [key in ShipmentStatus]: string }
+export const SHIPMENT_STATUSES: OrderShipmentStatusLookup = {
+  backorder: 'backorder',
+  pending: 'pending',
+  ready: 'ready',
+  shipped: 'shipped',
+  partial: 'partial',
+  canceled: 'canceled'
+}
+
+type SquareStatusLookup = { [key in SquareStatus]: string }
+export const SQUARE_STATUSES: SquareStatusLookup = {
+  new: 'new',
+  ready_to_import: 'ready to import',
+  complete: 'complete'
+}
+
+export const APP_VERSION = `v${
+  process.env.npm_package_version || require('../package.json').version
+} made with ♥ in NYC`

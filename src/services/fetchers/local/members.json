@@ -1,0 +1,22 @@
+[
+  {
+    "id": 0,
+    "name": "Charlie Otto",
+    "registration_email": "charlie.otto@example.com",
+    "phone": "000-000-00000"
+  },
+  {
+    "id": 1,
+    "name": "Finley Justice",
+    "registration_email": "Finley.Justice@example.com",
+    "phone": "111-111-1111",
+    "User": { "email": "Finley.Justice@example.com" }
+  },
+  {
+    "id": 2,
+    "name": "Frankie Frankie",
+    "registration_email": "Frankie.Frankie@example.net",
+    "phone": "2222222222",
+    "User": { "emai": "frankzalot@example.com" }
+  }
+]

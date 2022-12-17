@@ -217,20 +217,16 @@ export async function createOrder(props: {
       reject({ error: true, msg: `Insert error: ${error?.message}` })
     }
 
-    const oliz: SupaNewOrderLineItem[] = props.order.OrderLineItems.map(
-      (oli) => {
-        const { id, data, ...rest } = oli
-        const status = oli.data?.product?.count_on_hand
-          ? 'on_hand'
-          : 'backorder'
-        return {
-          data: JSON.stringify(data),
-          OrderId: order?.id,
-          status,
-          ...rest
-        }
+    const oliz = props.order.OrderLineItems.map((oli) => {
+      const { id, data, ...rest } = oli
+      const status = oli.data?.product?.count_on_hand ? 'on_hand' : 'backorder'
+      return {
+        data,
+        OrderId: order?.id,
+        status,
+        ...rest
       }
-    )
+    })
     const { error: oliError } = await supabase
       .from<SupaOrderLineItem>('OrderLineItems')
       .insert(oliz)
