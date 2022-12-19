@@ -20,6 +20,8 @@ export interface Product {
   updatedAt?: string
   count_on_hand?: number
   no_backorder?: boolean
+  sq_variation_id?: string
+  plu?: string
 }
 
 // interface LineItemProps {

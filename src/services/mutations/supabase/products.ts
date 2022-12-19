@@ -14,8 +14,8 @@ export const updateNoBackorder: UpdateNoBackorder = async (
 ) => {
   const column_or_default = column ? column : 'import_tag'
   const { error } = await supabase
-    .from<SupaProduct>('products')
-    .update({ no_backorder: true }, { returning: 'minimal' })
+    .from('products')
+    .update({ no_backorder: true })
     .eq(column_or_default, prevImportTag)
   return { error }
 }
@@ -24,21 +24,15 @@ export const upsertProducts: UpsertProducts = async (
   products: SupaProduct[],
   ignoreDuplicates: boolean
 ) => {
-  const { error, count } = await supabase
-    .from<SupaProduct>('products')
-    .upsert(products, {
-      count: 'exact',
-      returning: 'minimal',
-      ignoreDuplicates
-    })
+  const { error, count } = await supabase.from('products').upsert(products, {
+    count: 'exact',
+    ignoreDuplicates
+  })
   return { error, count }
 }
 
 export const deleteProducts: DeleteProducts = async (ids: string[]) => {
-  const { error } = await supabase
-    .from<SupaProduct>('products')
-    .delete({ returning: 'minimal' })
-    .in('id', ids)
+  const { error } = await supabase.from('products').delete().in('id', ids)
 
   return { error }
 }
@@ -48,7 +42,7 @@ export const updateProducts: UpdateProducts = async (
   ids: string[]
 ) => {
   const { error } = await supabase
-    .from<SupaProduct>('products')
+    .from('products')
     .update(product)
     .in('id', ids)
 

@@ -1,4 +1,5 @@
 import Handlebars from 'handlebars/dist/cjs/handlebars'
+import { OrderLineItem } from '../types/Order'
 
 import { SupaOrderWithLineItems } from '../types/SupaTypes'
 import { supabase } from './supabaseClient'
@@ -310,7 +311,7 @@ const template = Handlebars.compile(printTemplate)
 
 export default async function printOrders(orderIds: number[]) {
   const { data, error } = await supabase
-    .from<SupaOrderWithLineItems>('Orders')
+    .from('Orders')
     .select('*, OrderLineItems (*)')
     .in('id', orderIds)
 
@@ -319,7 +320,9 @@ export default async function printOrders(orderIds: number[]) {
   }
 
   const orders = data.map((order) => {
-    const line_items = order.OrderLineItems || []
+    // #TODO: better approach for `as OrderLineItem[]`
+    // ...supabase type bug? https://github.com/supabase/supabase/discussions/535
+    const line_items = (order.OrderLineItems as OrderLineItem[]) || []
 
     const onHandProducts = line_items.filter(
       (li) => li.kind === 'product' && li.status === 'on_hand'

@@ -7,8 +7,7 @@ import {
 } from '../types/SupaTypes'
 
 import { TAX_RATE } from '../constants'
-
-// supabase
+import { Json } from '../types/database.types'
 
 type OrderWithoutId = Omit<SupaOrder, 'id'> & {
   id?: number
@@ -22,33 +21,29 @@ export const createOrder = async (
   orderLineItems: SupaOrderLineItemWithOutId[]
 ) => {
   const { data, error } = await supabase
-    .from<SupaOrder>('Orders')
-    .insert(
-      {
-        ...order,
-        id: undefined,
-        createdAt: undefined,
-        updatedAt: undefined
-      },
-      { returning: 'representation' }
-    )
-    .single()
+    .from('Orders')
+    .insert({
+      ...order,
+      id: undefined,
+      createdAt: undefined,
+      updatedAt: undefined
+    })
+    .select()
 
-  if (error || !data || !data.id) {
+  const o = data && data[0]
+  if (error || !o || !o.id) {
     return null // ...something?
   }
 
   for await (const oli of orderLineItems) {
-    await supabase.from<SupaOrderLineItem>('OrderLineItems').insert(
-      {
-        ...oli,
-        OrderId: data.id
-      },
-      { returning: 'minimal' }
-    )
+    await supabase.from('OrderLineItems').insert({
+      ...oli,
+      data: oli.data as Json,
+      OrderId: o.id
+    })
   }
 
-  return data
+  return o
 
   // #TODO deal with on_hand_count checking like:
   // mainly tag line items with status 'on_hand' and
@@ -140,28 +135,26 @@ export const updateOrder = async (
   }
 
   const { data, error } = await supabase
-    .from<SupaOrder>('Orders')
-    .update(
-      {
-        ...order,
-        id: undefined,
-        createdAt: undefined,
-        updatedAt: undefined
-      },
-      { returning: 'representation' }
-    )
+    .from('Orders')
+    .update({
+      ...order,
+      id: undefined,
+      createdAt: undefined,
+      updatedAt: undefined
+    })
     .eq('id', order.id)
-    .single()
+    .select()
 
-  if (error || !data || !data.id) {
+  const o = data && data[0]
+  if (error || !o || !o.id) {
     console.warn('onoz updateOrder got error:', error)
     return null // ...something?
   }
 
   // prevent orpahned OrderLineItems, purge existing ones first.
   const { error: oldDeleteError } = await supabase
-    .from<SupaOrderLineItem>('OrderLineItems')
-    .delete({ returning: 'minimal' })
+    .from('OrderLineItems')
+    .delete()
     .eq('OrderId', order.id)
 
   if (oldDeleteError) {
@@ -171,20 +164,18 @@ export const updateOrder = async (
 
   for await (const oli of orderLineItems) {
     const { error: oldCreateError } = await supabase
-      .from<SupaOrderLineItem>('OrderLineItems')
-      .insert(
-        {
-          ...oli,
-          OrderId: data.id
-        },
-        { returning: 'minimal' }
-      )
+      .from('OrderLineItems')
+      .insert({
+        ...oli,
+        data: oli.data as Json,
+        OrderId: o.id
+      })
     if (oldCreateError) {
       console.warn('onoz oldCreateError:', oldCreateError)
     }
   }
 
-  return data
+  return o
 }
 
 export interface OrderCreditItem {
@@ -214,7 +205,7 @@ export const createOrderCredits = async (items: OrderCreditItem[]) => {
         const total = toMoney(-(absPrice + absPrice * TAX_RATE))
 
         const { data: orderLineItems, error } = await supabase
-          .from<SupaOrderLineItem>('OrderLineItems')
+          .from('OrderLineItems')
           .select()
           .eq('OrderId', OrderId)
           .eq('kind', 'credit')
@@ -224,7 +215,7 @@ export const createOrderCredits = async (items: OrderCreditItem[]) => {
           return
         }
 
-        await supabase.from<SupaOrderLineItem>('OrderLineItems').insert({
+        await supabase.from('OrderLineItems').insert({
           quantity: 1,
           price,
           total,

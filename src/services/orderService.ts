@@ -10,6 +10,7 @@ import { API_HOST } from '../constants'
 import { Order } from '../types/Order'
 import { User } from '../types/User'
 import { supabase } from '../lib/supabaseClient'
+import { Json } from '../types/database.types'
 
 type LineItemValidation = SupaOrderLineItem & {
   invalid?: string
@@ -76,7 +77,7 @@ export async function validateLineItemsService(lineItems: SupaOrderLineItem[]) {
     // )
 
     const { data: product, error } = await supabase
-      .from<SupaProduct>('products')
+      .from('products')
       .select()
       .eq('id', liData.product.id)
       .single()
@@ -134,7 +135,9 @@ export async function validateLineItemsService(lineItems: SupaOrderLineItem[]) {
     // if no_backorder and no count_on_hand then invalidate this li
     if (
       product.no_backorder === true &&
-      (product.count_on_hand === undefined || product.count_on_hand < 1)
+      (product.count_on_hand === undefined ||
+        product.count_on_hand === null ||
+        product.count_on_hand < 1)
     ) {
       li.invalid = 'product no longer available'
       li.quantity = 0
@@ -172,7 +175,7 @@ export async function getMyMember(userId: string) {
   // }
 
   const { data: member, error } = await supabase
-    .from<SupaMember>('Members')
+    .from('Members')
     .select()
     .eq('UserId', userId)
     .single()
@@ -208,8 +211,9 @@ export async function createOrder(props: {
 
     // console.log('zomg gonna orderToInsert:', orderToInsert)
     const { data: order, error } = await supabase
-      .from<SupaOrder>('Orders')
-      .insert(orderToInsert, { returning: 'representation' })
+      .from('Orders')
+      .insert(orderToInsert)
+      .select()
       .single()
 
     if (error || !order) {
@@ -221,14 +225,14 @@ export async function createOrder(props: {
       const { id, data, ...rest } = oli
       const status = oli.data?.product?.count_on_hand ? 'on_hand' : 'backorder'
       return {
-        data,
+        data: data as Json,
         OrderId: order?.id,
         status,
         ...rest
       }
     })
     const { error: oliError } = await supabase
-      .from<SupaOrderLineItem>('OrderLineItems')
+      .from('OrderLineItems')
       .insert(oliz)
 
     if (oliError) {
@@ -272,14 +276,15 @@ export function myOrders(
       return
     }
     const { data: orders, error } = await supabase
-      .from<SupaOrder>('Orders')
+      .from('Orders')
       .select()
       .eq('UserId', userId)
 
     if (error || !orders) {
       reject({ error: true, orders })
     }
-    resolve({ error: false, orders })
+    // #TODO: deal with `as SupaOrder[]`
+    resolve({ error: false, orders: orders as SupaOrder[] })
   })
 }
 
@@ -293,7 +298,7 @@ export function myOrder(
       return
     }
     const { data: order, error } = await supabase
-      .from<SupaOrder>('Orders')
+      .from('Orders')
       .select('*, OrderLineItems ( * )')
       // #TODO: maybe use something else than `email` to match this order?
       //memail: user?.email
@@ -303,7 +308,8 @@ export function myOrder(
     if (error || !order) {
       reject({ error: true, order })
     }
-    resolve({ error: false, order })
+    // #TODO: deal with ` as SupaOrder`
+    resolve({ error: false, order: order as SupaOrder })
   })
 }
 
@@ -319,7 +325,7 @@ async function getMemberCreditsAdjustmentsSums(MemberId: string | number) {
   }
 
   const { data: orders, error } = await supabase
-    .from<SupaOrder>('Orders')
+    .from('Orders')
     .select('id')
     .eq('MemberId', MemberId)
 
@@ -340,13 +346,13 @@ async function getMemberCreditsAdjustmentsSums(MemberId: string | number) {
   const orderIds = orders.map((o) => o.id)
 
   const { data: credits } = await supabase
-    .from<SupaOrderLineItem>('OrderLineItems')
+    .from('OrderLineItems')
     .select()
     .eq('kind', 'credit')
     .in('OrderId', orderIds)
 
   const { data: adjustments } = await supabase
-    .from<SupaOrderLineItem>('OrderLineItems')
+    .from('OrderLineItems')
     .select()
     .eq('kind', 'adjustment')
     .in('OrderId', orderIds)

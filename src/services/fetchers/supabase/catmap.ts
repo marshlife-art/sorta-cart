@@ -1,10 +1,9 @@
 import { supabase } from '../../../lib/supabaseClient'
-import { SupaCatmap } from '../../../types/SupaTypes'
 import { CatmapFetcher } from '../types'
 
 export const catmapFetcher: CatmapFetcher = async () => {
   const { data, error, count } = await supabase
-    .from<SupaCatmap>('catmap')
+    .from('catmap')
     .select('*', { count: 'exact' })
 
   if (!error && data?.length) {

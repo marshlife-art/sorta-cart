@@ -149,7 +149,7 @@ export default function AdminIndex() {
     const sub = supabase.auth.onAuthStateChange((event, session) => {
       dispatch(checkSession())
     })
-    return () => sub?.data?.unsubscribe()
+    return () => sub.data.subscription.unsubscribe()
   }, [])
 
   useEffect(() => {

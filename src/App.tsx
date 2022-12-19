@@ -43,7 +43,8 @@ export function App(
     const sub = supabase.auth.onAuthStateChange((event, session) => {
       checkSession()
     })
-    return () => sub?.data?.unsubscribe()
+
+    return () => sub.data.subscription.unsubscribe()
   }, [checkSession])
 
   const theme =

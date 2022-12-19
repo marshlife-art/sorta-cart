@@ -14,7 +14,7 @@ import { mapProductsToAutocomplete } from '../lib'
 
 export const productFetcher: ProductFetcher = async (id: string) => {
   const { error, data } = await supabase
-    .from<SupaProduct>('products')
+    .from('products')
     .select('id')
     .eq('id', id)
     .single()
@@ -67,7 +67,8 @@ export const productsFetcher: ProductsFetcher = async (
     query = query.limit(q.pageSize)
   }
   if (q.orderBy && q.orderBy.field) {
-    query = query.order(q.orderBy.field, {
+    // #TODO: hmm, better handling of field (need col name vs. 'string' type) to avoid `as any`?
+    query = query.order(q.orderBy.field as any, {
       ascending: q.orderDirection === 'asc'
     })
   }

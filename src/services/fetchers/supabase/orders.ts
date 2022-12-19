@@ -19,7 +19,7 @@ export const ordersDashboardFetcher: OrderDashboardFetcher = async () => {
 
 export const ordersForMember: OrdersForMember = async (MemberId: number) => {
   const { data, error } = await supabase
-    .from<SupaOrder>('Orders')
+    .from('Orders')
     .select()
     .eq('MemberId', MemberId)
 
@@ -28,7 +28,7 @@ export const ordersForMember: OrdersForMember = async (MemberId: number) => {
 
 export const orderFetcher: OrderFetcher = async (id: number) => {
   const { data, error } = await supabase
-    .from<SuperOrderAndAssoc>('Orders')
+    .from('Orders')
     .select('*, OrderLineItems ( * ), Members ( * )')
     .eq('id', id)
     .single()
@@ -72,9 +72,12 @@ export const ordersDataTableFetcher: OrderDataTableFetcher = async (
     query = query.limit(q.pageSize)
   }
   if (q.orderBy && q.orderBy.field) {
-    query = query.order(q.orderBy.field, {
+    // #TODO: maybe try to be particular about the .field, here? to avoid `as any`?
+    query = query.order(q.orderBy.field as any, {
       ascending: q.orderDirection === 'asc'
     })
+
+    // { ascending?: boolean; nullsFirst?: boolean; foreignTable: string }
   } else {
     query = query.order('id', { ascending: false })
   }

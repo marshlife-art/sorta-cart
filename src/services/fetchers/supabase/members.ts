@@ -35,9 +35,7 @@ export const membersAutocompleteFetcher: MembersAutocompleteFetcher = async ({
 }
 
 export const membersFetcher: MembersFetcher = async (q: Query<SupaMember>) => {
-  let query = supabase
-    .from<SupaMember>('Members')
-    .select('*', { count: 'exact' })
+  let query = supabase.from('Members').select('*', { count: 'exact' })
   //, users ( * ) i think need to use service role or otherwise setup rls for users relation?
 
   if (q.filters.length) {
@@ -93,7 +91,7 @@ export const membersFetcher: MembersFetcher = async (q: Query<SupaMember>) => {
 
 export const membersDashboardFetcher: MemberDashboardFetcher = async () => {
   const { data, error, count } = await supabase
-    .from<SupaMember>('Members')
+    .from('Members')
     .select('*', { count: 'exact' })
     .order('createdAt', { ascending: false })
     .limit(10)
@@ -103,7 +101,7 @@ export const membersDashboardFetcher: MemberDashboardFetcher = async () => {
 
 export const memberFetcher: MemberFetcher = async (memberId: number) => {
   const { data, error } = await supabase
-    .from<SupaMember>('Members')
+    .from('Members')
     .select()
     .eq('id', memberId)
     .single()

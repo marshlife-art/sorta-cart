@@ -10,7 +10,7 @@ export async function getProducts(limit = 1000) {
     error,
     count
   } = await supabase
-    .from<Product>('products')
+    .from('products')
     .select('*', { count: 'exact' })
     .limit(limit)
 
@@ -20,7 +20,7 @@ export async function getProducts(limit = 1000) {
 
 export async function getProductsCount() {
   const { error, count } = await supabase
-    .from<Product>('products')
+    .from('products')
     .select('*', { count: 'exact' })
 
   if (error) throw new Error(error.message)
@@ -28,7 +28,9 @@ export async function getProductsCount() {
 }
 
 export async function getCategories(): Promise<{ [index: string]: string }> {
-  const { data, error } = await supabase.rpc('distinct_product_categories')
+  const { data, error } = await supabase
+    .rpc('distinct_product_categories')
+    .single()
 
   if (error) {
     throw new Error(error.message)
@@ -38,14 +40,13 @@ export async function getCategories(): Promise<{ [index: string]: string }> {
   return data?.reduce((acc, row) => {
     acc[row.category] = row.category
     return acc
-  }, {})
+  }, {} as { [index: string]: string })
 }
 
 export async function getSubCategories(category: string) {
-  const { data, error } = await supabase.rpc(
-    'distinct_product_sub_categories',
-    { category }
-  )
+  const { data, error } = await supabase
+    .rpc('distinct_product_sub_categories', { category })
+    .single()
 
   if (error) {
     throw new Error(error.message)
@@ -55,7 +56,7 @@ export async function getSubCategories(category: string) {
   return data?.reduce((acc, row) => {
     acc[row.category] = row.category
     return acc
-  }, {})
+  }, {} as { [index: string]: string })
 }
 
 // all the functions below are known to need non-anon privileges, so client prop is passed in.
@@ -82,7 +83,7 @@ export async function updateProductCountOnHand(props: {
   const { variation_id, count_on_hand, client } = props
   const c = client ? client : supabase
   const { data, error } = await c
-    .from<Product>('products')
+    .from('products')
     .update({ count_on_hand })
     .match({ variation_id })
 

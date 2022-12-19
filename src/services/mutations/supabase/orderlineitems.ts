@@ -1,4 +1,5 @@
 import { supabase } from '../../../lib/supabaseClient'
+import { Json } from '../../../types/database.types'
 import { SupaOrderLineItem } from '../../../types/SupaTypes'
 import { InsertOrderLineItem, UpdateOrderLineItems } from '../types'
 
@@ -7,8 +8,11 @@ export const updateOrderLineItems: UpdateOrderLineItems = async (
   ids: number[]
 ) => {
   const { error, status } = await supabase
-    .from<SupaOrderLineItem>('OrderLineItems')
-    .update(orderLineItems, { returning: 'minimal' })
+    .from('OrderLineItems')
+    .update({
+      ...orderLineItems,
+      data: orderLineItems.data as Json
+    })
     .in('id', ids)
 
   return { error, status }
@@ -17,7 +21,10 @@ export const updateOrderLineItems: UpdateOrderLineItems = async (
 export const insertOrderLineItem: InsertOrderLineItem = async (
   lineItem: Partial<SupaOrderLineItem>
 ) => {
-  const { data, error } = await supabase.from('OrderLineItems').insert(lineItem)
+  const { data, error } = await supabase.from('OrderLineItems').insert({
+    ...lineItem,
+    data: lineItem.data as Json
+  })
 
   return { data, error }
 }

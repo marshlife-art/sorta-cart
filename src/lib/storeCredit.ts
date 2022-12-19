@@ -15,7 +15,7 @@ export const getMemberCreditsAdjustmentsSums = async (
   }
 
   const { data: orders, error } = await supabase
-    .from<SupaOrder>('Orders')
+    .from('Orders')
     .select('id')
     .eq('MemberId', MemberId)
 
@@ -36,13 +36,13 @@ export const getMemberCreditsAdjustmentsSums = async (
   const orderIds = orders.map((o) => o.id)
 
   const { data: credits } = await supabase
-    .from<SupaOrderLineItem>('OrderLineItems')
+    .from('OrderLineItems')
     .select()
     .eq('kind', 'credit')
     .in('OrderId', orderIds)
 
   const { data: adjustments } = await supabase
-    .from<SupaOrderLineItem>('OrderLineItems')
+    .from('OrderLineItems')
     .select()
     .eq('kind', 'adjustment')
     .in('OrderId', orderIds)
@@ -73,29 +73,48 @@ export const getStoreCreditReport = async () => {
     return []
   }
 
-  const rows = await Promise.all(
-    members.map(async (member) => {
-      const {
-        credits_sum,
-        adjustments_sum,
-        credits,
-        adjustments,
-        store_credit
-      } = await getMemberCreditsAdjustmentsSums(member.id)
+  const rows = []
+  for await (let member of members) {
+    const { credits_sum, adjustments_sum, credits, adjustments, store_credit } =
+      await getMemberCreditsAdjustmentsSums(member.id)
 
-      if (!adjustments || !credits) {
-        return []
-      }
-      return {
-        ...member,
-        credits,
-        credits_sum,
-        adjustments,
-        adjustments_sum,
-        store_credit
-      }
+    if (!adjustments || !credits) {
+      return
+    }
+    rows.push({
+      ...member,
+      credits,
+      credits_sum,
+      adjustments,
+      adjustments_sum,
+      store_credit
     })
-  )
+  }
+
+  // #TODO: ensure for loop above works, then yank old impl below.
+  // const rows = await Promise.all(
+  //   members.map(async (member) => {
+  //     const {
+  //       credits_sum,
+  //       adjustments_sum,
+  //       credits,
+  //       adjustments,
+  //       store_credit
+  //     } = await getMemberCreditsAdjustmentsSums(member.id)
+
+  //     if (!adjustments || !credits) {
+  //       return []
+  //     }
+  //     return {
+  //       ...member,
+  //       credits,
+  //       credits_sum,
+  //       adjustments,
+  //       adjustments_sum,
+  //       store_credit
+  //     }
+  //   })
+  // )
 
   return rows
     .filter((o) => o)

@@ -13,6 +13,7 @@
     "predeploy": "npm run build && cp CNAME build/",
     "build-store": "PUBLIC_URL=/store BUILD_PATH='./store' npm run build",
     "deploy": "gh-pages -d build",
+    "staticdeploy": "gh-pages -d build",
     "story:build": "node story/build.js",
     "story:watch": "STORY_WATCH=yesplz node story/build.js",
     "story:server": "python3 -m http.server -d story/build/"
@@ -25,7 +26,7 @@
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@mui/icons-material": "^5.2.5",
     "@mui/material": "^5.2.8",
-    "@supabase/supabase-js": "^1.29.1",
+    "@supabase/supabase-js": "^2.2.1",
     "date-fns": "^2.28.0",
     "handlebars": "^4.7.7",
     "dexie": "^3.2.0",

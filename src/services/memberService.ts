@@ -1,20 +1,29 @@
 import { API_HOST } from '../constants'
+import { supabase } from '../lib/supabaseClient'
 import { Member } from '../types/Member'
 import { User } from '../types/User'
 
+// http://localhost:54321/functions/v1/email-available
 export async function checkIfEamilExists(email: string): Promise<boolean> {
   try {
-    const r = await fetch(`${API_HOST}/members/email-available`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email
-      })
+    const { data, error } = await supabase.functions.invoke('email-available', {
+      body: { email }
     })
-    const response = await r.json()
-    return response.ok
+
+    if (error) return false
+    return data.ok
+
+    // const r = await fetch(`${API_HOST}/members/email-available`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({
+    //     email
+    //   })
+    // })
+    // const response = await r.json()
+    // return response.ok
   } catch (err) {
     console.warn('onoz! register/check err:', err)
     return false

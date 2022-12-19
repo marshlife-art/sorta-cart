@@ -18,7 +18,7 @@ import {
 export const wholesaleOrdersFetcher: WholesaleOrdersFetcher = async (
   status: OrderStatus
 ) => {
-  let query = supabase.from<SupaWholesaleOrder>('WholesaleOrders').select()
+  let query = supabase.from('WholesaleOrders').select()
   if (status) {
     query = query.eq('status', status)
   }
@@ -31,7 +31,7 @@ export const wholesaleOrderFetcher: WholesaleOrderFetcher = async (
   id: number
 ) => {
   const { data, error } = await supabase
-    .from<SupaWholesaleOrder>('WholesaleOrders')
+    .from('WholesaleOrders')
     .select('*, OrderLineItems ( * )')
     .eq('id', id)
     .single()
@@ -41,7 +41,7 @@ export const wholesaleOrderFetcher: WholesaleOrderFetcher = async (
 export const wholesaleOrdersDashboardFetcher: WholesaleOrderDashboardFetcher =
   async () => {
     const { data, error } = await supabase
-      .from<SupaWholesaleOrder>('WholesaleOrders')
+      .from('WholesaleOrders')
       .select('*', { count: 'exact' })
       .order('createdAt', { ascending: false })
       .limit(10)
@@ -55,7 +55,7 @@ export const wholesaleOrdersDashboardFetcher: WholesaleOrderDashboardFetcher =
 export const wholesaleOrdersDataTableFetcher: WholesaleOrdersDataTableFetcher =
   async (q: Query<SupaOrderLineItem> | Query<SupaWholesaleOrder>) => {
     let query = supabase
-      .from<SupaOrderLineItem>('OrderLineItems')
+      .from('OrderLineItems')
       .select('*', { count: 'exact' })
       .is('WholesaleOrderId', null)
       .eq('kind', 'product')
@@ -114,7 +114,7 @@ export const wholesaleOrdersDataTableFetcher: WholesaleOrdersDataTableFetcher =
 export const wholesaleOrderLineItemsFetcher: WholesaleOrderLineItemsFetcher =
   async () => {
     let query = supabase
-      .from<SupaOrderLineItem>('OrderLineItems')
+      .from('OrderLineItems')
       .select('*', { count: 'exact' })
       .is('WholesaleOrderId', null)
       .eq('kind', 'product')

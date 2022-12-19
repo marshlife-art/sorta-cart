@@ -10,8 +10,8 @@ export const insertWholesaleOrder: InsertWholesaleOrder = async (
   wholesaleOrder: Partial<SupaWholesaleOrder>
 ) => {
   const { data, error } = await supabase
-    .from<SupaWholesaleOrder>('WholesaleOrders')
-    .insert(wholesaleOrder, { returning: 'representation' })
+    .from('WholesaleOrders')
+    .insert(wholesaleOrder)
     .single()
 
   return { data, error }
@@ -29,7 +29,7 @@ export const upsertWholesaleOrder: UpsertWholesaleOrder = async (
   wholesaleOrder: Partial<SupaWholesaleOrder>
 ) => {
   const { data, error } = await supabase
-    .from<SupaWholesaleOrder>('WholesaleOrders')
+    .from('WholesaleOrders')
     .upsert({
       ...wholesaleOrder,
       createdAt: undefined,
