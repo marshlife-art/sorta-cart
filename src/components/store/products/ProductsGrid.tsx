@@ -1,5 +1,4 @@
 import {
-  Product,
   getCategories,
   getSubCategories
 } from '../../../services/productsService'
@@ -12,6 +11,7 @@ import ProductsGridNav from './ProductsGridNav'
 import styles from '../../../styles/Grid.module.css'
 import { supabase } from '../../../lib/supabaseClient'
 import useSWR from 'swr'
+import { SupaProduct } from '../../../types/SupaTypes'
 
 const COLORS = [
   ['lightblue', 'peachpuff'],
@@ -53,7 +53,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => {
   })
 })
 
-function formatPrice(product: Product) {
+function formatPrice(product: SupaProduct) {
   if (!product.u_price || !product.ws_price) {
     return ''
   }
@@ -162,7 +162,7 @@ const PROPERTY_MAP: { [index: string]: string } = {
   3: '70%+ organic'
 }
 
-function renderCodes(codes?: string) {
+function renderCodes(codes?: string | null) {
   if (!codes) {
     return ''
   }
@@ -225,7 +225,7 @@ function getLabelFor(prop: string): { ascLabel: string; descLabel: string } {
 }
 
 const ProductCard = (props: {
-  product: Product
+  product: SupaProduct
   // style: React.CSSProperties
   className: string
 }) => {
@@ -359,7 +359,7 @@ function ProductGroup(props: ProductGroupProps) {
 }
 
 interface ProductsGrouped {
-  [index: string]: { [index: string]: Product[] }
+  [index: string]: { [index: string]: SupaProduct[] }
 }
 
 interface ProductsData {
@@ -564,8 +564,10 @@ export default function ProductGrid() {
         query = query.order(sort.prop, { ascending: sort.asc })
       }
 
-      const { data: products, error, count } = await query
+      const { data, error, count } = await query
 
+      // #TODO: `as SupaProduct[]` why functions have unknown type :/
+      const products = data as SupaProduct[]
       let cats: string[] = []
       const grouped = products?.reduce((acc, product) => {
         const cat = product.category || 'no category'
@@ -602,7 +604,9 @@ export default function ProductGrid() {
       let allSubCatz: string[] = []
       for await (const c of selectedCatz) {
         const subcatz = await getSubCategories(c)
-        allSubCatz = [...allSubCatz, ...Object.keys(subcatz)]
+        if (subcatz) {
+          allSubCatz = [...allSubCatz, ...Object.keys(subcatz)]
+        }
       }
 
       return allSubCatz

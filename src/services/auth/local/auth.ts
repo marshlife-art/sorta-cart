@@ -15,11 +15,13 @@ const user = {
 const session = {
   access_token: '666',
   token_type: 'test',
+  refresh_token: 'refresh',
+  expires_in: 666_666,
   user
 }
 
-const getSession: GetSession = () => {
-  return session
+const getSession: GetSession = async () => {
+  return Promise.resolve(session)
 }
 
 const signIn: SignIn = async (email: string, password?: string) => {

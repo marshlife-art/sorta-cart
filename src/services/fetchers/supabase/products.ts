@@ -18,8 +18,8 @@ export const productFetcher: ProductFetcher = async (id: string) => {
     .select('id')
     .eq('id', id)
     .single()
-
-  return { error, data }
+  // #TODO: ugh, this `as SupaProduct` doesn't make sense :/
+  return { data: data as SupaProduct, error }
 }
 
 export const productsFetcher: ProductsFetcher = async (
@@ -80,13 +80,15 @@ export const productsFetcher: ProductsFetcher = async (
 
 export const distinctProductVendors: DistinctProductVendorsFetcher =
   async () => {
-    const { data, error } = await supabase.rpc('distinct_product_vendors')
+    const { data, error } = await supabase
+      .rpc('distinct_product_vendors')
+      .single()
 
     if (!error && data?.length) {
       return data?.reduce((acc, row) => {
         acc.push(row.vendor)
         return acc
-      }, [])
+      }, [] as Array<string>)
     }
 
     return []
@@ -94,13 +96,15 @@ export const distinctProductVendors: DistinctProductVendorsFetcher =
 
 export const distinctProductImportTags: DistinctProductImportTagsFetcher =
   async () => {
-    const { data, error } = await supabase.rpc('distinct_product_import_tags')
+    const { data, error } = await supabase
+      .rpc('distinct_product_import_tags')
+      .single()
 
     if (!error && data?.length) {
       return data?.reduce((acc, row) => {
         acc.push(row.import_tag)
         return acc
-      }, [])
+      }, [] as Array<string>)
     }
 
     return []
@@ -108,7 +112,9 @@ export const distinctProductImportTags: DistinctProductImportTagsFetcher =
 
 export const distinctProductCategories: DistinctProductCategoriesFetcher =
   async () => {
-    const { data, error } = await supabase.rpc('distinct_product_categories')
+    const { data, error } = await supabase
+      .rpc('distinct_product_categories')
+      .single()
 
     if (error || !data) {
       return {}
@@ -117,15 +123,14 @@ export const distinctProductCategories: DistinctProductCategoriesFetcher =
     return data.reduce((acc, row) => {
       acc[row.category] = row.category
       return acc
-    }, {})
+    }, {} as Record<string, string>)
   }
 
 export const distinctProductSubCategories: DistinctProductSubCategoriesFetcher =
   async (category: string) => {
-    const { data, error } = await supabase.rpc(
-      'distinct_product_sub_categories',
-      { category }
-    )
+    const { data, error } = await supabase
+      .rpc('distinct_product_sub_categories', { category })
+      .single()
 
     if (error || !data) {
       return {}
@@ -134,7 +139,7 @@ export const distinctProductSubCategories: DistinctProductSubCategoriesFetcher =
     return data?.reduce((acc, row) => {
       acc[row.category] = row.category
       return acc
-    }, {})
+    }, {} as Record<string, string>)
   }
 
 export const productsAutocompleteFetcher: ProductsAutocompleteFetcher = async ({

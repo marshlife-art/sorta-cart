@@ -16,7 +16,9 @@
     "staticdeploy": "gh-pages -d build",
     "story:build": "node story/build.js",
     "story:watch": "STORY_WATCH=yesplz node story/build.js",
-    "story:server": "python3 -m http.server -d story/build/"
+    "story:server": "python3 -m http.server -d story/build/",
+    "supabase:localtypes": "supabase gen types typescript --local > src/types/supabase.ts",
+    "supabase:gentypes": "supabase gen types typescript --project-id \"zlzhojhgkapokbmvokzz\" > src/types/supabase.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.7.1",

@@ -471,11 +471,12 @@ export default function DataTable() {
             if (q.pageSize) {
               query = query.limit(q.pageSize)
             }
-            if (q.orderBy && q.orderBy.field) {
-              query = query.order(q.orderBy.field, {
-                ascending: q.orderDirection === 'asc'
-              })
-            }
+            // #TODO: deal with this :/
+            // if (q.orderBy && q.orderBy.field) {
+            //   query = query.order(q.orderBy.field, {
+            //     ascending: q.orderDirection === 'asc'
+            //   })
+            // }
 
             const { data, error, count } = await query
 

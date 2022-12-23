@@ -11,7 +11,7 @@ import {
 } from '../../../services/fetchers'
 import { upsertWholesaleOrder } from '../../../services/mutations'
 
-const blankWholesaleOrder: WholesaleOrder = {
+const blankWholesaleOrder: Partial<WholesaleOrder> = {
   id: undefined,
   api_key: undefined,
   vendor: '',
@@ -51,7 +51,10 @@ const useWholesaleOrderService = (
     }
 
     if (id === undefined) {
-      setResult({ status: 'loaded', payload: blankWholesaleOrder })
+      setResult({
+        status: 'loaded',
+        payload: blankWholesaleOrder as WholesaleOrder
+      })
       setLoading(false)
       setReload(false)
       return

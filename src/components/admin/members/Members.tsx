@@ -81,7 +81,8 @@ export default function Members() {
             render: (row) => (
               <div
                 title={
-                  row.createdAt && new Date(row.createdAt).toLocaleString()
+                  (row.createdAt && new Date(row.createdAt).toLocaleString()) ??
+                  undefined
                 }
               >
                 {row.createdAt &&

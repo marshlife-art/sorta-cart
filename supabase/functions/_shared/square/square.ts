@@ -12,7 +12,7 @@ import crypto, {
 } from 'https://deno.land/std@0.168.0/node/crypto.ts'
 import { isDeepStrictEqual } from 'https://deno.land/std@0.168.0/node/util.ts'
 
-import { Product } from '../../../../src/types/Product.d.ts'
+import { SupaProduct } from '../../../../src/types/SupaTypes.ts'
 import { client } from './client.ts'
 import { getDefaultLocationId } from './locations.ts'
 
@@ -325,7 +325,7 @@ async function parseCategory(item: CatalogObjectWithQty): Promise<{
 
 export async function mapSqCatalogToProducts(
   catalog: CatalogObjectWithQty[]
-): Promise<Product[]> {
+): Promise<SupaProduct[]> {
   const catalogMap = catalog.map(async (item) => {
     const priceMaybeBigInt =
       (item.itemData &&
@@ -346,7 +346,7 @@ export async function mapSqCatalogToProducts(
 
     const { category, sub_category } = await parseCategory(item)
 
-    const product: Partial<Product> = {
+    const product: Partial<SupaProduct> = {
       id,
       ...parseNameAndDesc(item),
       u_price,
@@ -358,7 +358,7 @@ export async function mapSqCatalogToProducts(
     if (category) product.category = category
     if (sub_category) product.sub_category = sub_category
     if (sku) product.upc_code = sku
-    return product as Product // ugh! #TODO: deal with `as Product`
+    return product //as Product // ugh! #TODO: deal with `as Product`
   })
   return await Promise.all(catalogMap)
 }
@@ -459,7 +459,7 @@ function hasOwnProperty<X extends {}, Y extends PropertyKey>(
 
 type CatalogCustomAttributeValues = Record<string, CatalogCustomAttributeValue>
 
-async function mapProductToCustomAttributeValues(product: Product) {
+async function mapProductToCustomAttributeValues(product: SupaProduct) {
   const {
     result: { objects }
   } = await fetchCustomAttributes()
@@ -492,7 +492,7 @@ async function mapProductToCustomAttributeValues(product: Product) {
   }, {} as CatalogCustomAttributeValues)
 }
 
-async function getMeasurementUnitId(product?: Product) {
+async function getMeasurementUnitId(product?: SupaProduct) {
   if (!product || !product.plu || !product.size) {
     return undefined
   }
@@ -596,7 +596,7 @@ async function getCategoryId(category?: string, sub_category?: string) {
   return undefined
 }
 
-export async function addProductToCatalog(product: Product) {
+export async function addProductToCatalog(product: SupaProduct) {
   const {
     result: { objects }
   } = await fetchTaxes()

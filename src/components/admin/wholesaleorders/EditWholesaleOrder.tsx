@@ -63,7 +63,7 @@ export interface GroupedItem {
   product: SupaProduct | undefined | null
   vendor: string | undefined
   description: string
-  line_items: LineItem[]
+  line_items: Partial<LineItem>[]
 }
 
 export interface LineItemData {
@@ -116,6 +116,7 @@ export default function EditWholesaleOrder(props: EditWholesaleOrderProps) {
   const [snackMsg, setSnackMsg] = React.useState('')
 
   const handleOrderNotesChange = (notes?: string) => {
+    if (!notes) return
     setWholesaleOrder((prevOrder) => {
       if (prevOrder) {
         return {

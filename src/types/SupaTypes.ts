@@ -1,49 +1,52 @@
-import { Product } from './Product'
-import { definitions } from './supabase'
+import { Database, Json } from './supabase'
 
 export type User = {
   email?: string
   role?: string
 }
-export type SupaProduct = definitions['products']
-export type SupaMember = definitions['Members']
-export type SupaUser = { email?: string } // hmm, figure this out.
-export type SupaMemberWithUser = SupaMember & { User: SupaUser }
+export type SupaProduct = Database['public']['Tables']['products']['Row']
+export type SupaMember = Database['public']['Tables']['Members']['Row']
+export type SupaUser = { id?: string; email?: string; role?: string } // hmm, figure this out.
+export type SupaMemberWithUser = SupaMember & { User?: SupaUser | null }
 export type SupaNewOrderLineItem = Omit<SupaOrderLineItem, 'id'> & {
-  data: SupaOrderLineItemData | string | null
+  data: SupaOrderLineItemData
 }
 export type SupaOrderLineItemData = {
-  product?: SupaProduct | Product
+  product?: SupaProduct
   payment?: { receipt_url: string; receipt_number: string }
 }
 export type SupaOrderLineItem = Omit<
-  definitions['OrderLineItems'],
+  Database['public']['Tables']['OrderLineItems']['Row'],
   'id' | 'data'
 > & {
   id?: number
   data?: SupaOrderLineItemData | null
 }
-export type SupaOrder = definitions['Orders']
+export type SupaOrder = Database['public']['Tables']['Orders']['Row']
 export type SupaOrderWithLineItems = SupaOrder & {
-  OrderLineItems: SupaOrderLineItem[]
+  OrderLineItems?: SupaOrderLineItem[] | null
 }
 export type SupaOrderWithMembers = SupaOrder & {
   Members?: SupaMember
 }
 export type SuperOrderAndAssoc = SupaOrder & {
-  OrderLineItems: SupaOrderLineItem[]
-  Members?: SupaMember
-  User?: User
+  OrderLineItems?: SupaOrderLineItem[] | null
+  Members?: SupaMember | null
+  User?: User | null
 }
 
-type WholesaleOrder = definitions['WholesaleOrders']
+export type PartialSuperOrderAndAssoc = Partial<SupaOrder> & {
+  OrderLineItems?: Partial<SupaOrderLineItem>[] | null
+  Members?: Partial<SupaMember> | null
+  User?: Partial<User> | null
+}
+
+type WholesaleOrder = Database['public']['Tables']['WholesaleOrders']['Row']
 export type SupaWholesaleOrder = Omit<WholesaleOrder, 'id' | 'api_key'> & {
   id?: number
   api_key?: string
-  OrderLineItems: SupaOrderLineItem[]
-  data?: any
+  OrderLineItems?: SupaOrderLineItem[] | null
+  data?: Json
 }
 
-export type SupaCatmap = definitions['catmap']
-
-export type SquareImport = definitions['squareimport']
+export type SupaCatmap = Database['public']['Tables']['catmap']['Row']

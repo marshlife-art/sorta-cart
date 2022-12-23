@@ -1,11 +1,10 @@
 import Dexie from 'dexie'
 import 'dexie-observable'
+import { SupaOrderLineItem } from './types/SupaTypes'
 
-import { OrderLineItem } from './types/Order'
-// import { SupaOrderLineItem } from './types/SupaTypes'
-
+type PartialLineItem = Partial<SupaOrderLineItem>
 export class AppDatabase extends Dexie {
-  cart: Dexie.Table<OrderLineItem, number>
+  cart: Dexie.Table<PartialLineItem, number>
 
   constructor() {
     super('SortaCartDatabase')

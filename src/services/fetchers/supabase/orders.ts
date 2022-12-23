@@ -8,11 +8,14 @@ import {
   OrdersForMember
 } from '../types'
 
+type RecentOrders = SupaOrder[] | null
+
 export const ordersDashboardFetcher: OrderDashboardFetcher = async () => {
   const { data, error } = await supabase.rpc('recent_orders')
 
+  // #TODO: hmm recent_orders has unknown typing from supabase gen types?
   return {
-    data,
+    data: data as RecentOrders,
     error
   }
 }
@@ -33,7 +36,8 @@ export const orderFetcher: OrderFetcher = async (id: number) => {
     .eq('id', id)
     .single()
 
-  return { data, error }
+  // #TODO: ugh `data as SuperOrderAndAssoc` ;(
+  return { data: data as SuperOrderAndAssoc, error }
 }
 
 export const ordersDataTableFetcher: OrderDataTableFetcher = async (
@@ -84,5 +88,6 @@ export const ordersDataTableFetcher: OrderDataTableFetcher = async (
 
   const { data, error, count } = await query
 
-  return { data, error, count }
+  //#TODO: ugh `data as SuperOrderAndAssoc[] | null` ;()
+  return { data: data as SuperOrderAndAssoc[] | null, error, count }
 }

@@ -114,7 +114,7 @@ export interface WholesaleOrdersFetcher {
 
 export interface WholesaleOrderFetcher {
   (id: number): Promise<{
-    data: SupaWholesaleOrder | null
+    data: Json | SupaWholesaleOrder | null
     error: PostgrestError | null
   }>
 }

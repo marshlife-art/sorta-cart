@@ -13,7 +13,7 @@ const KNOWN_HEADERS: string[] = [
   'no_backorder',
   'featured',
   'count_on_hand',
-  'unit_type',
+  'unit_type'
 ]
 const HEADER_MAP: { [index: string]: string } = {
   'UPC Code': 'upc_code',
@@ -24,7 +24,7 @@ const HEADER_MAP: { [index: string]: string } = {
   UPCPLU: 'upc_code',
   Price: 'ws_price',
   UnitCost: 'u_price',
-  'Item Number': 'unf',
+  'Item Number': 'unf'
 }
 
 function transformHeader(header: string, index: number): string {
@@ -76,14 +76,14 @@ function step(props: {
       name,
       description_edit,
       count_on_hand,
-      unit_type,
+      unit_type
     } = data
 
     const upc_code: string = orig_upc_code
       ? orig_upc_code.replace(/-/g, '')
       : orig_upc_code // strip dashes (-) from upc_code
 
-    const product: SupaProduct = {
+    const product: Partial<SupaProduct> = {
       id: `${unf ? unf : ''}__${upc_code ? upc_code : ''}`, // "natural" pk
       unf,
       upc_code,
@@ -91,7 +91,7 @@ function step(props: {
       name,
       description_edit,
       count_on_hand,
-      unit_type,
+      unit_type
     }
 
     // WS_PRICE
@@ -164,8 +164,8 @@ export default function parseProductUpdatesCSV(
         step({
           row,
           products,
-          problems,
-        }),
+          problems
+        })
     })
   })
 }

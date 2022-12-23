@@ -1,9 +1,9 @@
 import { AppDatabase } from './appDatabase'
-import { OrderLineItem } from './types/Order'
+import { SupaOrderLineItem } from './types/SupaTypes'
 
 const db = new AppDatabase()
 
-const lineItem: OrderLineItem = {
+const lineItem = {
   id: 3,
   selected_unit: 'CS',
   quantity: 1,
@@ -11,7 +11,7 @@ const lineItem: OrderLineItem = {
   data: {
     product: {
       vendor: 'UNFI',
-      id: 666,
+      id: '666',
       unf: '011254-0',
       upc_code: '0-74333-45848-7',
       category: 'BULK FOOD',
@@ -21,14 +21,14 @@ const lineItem: OrderLineItem = {
       pk: 25,
       size: '#',
       unit_type: 'CS',
-      ws_price: '32.85',
-      u_price: '1.31',
+      ws_price: 32.85,
+      u_price: 1.31,
       codes: 'f, k, 2, n'
     }
   }
 }
 
-const lineItems: OrderLineItem[] = [
+const lineItems = [
   {
     id: 0,
     selected_unit: 'EA',
@@ -37,7 +37,7 @@ const lineItems: OrderLineItem[] = [
     data: {
       product: {
         vendor: 'UNFI',
-        id: 1801,
+        id: '1801',
         unf: '173529-9',
         upc_code: '0-70734-52968-9',
         category: 'GROCERY',
@@ -47,8 +47,8 @@ const lineItems: OrderLineItem[] = [
         pk: 6,
         size: '20 BAG',
         unit_type: 'CS',
-        ws_price: '17.16',
-        u_price: '4.00',
+        ws_price: 17.16,
+        u_price: 4.0,
         codes: 'k, n'
       }
     }
@@ -62,7 +62,7 @@ const lineItems: OrderLineItem[] = [
     data: {
       product: {
         vendor: 'MARSH',
-        id: 1813,
+        id: '1813',
         unf: '',
         upc_code: '',
         category: 'MARSH',
@@ -72,8 +72,8 @@ const lineItems: OrderLineItem[] = [
         pk: 1,
         size: '',
         unit_type: 'EA',
-        ws_price: '12.00',
-        u_price: '12.00',
+        ws_price: 12.0,
+        u_price: 12.0,
         codes: ''
       }
     }
@@ -81,8 +81,9 @@ const lineItems: OrderLineItem[] = [
 ]
 
 it('can add an item', async () => {
+  // #TODO: ugh `as SupaOrderLineItem`
   const cart = await db.cart
-    .add(lineItem)
+    .add(lineItem as SupaOrderLineItem)
     .then(() => {
       return db.cart.toArray()
     })
@@ -94,8 +95,9 @@ it('can add an item', async () => {
 })
 
 it('can bulk add items', async () => {
+  // #TODO: ugh `as SupaOrderLineItem[]`
   const cart = await db.cart
-    .bulkAdd(lineItems)
+    .bulkAdd(lineItems as SupaOrderLineItem[])
     .then(() => db.cart.toArray())
     .catch((e) => {
       console.error('bulkAdd error: ' + e.stack || e)

@@ -12,6 +12,7 @@ export const insertWholesaleOrder: InsertWholesaleOrder = async (
   const { data, error } = await supabase
     .from('WholesaleOrders')
     .insert(wholesaleOrder)
+    .select()
     .single()
 
   return { data, error }
@@ -36,6 +37,7 @@ export const upsertWholesaleOrder: UpsertWholesaleOrder = async (
       updatedAt: new Date().toISOString(),
       OrderLineItems: undefined
     })
+    .select()
     .single()
 
   return { data, error }

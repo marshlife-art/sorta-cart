@@ -28,10 +28,7 @@ export const updateOrderShipmentStatus: UpdateOrderShipmentStatus = async (
 }
 
 export const deleteOrders: DeleteOrders = async (ids: number[]) => {
-  const { error } = await supabase
-    .from('Orders')
-    .delete({ returning: 'minimal' })
-    .in('id', ids)
+  const { error } = await supabase.from('Orders').delete().in('id', ids)
 
   return { error }
 }

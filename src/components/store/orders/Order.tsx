@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 
 import Box from '@material-ui/core/Box'
 import Login from '../../Login'
-import { Order } from '../../../types/Order'
 import OrderDetailPanel from './OrderDetailPanel'
 import Paper from '@material-ui/core/Paper'
 import { RootState } from '../../../redux'
@@ -12,6 +11,9 @@ import { makeStyles } from '@material-ui/core/styles'
 import { myOrder } from '../../../services/orderService'
 import { useMatch } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { SuperOrderAndAssoc } from '../../../types/SupaTypes'
+
+type Order = Partial<SuperOrderAndAssoc>
 
 const useStyles = makeStyles((theme) => ({
   root: {

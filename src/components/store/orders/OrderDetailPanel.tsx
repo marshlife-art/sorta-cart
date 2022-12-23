@@ -1,7 +1,6 @@
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
 
 import Grid from '@material-ui/core/Grid'
-import { Order } from '../../../types/Order'
 import PaymentDialog from './PaymentDialog'
 import React from 'react'
 import Table from '@material-ui/core/Table'
@@ -10,6 +9,7 @@ import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
+import { SuperOrderAndAssoc } from '../../../types/SupaTypes'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export default function OrderDetailPanel(props: {
-  order: Order
+  order: Partial<SuperOrderAndAssoc>
   setRefetchOrders: React.Dispatch<React.SetStateAction<number>>
 }) {
   const classes = useStyles()
@@ -245,10 +245,12 @@ export default function OrderDetailPanel(props: {
       </Grid>
 
       <div className={classes.lastUpdated}>
-        <i>Created: </i> {new Date(order.createdAt).toLocaleString()}
+        <i>Created: </i>{' '}
+        {order.createdAt && new Date(order.createdAt).toLocaleString()}
         {order.createdAt !== order.updatedAt && (
           <>
-            <i>, Last updated:</i> {new Date(order.updatedAt).toLocaleString()}
+            <i>, Last updated:</i>{' '}
+            {order.updatedAt && new Date(order.updatedAt).toLocaleString()}
           </>
         )}
       </div>

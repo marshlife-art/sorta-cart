@@ -109,7 +109,9 @@ export default function Orders() {
             render: (order: Order) => (
               <div
                 title={
-                  order.createdAt && new Date(order.createdAt).toLocaleString()
+                  (order.createdAt &&
+                    new Date(order.createdAt).toLocaleString()) ??
+                  undefined
                 }
               >
                 {order.createdAt &&

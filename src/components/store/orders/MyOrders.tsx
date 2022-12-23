@@ -3,12 +3,12 @@ import { UserService, userService } from '../../../redux/session/reducers'
 import { getStoreCreditForUser, myOrders } from '../../../services/orderService'
 
 import MaterialTable from 'material-table'
-import { Order } from '../../../types/Order'
 import OrderDetailPanel from './OrderDetailPanel'
 import { RootState } from '../../../redux'
 import { formatDistance } from 'date-fns'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector } from 'react-redux'
+import { SuperOrderAndAssoc } from '../../../types/SupaTypes'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,9 +36,8 @@ export default function MyOrders() {
   const userService = useSelector<RootState, UserService>(
     (state) => state.session.userService
   )
-
   const classes = useStyles()
-  const [myorders, setMyOrders] = useState<Order[]>([])
+  const [myorders, setMyOrders] = useState<SuperOrderAndAssoc[]>([])
   const [storeCredit, setStoreCredit] = useState(0)
   const [refetchOrders, setRefetchOrders] = useState(0)
 
@@ -65,7 +64,7 @@ export default function MyOrders() {
         .then((response) => {
           const { orders, error } = response
           if (!error && orders) {
-            setMyOrders((orders as Order[]) || [])
+            setMyOrders((orders as SuperOrderAndAssoc[]) || [])
           }
         })
         .catch((err) => console.warn('onoz myOrders service caught err:', err))

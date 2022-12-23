@@ -29,15 +29,16 @@ import {
 import { upsertMember } from '../../../services/mutations'
 import { memberFetcher, ordersForMember } from '../../../services/fetchers'
 
-type Member =
-  | Omit<SupaMember, 'id' | 'data' | 'is_admin'> & {
-      id?: string | number
-      data: string | object
-      is_admin?: boolean
-    }
+// type Member =
+//   | Omit<SupaMember, 'id' | 'data' | 'is_admin'> & {
+//       id?: string | number
+//       data: string | object
+//       is_admin?: boolean
+//     }
+type PartialMember = Partial<SupaMember>
 
-const blankMember: Member = {
-  id: 'new',
+const blankMember: PartialMember = {
+  id: -1,
   registration_email: '',
   name: '',
   phone: '',
@@ -78,10 +79,10 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 async function fetchMemberOrders(
-  MemberId: string,
+  MemberId: number,
   setOrders: React.Dispatch<React.SetStateAction<Order[]>>
 ) {
-  const { data: orders, error } = await ordersForMember(Number(MemberId))
+  const { data: orders, error } = await ordersForMember(MemberId)
   if (error || !orders) {
     console.warn('fetchMemberOrders got error', error)
     setOrders([])
@@ -99,26 +100,26 @@ export default function EditMember() {
 
   const [error, setError] = useState('')
   const [response, setResponse] = useState('')
-  const memberId = match?.params?.id
+  const memberId = Number(match?.params?.id)
 
-  const [member, setMember] = useState<Member>(blankMember)
+  const [member, setMember] = useState<PartialMember>(blankMember)
   const [createNewUser, setCreateNewUser] = useState(false)
   const [storeCredit, setStoreCredit] = useState(0)
   const [orders, setOrders] = useState<Order[]>([])
 
   useEffect(() => {
-    if (!memberId || memberId === 'undefined') {
+    if (!memberId && memberId !== 0) {
       return
     }
 
-    if (memberId === 'new') {
+    if (memberId === -1) {
       setMember(blankMember)
       setLoadingMember(false)
     } else {
       memberFetcher(Number(memberId)).then(({ data: member }) => {
         setMember({
-          ...member,
-          data: member?.data ? JSON.parse(member.data) : {}
+          ...member
+          // data: member?.data ? JSON.parse(member.data) : {}
         })
         setLoadingMember(false)
       })
@@ -138,8 +139,8 @@ export default function EditMember() {
 
     const { error } = await upsertMember({
       ...member,
-      id: memberId === 'new' ? undefined : memberId,
-      createdAt: memberId === 'new' ? undefined : member.createdAt,
+      id: memberId === -1 ? undefined : memberId,
+      createdAt: memberId === -1 ? undefined : member.createdAt,
       updatedAt: null,
       fts: undefined
     })
@@ -183,7 +184,7 @@ export default function EditMember() {
                 </IconButton>
               </Tooltip>
 
-              <h2>{memberId === 'new' ? 'Create' : 'Edit'} Member</h2>
+              <h2>{memberId === -1 ? 'Create' : 'Edit'} Member</h2>
             </div>
 
             <TextField
@@ -352,7 +353,7 @@ export default function EditMember() {
                 color="primary"
                 fullWidth
               >
-                {memberId === 'new' ? 'CREATE' : 'SAVE'}
+                {memberId === -1 ? 'CREATE' : 'SAVE'}
               </Button>
             </div>
           </Grid>

@@ -10,7 +10,7 @@ import FormGroup from '@material-ui/core/FormGroup'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import FormLabel from '@material-ui/core/FormLabel'
 import Loading from './Loading'
-import { Member } from '../types/Member'
+// import { Member } from '../types/Member'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import { RootState } from '../redux'
@@ -18,12 +18,14 @@ import { Slider } from '@material-ui/core'
 import SquarePayment from './store/square/SquarePayment'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
-import { User } from '../types/User'
+// import { User } from '../types/User'
 import { UserService } from '../redux/session/reducers'
 import { checkIfEamilExists } from '../services/memberService'
 import { makeStyles } from '@material-ui/core/styles'
 import { register } from '../redux/session/actions'
 import { useNavigate } from 'react-router-dom'
+import { SupaMember, SupaUser } from '../types/SupaTypes'
+import { Json } from '../types/supabase'
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -101,8 +103,8 @@ export default function Register() {
   const [registrationFee, setRegistrationFee] = useState(0)
   const [subsityAmount, setSubsityAmount] = useState(99)
   const [otherexpexplain, setOtherexpexplain] = useState(false)
-  const [userData, setUserData] = useState<Partial<User>>({})
-  const [member, setMember] = useState<Partial<Member>>({})
+  const [userData, setUserData] = useState<Partial<SupaUser>>({})
+  const [member, setMember] = useState<Partial<SupaMember>>({})
   const [memberData, setMemberData] = useState<MemberData>()
 
   const [valid, setValid] = useState(false)
@@ -128,7 +130,7 @@ export default function Register() {
     dispatch(
       register(
         userData,
-        { ...member, data: memberData, fees_paid: registrationFee },
+        { ...member, data: memberData as Json, fees_paid: registrationFee },
         sourceId
       )
     )

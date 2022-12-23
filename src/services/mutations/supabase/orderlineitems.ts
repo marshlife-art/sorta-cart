@@ -1,5 +1,5 @@
 import { supabase } from '../../../lib/supabaseClient'
-import { Json } from '../../../types/database.types'
+import { Json } from '../../../types/supabase'
 import { SupaOrderLineItem } from '../../../types/SupaTypes'
 import { InsertOrderLineItem, UpdateOrderLineItems } from '../types'
 

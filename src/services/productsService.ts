@@ -1,8 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabaseClient'
-import { definitions } from '../types/supabase'
-
-export type Product = definitions['products']
+import { SupaProduct } from '../types/SupaTypes'
 
 export async function getProducts(limit = 1000) {
   const {
@@ -36,11 +34,12 @@ export async function getCategories(): Promise<{ [index: string]: string }> {
     throw new Error(error.message)
   }
 
+  if (!data) return {}
   // #TODO: rework this to just reduce to a string array of .category items
-  return data?.reduce((acc, row) => {
+  return data.reduce((acc, row) => {
     acc[row.category] = row.category
     return acc
-  }, {} as { [index: string]: string })
+  }, {} as Record<string, string>)
 }
 
 export async function getSubCategories(category: string) {
@@ -62,7 +61,7 @@ export async function getSubCategories(category: string) {
 // all the functions below are known to need non-anon privileges, so client prop is passed in.
 // there might be a better way; this is sort of ad-hoc DI :internet-shrugz:
 export async function upsertProducts(props: {
-  products: Product | Product[]
+  products: SupaProduct | SupaProduct[]
   client?: SupabaseClient
 }) {
   const { client, products } = props

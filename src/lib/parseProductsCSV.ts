@@ -136,7 +136,7 @@ function step(props: {
     // there could probably be a better way to pull out known Product properties
     const { unf, upc_code, name, description, size, unit_type, plu } = data
 
-    const product: SupaProduct = {
+    const product: Partial<SupaProduct> = {
       id: `${unf ? unf : ''}__${upc_code ? upc_code : ''}`, // "natural" pk
       unf,
       upc_code: upc_code ? upc_code.replace(/-/g, '') : upc_code, // strip dashes (-) from upc_code

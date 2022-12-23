@@ -3,16 +3,17 @@ import {
   SupaNewOrderLineItem,
   SupaOrder,
   SupaOrderLineItem,
-  SupaProduct
+  SupaOrderWithLineItems,
+  SupaProduct,
+  SupaUser,
+  SuperOrderAndAssoc
 } from '../types/SupaTypes'
 
 import { API_HOST } from '../constants'
-import { Order } from '../types/Order'
-import { User } from '../types/User'
 import { supabase } from '../lib/supabaseClient'
-import { Json } from '../types/database.types'
+import { Json } from '../types/supabase'
 
-type LineItemValidation = SupaOrderLineItem & {
+export type LineItemValidation = SupaOrderLineItem & {
   invalid?: string
 }
 
@@ -47,7 +48,14 @@ export async function validateLineItemsService(lineItems: SupaOrderLineItem[]) {
       continue
     }
 
-    if (li.price < 0 || li.total < 0 || li.quantity < 0) {
+    if (
+      li.price === null ||
+      li.price < 0 ||
+      li.total === null ||
+      li.total < 0 ||
+      li.quantity === null ||
+      li.quantity < 0
+    ) {
       li.invalid = 'price, total, or quantity less than zero.'
       li.quantity = 0
       li.total = 0
@@ -184,7 +192,7 @@ export async function getMyMember(userId: string) {
 }
 
 export async function createOrder(props: {
-  order: Order
+  order: Partial<SuperOrderAndAssoc>
   isFree: boolean
   canPayLater: boolean
   sourceId: string
@@ -221,26 +229,31 @@ export async function createOrder(props: {
       reject({ error: true, msg: `Insert error: ${error?.message}` })
     }
 
-    const oliz = props.order.OrderLineItems.map((oli) => {
+    const oliz = props.order.OrderLineItems?.map((oli) => {
       const { id, data, ...rest } = oli
-      const status = oli.data?.product?.count_on_hand ? 'on_hand' : 'backorder'
+      // #TODO: ugh `as any` ;(
+      const status = (data as any).product?.count_on_hand
+        ? 'on_hand'
+        : 'backorder'
       return {
         data: data as Json,
+        ...rest,
         OrderId: order?.id,
-        status,
-        ...rest
+        status
       }
     })
-    const { error: oliError } = await supabase
-      .from('OrderLineItems')
-      .insert(oliz)
+    if (oliz) {
+      const { error: oliError } = await supabase
+        .from('OrderLineItems')
+        .insert(oliz)
 
-    if (oliError) {
-      console.warn('new order line items insert error:', oliError)
-      reject({
-        error: true,
-        message: `Error creating line items: ${oliError.message}`
-      })
+      if (oliError) {
+        console.warn('new order line items insert error:', oliError)
+        reject({
+          error: true,
+          message: `Error creating line items: ${oliError.message}`
+        })
+      }
     }
 
     fetch(`${API_HOST}/store/checkout`, {
@@ -290,7 +303,7 @@ export function myOrders(
 
 export function myOrder(
   orderId?: string,
-  user?: User
+  user?: SupaUser
 ): Promise<{ error: boolean; order?: SupaOrder | null }> {
   return new Promise(async (resolve, reject) => {
     if (!orderId) {

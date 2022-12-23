@@ -1,7 +1,7 @@
 import { Session, User, ApiError } from '@supabase/supabase-js'
 
 export interface GetSession {
-  (): Session | null
+  (): Promise<Session | null>
 }
 
 export interface SignIn {

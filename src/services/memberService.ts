@@ -1,7 +1,6 @@
 import { API_HOST } from '../constants'
 import { supabase } from '../lib/supabaseClient'
-import { Member } from '../types/Member'
-import { User } from '../types/User'
+import { SupaMember, SupaUser } from '../types/SupaTypes'
 
 // http://localhost:54321/functions/v1/email-available
 export async function checkIfEamilExists(email: string): Promise<boolean> {
@@ -32,13 +31,13 @@ export async function checkIfEamilExists(email: string): Promise<boolean> {
 
 export interface RegisterMemberResponse {
   msg: string
-  member: Member
-  user: User
+  member: SupaMember
+  user: SupaUser
 }
 
 export function registerMember(props: {
-  user: Partial<User>
-  member: Partial<Member>
+  user: Partial<SupaUser>
+  member: Partial<SupaMember>
   sourceId: string
 }): Promise<RegisterMemberResponse> {
   return new Promise(async (resolve, reject) => {

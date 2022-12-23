@@ -1,4 +1,3 @@
-import { Order, OrderLineItem } from '../../../types/Order'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
 import { UserService, UserServiceProps } from '../../../redux/session/reducers'
@@ -37,6 +36,10 @@ import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { SupaOrderLineItem, SuperOrderAndAssoc } from '../../../types/SupaTypes'
+
+type Order = Partial<SuperOrderAndAssoc>
+type OrderLineItem = Partial<SupaOrderLineItem>
 
 const registrationStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -270,19 +273,24 @@ function ReviewCart(
         ? (cartResult.payload.line_items as OrderLineItem[])
         : ([] as OrderLineItem[])
 
-    setOrder((order) => ({
-      ...order,
-      email,
-      phone,
-      name,
-      address,
-      notes,
-      item_count: cartItems.length,
-      OrderLineItems: [
-        ...cartItems,
-        ...order.OrderLineItems.filter((li) => li.kind !== 'product')
-      ]
-    }))
+    setOrder((order) => {
+      const OrderLineItems = order.OrderLineItems
+        ? [
+            ...cartItems,
+            ...order.OrderLineItems.filter((li) => li.kind !== 'product')
+          ]
+        : cartItems
+      return {
+        ...order,
+        email,
+        phone,
+        name,
+        address,
+        notes,
+        item_count: cartItems.length,
+        OrderLineItems
+      } as Order
+    })
 
     props.handleNext()
   }
@@ -480,7 +488,7 @@ function Payment(
         order.OrderLineItems.filter((oli) => oli?.kind === 'product').every(
           (oli) =>
             oli?.data?.product?.count_on_hand &&
-            oli?.data?.product?.count_on_hand >= oli?.quantity
+            oli?.data?.product?.count_on_hand >= Number(oli?.quantity)
         )
     )
   }, [order])
@@ -539,7 +547,10 @@ function Payment(
                       color="primary"
                       size="large"
                       onClick={() => handleNext('')}
-                      disabled={!order || order.OrderLineItems.length === 0}
+                      disabled={
+                        !order.OrderLineItems ||
+                        order.OrderLineItems.length === 0
+                      }
                     >
                       Complete Order
                     </Button>
@@ -555,7 +566,10 @@ function Payment(
                         color="primary"
                         size="large"
                         onClick={() => setCanPayLater(false)}
-                        disabled={!order || order.OrderLineItems.length === 0}
+                        disabled={
+                          !order.OrderLineItems ||
+                          order.OrderLineItems.length === 0
+                        }
                         className={classes.freeOrPayButton}
                       >
                         Make a Payment
@@ -567,7 +581,10 @@ function Payment(
                         color="primary"
                         size="large"
                         onClick={() => handleNext('')}
-                        disabled={!order || order.OrderLineItems.length === 0}
+                        disabled={
+                          !order.OrderLineItems ||
+                          order.OrderLineItems.length === 0
+                        }
                         className={classes.freeOrPayButton}
                       >
                         Complete Order and Pay Later
@@ -579,7 +596,7 @@ function Payment(
                 <SquarePayment
                   handleNext={handleNext}
                   loading={loading}
-                  amount={order.total * 100}
+                  amount={Number(order.total) * 100}
                 />
               )}
             </div>
@@ -695,7 +712,7 @@ export default function Checkout() {
 
   const [activeStep, setActiveStep] = useState(0)
   const [canGoToNextStep, setCanGoToNextStep] = useState(false)
-  const [order, setOrder] = useState<Order>(BLANK_ORDER)
+  const [order, setOrder] = useState<Partial<SuperOrderAndAssoc>>(BLANK_ORDER)
 
   const steps = getSteps()
 

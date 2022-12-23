@@ -41,18 +41,19 @@ import { createOrder, updateOrder } from '../../../lib/orderService'
 import {
   SuperOrderAndAssoc,
   SupaOrderLineItem,
-  SupaProduct as Product
+  SupaProduct as Product,
+  PartialSuperOrderAndAssoc
 } from '../../../types/SupaTypes'
 import { MemberOption } from '../../../services/fetchers/types'
 
-type Order = Omit<SuperOrderAndAssoc, 'id'> & {
-  id?: number
-}
-// type PartialOrder = Partial<Order>
-type LineItem = SupaOrderLineItem
-type PartialLineItem = Partial<SupaOrderLineItem>
+// type Order = Omit<SuperOrderAndAssoc, 'id'> & {
+//   id?: number
+// }
+type Order = Partial<SuperOrderAndAssoc>
 
-const blankOrder: Order = {
+type LineItem = Partial<SupaOrderLineItem>
+
+const blankOrder: PartialSuperOrderAndAssoc = {
   id: undefined,
   status: 'new',
   payment_status: 'balance_due',
@@ -124,8 +125,8 @@ export async function fetchStoreCredit(
   setStoreCredit(store_credit)
 }
 
-function tryNumber(input?: string | number): number {
-  if (input === undefined) {
+function tryNumber(input?: string | number | null): number {
+  if (input === undefined || input === null) {
     return 0.0
   }
   const str = `${input}`
@@ -146,7 +147,7 @@ export default function EditOrder() {
 
   const [orderId, setOrderId] = useState('')
   const [loading, setLoading] = useState(true)
-  const [order, setOrder] = useState<Order>(blankOrder)
+  const [order, setOrder] = useState<PartialSuperOrderAndAssoc>(blankOrder)
   const [saving, setSaving] = useState(false)
   const [showLiAutocomplete, setShowLiAutocomplete] = useState(false)
   const [showMemberAutocomplete, setShowMemberAutocomplete] = useState(false)
@@ -163,6 +164,7 @@ export default function EditOrder() {
       if (orderService.payload) {
         const _order = orderService.payload
         if (
+          _order &&
           _order.Members &&
           _order.Members.discount &&
           _order.Members.discount > 0
@@ -254,10 +256,18 @@ export default function EditOrder() {
             total: discountPrice,
             kind: 'adjustment'
           }
-          setOrder((prevOrder) => ({
-            ...prevOrder,
-            OrderLineItems: [...prevOrder.OrderLineItems, adjustment]
-          }))
+          setOrder((prevOrder) => {
+            if (!prevOrder.OrderLineItems) {
+              return {
+                ...prevOrder,
+                OrderLineItems: [adjustment]
+              }
+            }
+            return {
+              ...prevOrder,
+              OrderLineItems: [...prevOrder.OrderLineItems, adjustment]
+            }
+          })
         }
       }
     }
@@ -289,13 +299,25 @@ export default function EditOrder() {
         total: parseFloat(`${product.ws_price}`),
         kind: 'product',
         vendor: product.vendor,
-        data: { product } as LineItem['data'] // ffffuck why tsc, whhhhy
+        data: { product } //as LineItem['data'] // ffffuck why tsc, whhhhy
       }
+      const item_count =
+        (order &&
+          order.OrderLineItems &&
+          order?.OrderLineItems?.filter((li) => li.kind === 'product').length +
+            1) ||
+        0
+      // #TODO: ugh, `as SupaOrderLineItem[]` here because `string | null | undefined` != `string | null` ;(
+      // Type 'string | null | undefined' is not assignable to type 'string | null'.
+      // Type 'undefined' is not assignable to type 'string | null'.
+      const OrderLineItems = order.OrderLineItems
+        ? [...order.OrderLineItems, lineItem]
+        : [lineItem]
+
       setOrder((order) => ({
         ...order,
-        item_count:
-          order.OrderLineItems.filter((li) => li.kind === 'product').length + 1,
-        OrderLineItems: [...order.OrderLineItems, lineItem]
+        item_count,
+        OrderLineItems
       }))
       setNeedToCheckForDiscounts(true)
     }
@@ -304,7 +326,7 @@ export default function EditOrder() {
   function updateLineItem(idx: number, line_item: LineItem) {
     setOrder((prevOrder) => {
       let orderLineItems = prevOrder.OrderLineItems
-      orderLineItems.splice(idx, 1, line_item)
+      orderLineItems?.splice(idx, 1, line_item)
 
       return {
         ...prevOrder,
@@ -312,12 +334,12 @@ export default function EditOrder() {
       }
     })
   }
-  function onLineItemUpdated(idx: number, line_item: LineItem) {
+  function onLineItemUpdated(idx: number, line_item: SupaOrderLineItem) {
     updateLineItem(idx, line_item)
     setNeedToCheckForDiscounts(true)
   }
   function removeLineItem(idx: number) {
-    if (idx > -1) {
+    if (idx > -1 && order.OrderLineItems) {
       const li = order.OrderLineItems[idx]
       if (li.kind === 'adjustment' && li.description === 'member discount') {
         setCanApplyMemberDiscount(false)
@@ -325,6 +347,9 @@ export default function EditOrder() {
     }
     setOrder((prevOrder) => {
       const orderLineItems = prevOrder.OrderLineItems
+      if (!orderLineItems) {
+        return prevOrder
+      }
       orderLineItems.splice(idx, 1)
       const item_count = orderLineItems.filter(
         (li) => li.kind === 'product'
@@ -345,10 +370,14 @@ export default function EditOrder() {
       total: 0.0,
       kind: 'adjustment'
     }
-    setOrder((prevOrder) => ({
-      ...prevOrder,
-      OrderLineItems: [...prevOrder.OrderLineItems, adjustment]
-    }))
+    setOrder((prevOrder) => {
+      if (!prevOrder.OrderLineItems)
+        return { ...prevOrder, OrderLineItems: [adjustment] }
+      return {
+        ...prevOrder,
+        OrderLineItems: [...prevOrder.OrderLineItems, adjustment]
+      }
+    })
   }
 
   function createPayment(event: any) {
@@ -360,10 +389,18 @@ export default function EditOrder() {
       total: -price,
       kind: 'payment'
     }
-    setOrder((prevOrder) => ({
-      ...prevOrder,
-      OrderLineItems: [...prevOrder.OrderLineItems, payment]
-    }))
+    setOrder((prevOrder) => {
+      if (!prevOrder.OrderLineItems) {
+        return {
+          ...prevOrder,
+          OrderLineItems: [payment]
+        }
+      }
+      return {
+        ...prevOrder,
+        OrderLineItems: [...prevOrder.OrderLineItems, payment]
+      }
+    })
   }
 
   function createCreditClick(event: any) {
@@ -381,10 +418,18 @@ export default function EditOrder() {
       total: -parseFloat(Math.abs(total).toFixed(2)),
       kind: 'credit'
     }
-    setOrder((prevOrder) => ({
-      ...prevOrder,
-      OrderLineItems: [...prevOrder.OrderLineItems, credit]
-    }))
+    setOrder((prevOrder) => {
+      if (!prevOrder.OrderLineItems) {
+        return {
+          ...prevOrder,
+          OrderLineItems: [credit]
+        }
+      }
+      return {
+        ...prevOrder,
+        OrderLineItems: [...prevOrder.OrderLineItems, credit]
+      }
+    })
   }
 
   function createCreditFromLineItem(line_item: LineItem) {
@@ -405,10 +450,18 @@ export default function EditOrder() {
       total: amt,
       kind: 'adjustment'
     }
-    setOrder((prevOrder) => ({
-      ...prevOrder,
-      OrderLineItems: [...prevOrder.OrderLineItems, adjustment]
-    }))
+    setOrder((prevOrder) => {
+      if (!prevOrder.OrderLineItems) {
+        return {
+          ...prevOrder,
+          OrderLineItems: [adjustment]
+        }
+      }
+      return {
+        ...prevOrder,
+        OrderLineItems: [...prevOrder.OrderLineItems, adjustment]
+      }
+    })
   }
 
   // #TODO: hmm, figure this out.
@@ -460,7 +513,7 @@ export default function EditOrder() {
   }
 
   const onSaveBtnClick = async (): Promise<void> => {
-    const { OrderLineItems: orderLineItems, Members, User, fts, ...o } = order
+    const { OrderLineItems: orderLineItems, Members, User, ...o } = order
 
     setSaving(true)
 
@@ -490,9 +543,8 @@ export default function EditOrder() {
 
   function onTaxesChange(tax: number) {
     setOrder((prevOrder) => {
-      const notTaxLineItems = prevOrder.OrderLineItems.filter(
-        (li) => li.kind !== 'tax'
-      )
+      const notTaxLineItems =
+        prevOrder.OrderLineItems?.filter((li) => li.kind !== 'tax') ?? []
 
       return {
         ...prevOrder,
@@ -567,6 +619,7 @@ export default function EditOrder() {
   const shouldShowAddMemberDiscount =
     !canApplyMemberDiscount ||
     (order &&
+      order.OrderLineItems &&
       order.OrderLineItems.filter((li) => li.description === 'member discount')
         .length === 0)
 
@@ -860,12 +913,14 @@ export default function EditOrder() {
               )}
             </div>
             <OrderLineItems
-              line_items={order.OrderLineItems.map((oli) => ({
-                ...oli,
-                price: tryNumber(oli.price),
-                quantity: tryNumber(oli.quantity),
-                total: tryNumber(oli.total)
-              }))}
+              line_items={
+                (order?.OrderLineItems?.map((oli) => ({
+                  ...oli,
+                  price: tryNumber(oli.price),
+                  quantity: tryNumber(oli.quantity),
+                  total: tryNumber(oli.total)
+                })) ?? []) as SupaOrderLineItem[]
+              }
               onLineItemUpdated={onLineItemUpdated}
               removeLineItem={removeLineItem}
               onTaxesChange={onTaxesChange}

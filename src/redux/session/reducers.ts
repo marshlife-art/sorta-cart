@@ -1,11 +1,12 @@
 import { combineReducers } from 'redux'
 
 import { Action } from './actions'
-import { User, LoginError, LoginMessage } from '../../types/User'
+import { LoginError, LoginMessage } from '../../types/User'
+import { SupaUser } from '../../types/SupaTypes'
 
 export interface UserService {
   isFetching: boolean
-  user?: User
+  user?: SupaUser
   error?: LoginError
   message?: LoginMessage
 }

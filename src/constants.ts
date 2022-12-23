@@ -1,7 +1,6 @@
 import { OrderStatus, PaymentStatus, ShipmentStatus } from './types/Order'
+import { SupaOrder, SuperOrderAndAssoc } from './types/SupaTypes'
 import { SquareStatus } from './types/WholesaleOrder'
-
-import { Order } from './types/Order'
 
 export const API_HOST: string =
   process.env.NODE_ENV === 'production'
@@ -11,8 +10,8 @@ export const API_HOST: string =
 export const TAX_RATE = 0.06391
 export const TAX_RATE_STRING = `${(TAX_RATE * 100).toFixed(3)}%`
 
-export const BLANK_ORDER: Order = {
-  id: 'new',
+export const BLANK_ORDER: Partial<SuperOrderAndAssoc> = {
+  id: -1,
   status: 'new',
   payment_status: 'balance_due',
   shipment_status: 'backorder',

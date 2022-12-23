@@ -1,4 +1,3 @@
-import { Order, OrderLineItem } from '../../../types/Order'
 import React, { useEffect } from 'react'
 import { TAX_RATE, TAX_RATE_STRING } from '../../../constants'
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles'
@@ -22,6 +21,11 @@ import TextField from '@material-ui/core/TextField'
 import Tooltip from '@material-ui/core/Tooltip'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { useNavigate } from 'react-router-dom'
+import {
+  SupaOrder,
+  SupaOrderLineItem,
+  SuperOrderAndAssoc
+} from '../../../types/SupaTypes'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,8 +43,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function usdFormat(num?: number | string) {
-  if (num === undefined) {
+function usdFormat(num?: number | string | null) {
+  if (num === undefined || num === null) {
     return '$0.00'
   } else if (typeof num === 'string') {
     return `$${parseFloat(num).toFixed(2)}`
@@ -49,24 +53,26 @@ function usdFormat(num?: number | string) {
   }
 }
 
-function subtotal(items: OrderLineItem[]) {
-  return items
-    .map(({ total }) => total)
-    .reduce((sum, i) => sum + parseFloat(`${i}`), 0)
+function subtotal(items: SupaOrderLineItem[]) {
+  return Number(
+    items
+      .map(({ total }) => total)
+      .reduce((sum, i) => Number(sum) + parseFloat(`${i}`), 0)
+  )
 }
 
-function liTotal(line_item: OrderLineItem): number {
+function liTotal(line_item: SupaOrderLineItem): number {
   const product = line_item.data && line_item.data.product
   if (product) {
     return line_item.selected_unit === 'EA' && product.u_price
-      ? line_item.quantity * parseFloat(product.u_price)
-      : line_item.quantity * parseFloat(product.ws_price)
+      ? Number(line_item.quantity) * Number(product.u_price)
+      : Number(line_item.quantity) * Number(product.ws_price)
   } else {
-    return line_item.quantity * (line_item.price || 0)
+    return Number(line_item.quantity) * (line_item.price || 0)
   }
 }
 
-function liPkSize(line_item: OrderLineItem): string {
+function liPkSize(line_item: SupaOrderLineItem): string {
   const product = line_item.data && line_item.data.product
   if (product) {
     const pksize = []
@@ -79,12 +85,12 @@ function liPkSize(line_item: OrderLineItem): string {
 }
 
 interface CartTableProps {
-  line_items: OrderLineItem[]
+  line_items: SupaOrderLineItem[]
   emptyCartAndCloseDrawer?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void
   closeDrawer?: () => void
-  setOrder?: React.Dispatch<React.SetStateAction<Order>>
+  setOrder?: React.Dispatch<React.SetStateAction<Partial<SuperOrderAndAssoc>>>
   checkout?: boolean
   summary?: boolean
 }
@@ -106,10 +112,11 @@ export default function CartTable(props: CartTableProps) {
           ...order,
           subtotal: +invoiceSubtotal.toFixed(2),
           total: +invoiceTotal.toFixed(2),
-          item_count: order.OrderLineItems.filter((li) => li.kind === 'product')
-            .length,
+          item_count: order.OrderLineItems?.filter(
+            (li) => li.kind === 'product'
+          ).length,
           OrderLineItems: [
-            ...order.OrderLineItems.filter((li) => li.kind !== 'tax'),
+            ...(order.OrderLineItems ?? []).filter((li) => li.kind !== 'tax'),
             {
               kind: 'tax',
               description: TAX_RATE_STRING,
@@ -118,18 +125,19 @@ export default function CartTable(props: CartTableProps) {
             }
           ]
         }
-        return newOrder
+        // #TODO: ugh, `as Partial<SuperOrderAndAssoc>` :/
+        return newOrder as Partial<SuperOrderAndAssoc>
       })
     }
   }, [setOrder, invoiceSubtotal, invoiceTaxes, invoiceTotal])
 
-  const handleUnitChange = (line_item: OrderLineItem, unit: string) => {
+  const handleUnitChange = (line_item: SupaOrderLineItem, unit: string) => {
     line_item.selected_unit = unit
     line_item.total = liTotal(line_item)
     updateLineItem(line_item)
   }
 
-  const handleQtyChange = (line_item: OrderLineItem, quantity: number) => {
+  const handleQtyChange = (line_item: SupaOrderLineItem, quantity: number) => {
     line_item.quantity = quantity > 0 ? quantity : 1
     line_item.total = liTotal(line_item)
     updateLineItem(line_item)
@@ -139,11 +147,12 @@ export default function CartTable(props: CartTableProps) {
     id && removeItemFromCart(id)
   }
 
+  // #TODO: deal with invalid prop :/
   const products = props.line_items.filter(
-    (li) => li.kind === 'product' && !li.invalid
+    (li) => li.kind === 'product' //&& !li.invalid
   )
   const invalidProducts = props.line_items.filter(
-    (li) => li.kind === 'product' && li.invalid
+    (li) => li.kind === 'product' //&& li.invalid
   )
   const adjustments = props.line_items.filter((li) => li.kind === 'adjustment')
 

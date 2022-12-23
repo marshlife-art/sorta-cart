@@ -116,7 +116,7 @@ export default function WholesaleOrderLineItems(props: {
         qtyAdjustments: 0,
         totalSum: toMoney(acc ? acc.totalSum + liTotal : liTotal),
         product: li && li.data && li.data.product,
-        vendor: li.vendor,
+        vendor: li.vendor ?? undefined,
         description: li.description || 'no description',
         line_items: acc ? [...acc.line_items, li] : [li]
       }
@@ -364,7 +364,9 @@ export default function WholesaleOrderLineItems(props: {
                       ? `${li.quantity} EA`
                       : `${li.quantity} ${li.selected_unit}`}
                   </TableCell>
-                  <TableCell align="center">{tryGetEaQty(li)}</TableCell>
+                  <TableCell align="center">
+                    {tryGetEaQty(li as SupaOrderLineItem)}
+                  </TableCell>
                   <TableCell align="right">{li.total}</TableCell>
                 </TableRow>
               ))}

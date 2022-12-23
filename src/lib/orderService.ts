@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient'
 import {
+  PartialSuperOrderAndAssoc,
   SupaOrder,
   SupaOrderLineItem,
   SupaOrderWithLineItems,
@@ -7,18 +8,18 @@ import {
 } from '../types/SupaTypes'
 
 import { TAX_RATE } from '../constants'
-import { Json } from '../types/database.types'
+import { Json } from '../types/supabase'
 
-type OrderWithoutId = Omit<SupaOrder, 'id'> & {
-  id?: number
-}
-type SupaOrderLineItemWithOutId = Omit<SupaOrderLineItem, 'id'> & {
-  id?: number
-}
+// type OrderWithoutId = Omit<SupaOrder, 'id'> & {
+//   id?: number
+// }
+// type SupaOrderLineItemWithOutId = Omit<SupaOrderLineItem, 'id'> & {
+//   id?: number
+// }
 
 export const createOrder = async (
-  order: OrderWithoutId,
-  orderLineItems: SupaOrderLineItemWithOutId[]
+  order: PartialSuperOrderAndAssoc,
+  orderLineItems: Partial<SupaOrderLineItem>[]
 ) => {
   const { data, error } = await supabase
     .from('Orders')
@@ -125,7 +126,7 @@ export const createOrder = async (
 }
 
 export const updateOrder = async (
-  order: OrderWithoutId,
+  order: PartialSuperOrderAndAssoc,
   orderLineItems: SupaOrderLineItem[]
 ) => {
   if (!order || !order.id) {

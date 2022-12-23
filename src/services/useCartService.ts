@@ -5,10 +5,12 @@ import { API_HOST } from '../constants'
 import { AppDatabase } from '../appDatabase'
 import { Cart } from '../types/Cart'
 import { IDatabaseChange } from 'dexie-observable/api'
-import { OrderLineItem } from '../types/Order'
-import { Product } from '../types/Product'
+
 import { Service } from '../types/Service'
 import { validateLineItemsService } from './orderService'
+
+type PartialLineItem = Partial<SupaOrderLineItem>
+//PartialSuperOrderAndAssoc
 
 const db = new AppDatabase()
 
@@ -87,7 +89,7 @@ const addToCart = async (product: SupaProduct) => {
       li.data?.product?.upc_code === product.upc_code
   )
 
-  if (existingLi) {
+  if (existingLi && existingLi.quantity) {
     // console.log('item already exists in cart! update qty:')
     existingLi.quantity += 1
     existingLi.total = +(
@@ -95,7 +97,7 @@ const addToCart = async (product: SupaProduct) => {
     ).toFixed(2)
     updateLineItem(existingLi)
   } else {
-    let line_item: OrderLineItem = {
+    let line_item: PartialLineItem = {
       quantity: 1,
       total: +(product?.ws_price || 0),
       selected_unit: product.unit_type,
@@ -103,7 +105,7 @@ const addToCart = async (product: SupaProduct) => {
       description: `${product.name} ${product.description}`.trim(),
       kind: 'product',
       vendor: product.vendor,
-      data: { product: product as unknown as Product }
+      data: { product: product as unknown as SupaProduct }
     }
 
     db.cart
@@ -118,9 +120,9 @@ const addStoreCreditToCart = async (storeCredit: number) => {
   const line_items = await db.cart.toArray()
   const subtotal = line_items
     .map(({ total }) => total)
-    .reduce((sum, i) => sum + i, 0)
+    .reduce((sum, i) => Number(sum) + Number(i), 0)
 
-  if (subtotal <= 0) {
+  if (subtotal === null || subtotal === undefined || subtotal <= 0) {
     // console.log('subtotal is 0 or less, not going to addStoreCreditToCart')
     return
   }
@@ -138,7 +140,7 @@ const addStoreCreditToCart = async (storeCredit: number) => {
   const amt = Math.abs(storeCredit) >= subtotal ? -subtotal : storeCredit
   // console.log('line_items:', line_items, ' subtotal:', subtotal, ' amt:', amt)
 
-  const adjustment: OrderLineItem = {
+  const adjustment: PartialLineItem = {
     description: 'STORE CREDIT',
     quantity: 1,
     price: amt,
@@ -165,7 +167,7 @@ const emptyCart = () => {
   })
 }
 
-const updateLineItem = (line_item: OrderLineItem) => {
+const updateLineItem = (line_item: PartialLineItem) => {
   line_item &&
     line_item.id &&
     db.cart
@@ -196,7 +198,7 @@ const validateLineItems = async (props: {
           removeItemFromCart(li.id)
           continue
         }
-        updateLineItem(li as OrderLineItem)
+        updateLineItem(li as PartialLineItem)
       }
     }
   }
@@ -215,7 +217,7 @@ const setDonationAmount = async (amount: number) => {
     donationItem.total = +amount.toFixed(2)
     updateLineItem(donationItem)
   } else {
-    const donation: OrderLineItem = {
+    const donation: PartialLineItem = {
       description: 'DONATION',
       quantity: 1,
       price: amount,

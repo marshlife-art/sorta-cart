@@ -17,9 +17,8 @@ import ListSubheader from '@material-ui/core/ListSubheader'
 import List from '@material-ui/core/List'
 import { Icon } from '@material-ui/core'
 
-import { Member } from '../../../types/Member'
 import { getStoreCreditReport } from '../../../lib/storeCredit'
-import { SupaOrderLineItem } from '../../../types/SupaTypes'
+import { SupaMember, SupaOrderLineItem } from '../../../types/SupaTypes'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -95,7 +94,7 @@ const ExpansionPanelDetails = withStyles((theme) => ({
   }
 }))(MuiExpansionPanelDetails)
 
-type StoreCreditRow = Member & {
+type StoreCreditRow = SupaMember & {
   credits: SupaOrderLineItem[]
   credits_sum: number
   adjustments: SupaOrderLineItem[]
@@ -110,7 +109,7 @@ export default function StoreCredits() {
 
   const [members, setMembers] = useState<StoreCreditRow[]>([])
   useEffect(() => {
-    getStoreCreditReport().then((result) => setMembers(result))
+    getStoreCreditReport().then((result) => result && setMembers(result))
   }, [])
 
   return (

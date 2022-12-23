@@ -40,9 +40,9 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function usdFormat(num?: number | string) {
+function usdFormat(num?: number | string | null) {
   try {
-    if (num === undefined) {
+    if (num === undefined || num === null) {
       return '$0.00'
     }
 

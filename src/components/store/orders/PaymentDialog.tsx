@@ -15,11 +15,11 @@ import IconButton from '@material-ui/core/IconButton'
 import Loading from '../../Loading'
 import MuiDialogContent from '@material-ui/core/DialogContent'
 import MuiDialogTitle from '@material-ui/core/DialogTitle'
-import { Order } from '../../../types/Order'
 import PaymentIcon from '@material-ui/icons/AttachMoney'
 import React from 'react'
 import SquarePayment from '../square/SquarePayment'
 import Typography from '@material-ui/core/Typography'
+import { SuperOrderAndAssoc } from '../../../types/SupaTypes'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -79,7 +79,7 @@ const useStyles = makeStyles((theme: Theme) =>
 interface PaymentDialogProps {
   amount: number
   description: string
-  order: Order
+  order: Partial<SuperOrderAndAssoc>
   setRefetchOrders: React.Dispatch<React.SetStateAction<number>>
 }
 

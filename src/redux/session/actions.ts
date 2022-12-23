@@ -1,14 +1,14 @@
-import { LoginError, LoginMessage, User } from '../../types/User'
+import { LoginError, LoginMessage } from '../../types/User'
 import { ThunkAction, ThunkDispatch } from 'redux-thunk'
 
 import { AnyAction } from 'redux'
-import { Member } from '../../types/Member'
 import { auth } from '../../services/auth'
 import { registerMember } from '../../services/memberService'
+import { SupaMember, SupaUser } from '../../types/SupaTypes'
 
 export interface SetAction {
   type: 'SET'
-  user: User
+  user: SupaUser
 }
 export interface SetFetcing {
   type: 'SET_FETCHING'
@@ -25,7 +25,7 @@ export interface SetMagic {
 
 export type Action = SetAction | SetFetcing | SetError | SetMagic
 
-export const set = (user: User): SetAction => {
+export const set = (user: SupaUser): SetAction => {
   return { type: 'SET', user }
 }
 export const setError = (error: LoginError): SetError => {
@@ -38,10 +38,9 @@ export const setMagic = (message: LoginMessage): SetMagic => {
   return { type: 'SET_MAGIC', message }
 }
 
-const NULL_USER: User = {
+const NULL_USER: SupaUser = {
   id: undefined,
-  email: undefined,
-  token: undefined
+  email: undefined
 }
 
 export const checkSession = (): ThunkAction<
@@ -51,10 +50,10 @@ export const checkSession = (): ThunkAction<
   AnyAction
 > => {
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(async (resolve) => {
       dispatch(isFetching(true))
 
-      const session = auth.getSession()
+      const session = await auth.getSession()
       // console.log('zomg session:', session)
       if (session?.user) {
         dispatch(set({ ...session.user, role: 'admin' })) // #TODO: don't hard-code admin role :/
@@ -124,8 +123,8 @@ export const logout = (): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
 }
 
 export const register = (
-  user: Partial<User>,
-  member: Partial<Member>,
+  user: Partial<SupaUser>,
+  member: Partial<SupaMember>,
   sourceId: string
 ): ThunkAction<Promise<void>, {}, {}, AnyAction> => {
   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {

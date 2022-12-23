@@ -55,8 +55,9 @@ export default function Members() {
             >
               <TableCell
                 title={
-                  member.createdAt &&
-                  new Date(member.createdAt).toLocaleString()
+                  (member.createdAt &&
+                    new Date(member.createdAt).toLocaleString()) ??
+                  undefined
                 }
               >
                 {member.createdAt &&
