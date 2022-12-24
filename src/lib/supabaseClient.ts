@@ -1,11 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '../types/supabase'
 
-const NEXT_PUBLIC_SUPABASE_URL = 'https://ztasaotbeuyjupkyibgi.supabase.co'
-const NEXT_PUBLIC_SUPABASE_ANON =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzNzk3MTg0NSwiZXhwIjoxOTUzNTQ3ODQ1fQ._p1lpy1TN7D2hg_tFZGTdXyU3OkbU_AhU0JQ1x8uaLY'
+const SUPABASE_URL = process.env.MARSH_SUPABASE_URL || ''
+const SUPABASE_ANON = process.env.MARSH_SUPABASE_ANNON || ''
+export const SUPABASE_SERVICE_ROLE_KEY =
+  process.env.MARSH_SUPABASE_SERVICE_ROLE_KEY || ''
 
-export const supabase = createClient<Database>(
-  NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_ANON
-)
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON)

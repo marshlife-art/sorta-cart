@@ -175,7 +175,8 @@ CREATE TABLE "public"."OrderLineItems" (
   "data" "jsonb",
   "createdAt" timestamp with time zone DEFAULT "timezone"('utc'::"text", "now"()),
   "updatedAt" timestamp with time zone DEFAULT "timezone"('utc'::"text", "now"()),
-  "status" "text"
+  "status" "text",
+  "invalid" "text"
 );
 --
 -- Name: WholesaleOrders; Type: TABLE; Schema: public; Owner: postgres

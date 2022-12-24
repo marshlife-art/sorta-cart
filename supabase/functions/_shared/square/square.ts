@@ -12,7 +12,7 @@ import crypto, {
 } from 'https://deno.land/std@0.168.0/node/crypto.ts'
 import { isDeepStrictEqual } from 'https://deno.land/std@0.168.0/node/util.ts'
 
-import { SupaProduct } from '../../../../src/types/SupaTypes.ts'
+import { SupaProduct } from '../../_shared/types/SupaTypes.ts'
 import { client } from './client.ts'
 import { getDefaultLocationId } from './locations.ts'
 
@@ -358,7 +358,7 @@ export async function mapSqCatalogToProducts(
     if (category) product.category = category
     if (sub_category) product.sub_category = sub_category
     if (sku) product.upc_code = sku
-    return product //as Product // ugh! #TODO: deal with `as Product`
+    return product as SupaProduct // ugh! #TODO: deal with `as Product`
   })
   return await Promise.all(catalogMap)
 }
@@ -547,11 +547,14 @@ async function searchCatalogForIdCustomAttribute(stringFilter: string) {
   })
 }
 
-async function getCategoryId(category?: string, sub_category?: string) {
+async function getCategoryId(
+  category?: string | null,
+  sub_category?: string | null
+) {
   let cat: string | undefined
-  if (!category) {
+  if (!category && sub_category) {
     cat = sub_category
-  } else if (!sub_category) {
+  } else if (!sub_category && category) {
     cat = category
   } else {
     cat = `${category} > ${sub_category}`
@@ -641,7 +644,7 @@ export async function addProductToCatalog(product: SupaProduct) {
   const measurementUnitId = await getMeasurementUnitId(product)
   const categoryId = await getCategoryId(product.category, product.sub_category)
   const name = `${product.name} -- ${product.description}`
-  const amount = BigInt(product.u_price * 100)
+  const amount = BigInt(Number(product.u_price) * 100)
   const sku = product.plu ? product.plu : product.upc_code
 
   /*

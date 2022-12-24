@@ -147,12 +147,11 @@ export default function CartTable(props: CartTableProps) {
     id && removeItemFromCart(id)
   }
 
-  // #TODO: deal with invalid prop :/
   const products = props.line_items.filter(
-    (li) => li.kind === 'product' //&& !li.invalid
+    (li) => li.kind === 'product' && !li.invalid
   )
   const invalidProducts = props.line_items.filter(
-    (li) => li.kind === 'product' //&& li.invalid
+    (li) => li.kind === 'product' && li.invalid
   )
   const adjustments = props.line_items.filter((li) => li.kind === 'adjustment')
 

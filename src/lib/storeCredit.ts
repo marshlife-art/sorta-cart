@@ -130,7 +130,7 @@ export const getStoreCreditForUser = async (UserId: number) => {
   }
 
   const { data, error } = await supabase
-    .from('Member')
+    .from('Members')
     .select('id')
     .eq('UserId', UserId)
     .single()

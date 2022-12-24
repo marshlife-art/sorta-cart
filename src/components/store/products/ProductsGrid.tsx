@@ -526,9 +526,11 @@ export default function ProductGrid() {
       selectedCodes: codes,
       sortBy: sort
     }) => {
-      let query = supabase.rpc('default_products', undefined, {
-        count: 'exact'
-      })
+      let query = supabase
+        .rpc('default_products', undefined, {
+          count: 'exact'
+        })
+        .limit(1000)
 
       if (q) {
         // query = query.textSearch('fts', q, {

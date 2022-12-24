@@ -3,7 +3,7 @@ import { description } from 'https://deno.land/x/describe/mod.ts'
 
 import { createOrder, mapLineItems } from './orders.ts'
 import { createPayment } from './payments.ts'
-import { SupaNewOrderLineItem } from '../../../../src/types/SupaTypes.ts'
+import { SupaNewOrderLineItem } from '../types/SupaTypes.ts'
 
 const TEST_ORDER = {
   status: 'new',

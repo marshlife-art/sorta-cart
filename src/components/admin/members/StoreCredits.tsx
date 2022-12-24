@@ -109,7 +109,9 @@ export default function StoreCredits() {
 
   const [members, setMembers] = useState<StoreCreditRow[]>([])
   useEffect(() => {
-    getStoreCreditReport().then((result) => result && setMembers(result))
+    getStoreCreditReport().then(
+      (result) => result && setMembers(result as StoreCreditRow[])
+    )
   }, [])
 
   return (

@@ -13,10 +13,6 @@ import { API_HOST } from '../constants'
 import { supabase } from '../lib/supabaseClient'
 import { Json } from '../types/supabase'
 
-export type LineItemValidation = SupaOrderLineItem & {
-  invalid?: string
-}
-
 function tryParseData(data: any) {
   try {
     return JSON.parse(data)
@@ -30,7 +26,7 @@ export async function validateLineItemsService(lineItems: SupaOrderLineItem[]) {
 
   let invalidLineItems = []
   for (const item of lineItems) {
-    const li: LineItemValidation = { ...item }
+    const li: SupaOrderLineItem = { ...item }
 
     // only check product kind
     if (li.kind !== 'product') {
@@ -103,7 +99,7 @@ export async function validateLineItemsService(lineItems: SupaOrderLineItem[]) {
       product.ws_price !== liData.product.ws_price ||
       product.u_price !== liData.product.u_price
     ) {
-      li.invalid = undefined
+      li.invalid = null
       const liPrice =
         li.selected_unit === 'CS' ? product.ws_price : product.u_price
       const liPriceMoney = +parseFloat(`${liPrice}`).toFixed(2)
@@ -126,7 +122,7 @@ export async function validateLineItemsService(lineItems: SupaOrderLineItem[]) {
     // check if there's only some left of a product that has no_backorder
     if (product.count_on_hand && eaQty > product.count_on_hand) {
       if (product.no_backorder === true) {
-        li.invalid = undefined
+        li.invalid = null
         li.selected_unit = 'EA'
         li.price = +parseFloat(`${product.u_price}`).toFixed(2)
         li.quantity = Math.abs(product.count_on_hand)
@@ -161,7 +157,7 @@ export async function validateLineItemsService(lineItems: SupaOrderLineItem[]) {
       li.total != +(liPrice * li.quantity).toFixed(2)
       // note: not using super-strict comparison !== here :/
     ) {
-      li.invalid = undefined
+      li.invalid = null
       li.price = parseFloat(`${liPrice}`)
       li.total = +(
         parseFloat(`${liPrice}`) * parseFloat(`${li.quantity}`)
@@ -256,22 +252,23 @@ export async function createOrder(props: {
       }
     }
 
-    fetch(`${API_HOST}/store/checkout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        // order: { ...orderToInsert, OrderLineItems },
-        api_key: order?.api_key,
-        sourceId: sourceId
-      })
-    })
-      .then((r) => r.json())
-      .then((r) => {
-        // #TODO
-        console.log('store/checkout api response:', r)
-      })
+    // #TODO:
+    // fetch(`http://localhost:54321/functions/v1/checkout`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     // order: { ...orderToInsert, OrderLineItems },
+    //     api_key: order?.api_key,
+    //     sourceId: sourceId
+    //   })
+    // })
+    //   .then((r) => r.json())
+    //   .then((r) => {
+    //     // #TODO
+    //     console.log('store/checkout api response:', r)
+    //   })
 
     // if (!sourceId) {
     //   reject({ error: true, msg: 'Bad payment.' })
@@ -395,7 +392,7 @@ export async function getStoreCreditForUser(UserId: number | string) {
   }
 
   const { data, error } = await supabase
-    .from('Member')
+    .from('Members')
     .select('id')
     .eq('UserId', UserId)
     .single()

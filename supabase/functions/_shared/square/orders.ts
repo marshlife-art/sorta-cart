@@ -6,7 +6,7 @@ import {
   OrderLineItemTax
 } from 'https://esm.sh/square@25.0.0'
 
-import { SupaNewOrderLineItem } from '../../../../src/types/SupaTypes.ts'
+import { SupaNewOrderLineItem } from '../types/SupaTypes.ts'
 import { client } from './client.ts'
 import { getDefaultLocationId } from './locations.ts'
 
@@ -117,7 +117,7 @@ function tryParseJSON(data?: string | object | null) {
   }
 }
 
-function toCents(amount?: number | string) {
+function toCents(amount?: number | string | null) {
   const amountInt = parseFloat(`${amount}`)
   if (!isNaN(amountInt)) {
     return BigInt(Math.round(amountInt * 100))
@@ -125,8 +125,11 @@ function toCents(amount?: number | string) {
   return BigInt(0)
 }
 export function mapLineItems(
-  line_items: SupaNewOrderLineItem[]
+  line_items?: SupaNewOrderLineItem[]
 ): OrderLineItem[] {
+  if (!line_items) {
+    return []
+  }
   return line_items
     .filter((li) => li.kind === 'product' || li.kind === 'adjustment')
     .map((li) => {

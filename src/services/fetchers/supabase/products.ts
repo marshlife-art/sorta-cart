@@ -112,15 +112,14 @@ export const distinctProductImportTags: DistinctProductImportTagsFetcher =
 
 export const distinctProductCategories: DistinctProductCategoriesFetcher =
   async () => {
-    const { data, error } = await supabase
-      .rpc('distinct_product_categories')
-      .single()
+    const { data, error } = await supabase.rpc('distinct_product_categories')
 
     if (error || !data) {
+      console.log('zomg error or no data:', error)
       return {}
     }
 
-    return data.reduce((acc, row) => {
+    return data.reduce((acc, row: any) => {
       acc[row.category] = row.category
       return acc
     }, {} as Record<string, string>)

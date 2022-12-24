@@ -2,7 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 import { createPayment } from '../_shared/square/payments.ts'
 import { supabaseServiceRoleClient } from '../_shared/supabase-admin.ts'
-import { SupaMember } from '../../../src/types/SupaTypes.ts'
+import { SupaMember } from '../_shared/types/SupaTypes.ts'
 
 async function insertMember(member: Partial<SupaMember>) {
   const { data, error } = await supabaseServiceRoleClient
