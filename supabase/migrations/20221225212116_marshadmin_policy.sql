@@ -18,13 +18,31 @@ drop policy "authenticated insert" on "public"."products";
 
 drop policy "authenticated update" on "public"."products";
 
+drop policy "authenticated users only" on "public"."Orders";
+
 create policy "marsh admins only"
 on "public"."Members"
 as permissive
 for all
 to public
-using ((auth.marshrole() = 'admin'::text))
+using (((auth.marshrole() = 'admin'::text) OR (auth.uid() = "UserId")))
 with check ((auth.marshrole() = 'admin'::text));
+
+
+create policy "insert for authenticated users only"
+on "public"."OrderLineItems"
+as permissive
+for insert
+to authenticated
+with check (true);
+
+
+create policy "insert for authenticated users only"
+on "public"."Orders"
+as permissive
+for insert
+to authenticated
+with check (true);
 
 
 create policy "marsh admins only"
@@ -115,6 +133,15 @@ for all
 to public
 using (true)
 with check ((auth.marshrole() = 'admin'::text));
+
+
+create policy "authenticated users only"
+on "public"."Orders"
+as permissive
+for all
+to public
+using (((auth.role() = 'authenticated'::text) OR (auth.uid() = "UserId")))
+with check ((auth.role() = 'authenticated'::text));
 
 
 
