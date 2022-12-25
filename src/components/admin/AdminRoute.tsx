@@ -13,11 +13,6 @@ export default function AdminRoute(props: {
     (state) => state.session.userService
   )
 
-  console.log(
-    'fuck isAdmin(userService):',
-    auth.isAdmin(userService?.user),
-    userService
-  )
   return auth.isAdmin(userService?.user) ? (
     props.element || <></>
   ) : (

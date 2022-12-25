@@ -228,7 +228,7 @@ export async function createOrder(props: {
     const oliz = props.order.OrderLineItems?.map((oli) => {
       const { id, data, ...rest } = oli
       // #TODO: ugh `as any` ;(
-      const status = (data as any).product?.count_on_hand
+      const status = (data as any)?.product?.count_on_hand
         ? 'on_hand'
         : 'backorder'
       return {
@@ -252,28 +252,18 @@ export async function createOrder(props: {
       }
     }
 
-    // #TODO:
-    // fetch(`http://localhost:54321/functions/v1/checkout`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     // order: { ...orderToInsert, OrderLineItems },
-    //     api_key: order?.api_key,
-    //     sourceId: sourceId
-    //   })
-    // })
-    //   .then((r) => r.json())
-    //   .then((r) => {
-    //     // #TODO
-    //     console.log('store/checkout api response:', r)
-    //   })
+    const { data } = await supabase.functions.invoke('checkout', {
+      body: {
+        api_key: order?.api_key,
+        sourceId: sourceId
+      }
+    })
 
-    // if (!sourceId) {
-    //   reject({ error: true, msg: 'Bad payment.' })
-    // }
-    resolve({ error: false, msg: 'success!' })
+    if (data.ok) {
+      resolve({ error: false, msg: 'success!' })
+    } else {
+      reject({ error: true, msg: data.error })
+    }
   })
 }
 

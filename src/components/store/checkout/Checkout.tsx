@@ -597,6 +597,8 @@ function Payment(
                   handleNext={handleNext}
                   loading={loading}
                   amount={Number(order.total) * 100}
+                  autocompletePayment={false}
+                  captureCardOnly={true}
                 />
               )}
             </div>

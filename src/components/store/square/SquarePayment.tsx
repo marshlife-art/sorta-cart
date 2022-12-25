@@ -19,11 +19,18 @@ interface SquarePaymentFormProps {
   amount: number
   loading: boolean
   autocompletePayment?: boolean
+  captureCardOnly?: boolean
 }
 
 function SquarePaymentForm(props: SquarePaymentFormProps) {
-  const { paymentForm, amount, loading, handleNext, autocompletePayment } =
-    props
+  const {
+    paymentForm,
+    amount,
+    loading,
+    handleNext,
+    autocompletePayment,
+    captureCardOnly
+  } = props
 
   const appId = SQUARE_APP_ID
   const locationId = SQUARE_LOCATION_ID
@@ -36,7 +43,10 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
   }
 
   async function createPayment(token: string) {
-    // sourceId, amountCents, note
+    if (captureCardOnly) {
+      console.log('ZOMG captureCardOnly gonna skip invoking square-payment!')
+      return { id: token }
+    }
 
     const { data, error } = await supabase.functions.invoke('square-payment', {
       body: {
@@ -188,6 +198,7 @@ interface SquarePaymentProps {
   amount: number
   loading: boolean
   autocompletePayment?: boolean
+  captureCardOnly?: boolean
 }
 
 export default function SquarePayment(props: SquarePaymentProps) {
@@ -209,6 +220,7 @@ export default function SquarePayment(props: SquarePaymentProps) {
       amount={props.amount || 0}
       loading={props.loading}
       autocompletePayment={props.autocompletePayment}
+      captureCardOnly={props.captureCardOnly}
     />
   ) : (
     <Loading />

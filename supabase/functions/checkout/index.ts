@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { corsHeaders } from '../_shared/cors.ts'
-import { createPayment } from '../_shared/square/payments.ts'
+import { corsHeaders, jsonCorsHeaders } from '../_shared/cors.ts'
+import { completePayment, createPayment } from '../_shared/square/payments.ts'
 import { createOrder, mapLineItems } from '../_shared/square/orders.ts'
 import { supabaseServiceRoleClient } from '../_shared/supabase-admin.ts'
 import {
@@ -69,9 +69,37 @@ async function handleNewOrderAndPayment(
       orderId
     })
 
-    console.log('square payment result:', data)
+    return { ok: !!data.id, data }
 
-    return { ok: true, data }
+    // console.log(
+    //   '[checout] gonna try to complete payment with sourceId:',
+    //   sourceId
+    // )
+    // const completePaymentResponse = await completePayment(sourceId)
+    // console.log(
+    //   '[checkout] square complete payment result:',
+    //   completePaymentResponse
+    // )
+    // if (completePaymentResponse.error) {
+    //   console.warn(
+    //     '[checkout] completePaymentResponse error:',
+    //     completePaymentResponse.error
+    //   )
+    //   return new Response(
+    //     JSON.stringify({
+    //       error: completePaymentResponse.error,
+    //       msg: 'payment error!'
+    //     }),
+    //     {
+    //       headers: jsonCorsHeaders,
+    //       status: 500
+    //     }
+    //   )
+    // }
+
+    // console.log('[checkout] square payment result:', completePaymentResponse)
+
+    // return { ok: true, data: completePaymentResponse }
   }
 
   return { ok: false }
@@ -120,9 +148,9 @@ serve(async (req) => {
         orderError
       )
       return new Response(
-        JSON.stringify({ ok: false, error: ' got error selecting order!' }),
+        JSON.stringify({ ok: false, error: 'got error selecting order!' }),
         {
-          headers: { 'Content-Type': 'application/json' }
+          headers: jsonCorsHeaders
         }
       )
     }
@@ -137,23 +165,34 @@ serve(async (req) => {
       sourceId
     )
 
-    if (ok && data) {
-      // update order payment_status and create payment order line item.
-      await updateOrderPayment(api_key, { total: total, data })
-
-      // #TODO: send email...
-      // await emailOrderReceipt(order.api_key)
+    if (!ok) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          error: 'got error creating new order and payment.'
+        }),
+        {
+          headers: jsonCorsHeaders,
+          status: 500
+        }
+      )
     }
 
+    // update order payment_status and create payment order line item.
+    await updateOrderPayment(api_key, { total: total, data })
+
+    // #TODO: send email...
+    // await emailOrderReceipt(order.api_key)
+
     return new Response(JSON.stringify({ ok: 'ok' }), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: jsonCorsHeaders
     })
   } catch (e) {
-    console.warn('[register] caught error:', e)
+    console.warn('[checkout] caught error:', e)
     return new Response(
-      JSON.stringify({ ok: false, error: 'register error' }),
+      JSON.stringify({ ok: false, error: 'checkout error' }),
       {
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonCorsHeaders,
         status: 500
       }
     )

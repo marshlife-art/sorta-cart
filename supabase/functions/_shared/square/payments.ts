@@ -44,9 +44,15 @@ export async function createPayment(props: {
     autocomplete
   }
   try {
+    console.log(
+      '[payments] gonna try to create payment. sourceId, payment:',
+      sourceId,
+      payment
+    )
+
     const { result, statusCode } = await paymentsApi.createPayment(payment)
 
-    // console.log('Payment succeeded!', { result, statusCode })
+    console.log('Payment result, statusCode:', { result, statusCode })
 
     return {
       id: result.payment?.id,

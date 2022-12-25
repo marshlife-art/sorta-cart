@@ -37,8 +37,16 @@ serve(async (req) => {
     })
   }
 
+  // #TODO: hmm, return sourceId if !autocomplete? otherwise paymentResponse
   return new Response(
-    JSON.stringify({ success: true, msg: 'ok', paymentResponse }),
+    JSON.stringify({
+      success: true,
+      msg: 'ok',
+      paymentResponse: {
+        ...paymentResponse,
+        id: !autocomplete ? sourceId : paymentResponse.id
+      }
+    }),
     {
       headers: jsonCorsHeaders
     }
