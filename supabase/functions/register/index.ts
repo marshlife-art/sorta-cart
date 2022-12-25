@@ -75,6 +75,7 @@ serve(async (req) => {
     const { member, msg } = await insertMember({
       ...newMember,
       registration_email: newUser.email,
+      shares: 1,
       UserId: user.id
     })
     console.log('[register] insertMember msg, member:', msg, member, user)
