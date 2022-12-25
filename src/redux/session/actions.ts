@@ -54,9 +54,8 @@ export const checkSession = (): ThunkAction<
       dispatch(isFetching(true))
 
       const session = await auth.getSession()
-      // console.log('zomg session:', session)
       if (session?.user) {
-        dispatch(set({ ...session.user, role: 'admin' })) // #TODO: don't hard-code admin role :/
+        dispatch(set({ ...session.user }))
       } else {
         dispatch(set(NULL_USER))
       }
@@ -79,7 +78,7 @@ export const login = (
         .signIn(email, password)
         .then((response) => {
           if (response.user && response.user.id) {
-            dispatch(set({ ...response.user, role: 'admin' })) // #TODO: don't hard-code admin role :/
+            dispatch(set({ ...response.user }))
           } else {
             if (!password && !response.error) {
               dispatch(

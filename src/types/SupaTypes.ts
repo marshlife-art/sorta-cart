@@ -6,7 +6,12 @@ export type User = {
 }
 export type SupaProduct = Database['public']['Tables']['products']['Row']
 export type SupaMember = Database['public']['Tables']['Members']['Row']
-export type SupaUser = { id?: string; email?: string; role?: string } // hmm, figure this out.
+export type SupaUser = {
+  id?: string
+  email?: string
+  role?: string
+  app_metadata?: { [key: string]: any }
+} // hmm, figure this out.
 export type SupaMemberWithUser = SupaMember & { User?: SupaUser | null }
 export type SupaNewOrderLineItem = Omit<SupaOrderLineItem, 'id'> & {
   data: SupaOrderLineItemData

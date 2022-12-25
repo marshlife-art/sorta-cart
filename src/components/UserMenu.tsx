@@ -11,6 +11,7 @@ import Switch from '@material-ui/core/Switch'
 import { RootState } from '../redux'
 import { setPreferences } from '../redux/preferences/actions'
 import { logout } from '../redux/session/actions'
+import { auth } from '../services/auth'
 // import { openAnnouncement } from '../redux/announcement/actions'
 
 const StyledMenu = withStyles({
@@ -100,11 +101,8 @@ export default function UserMenu(props: UserMenuProps) {
   }
 
   const hasUser = !!(userService && userService.user && userService.user.id)
-  const isAdmin = !!(
-    userService &&
-    userService.user &&
-    userService.user.role === 'admin'
-  )
+  const isAdmin = auth.isAdmin(userService?.user)
+
   return (
     <>
       <StyledMenu
@@ -117,7 +115,7 @@ export default function UserMenu(props: UserMenuProps) {
         {hasUser && (
           <ListItemText
             primary={userService.user && userService.user.email}
-            secondary={userService.user && userService.user.role}
+            secondary={isAdmin ? 'Admin' : 'Member'}
             style={{ padding: '0 16px 6px', borderBottom: 'thin solid #f60' }}
           />
         )}
@@ -128,7 +126,7 @@ export default function UserMenu(props: UserMenuProps) {
               handleClose()
             }}
           >
-            <ListItemText primary="ADMIN" />
+            <ListItemText primary="Admin" />
           </StyledMenuItem>
         )}
 

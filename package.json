@@ -19,7 +19,8 @@
     "story:server": "python3 -m http.server -d story/build/",
     "supabase:localtypes": "supabase gen types typescript --local > src/types/supabase.ts",
     "supabase:gentypes": "supabase gen types typescript --project-id \"zlzhojhgkapokbmvokzz\" > src/types/supabase.ts",
-    "supabase:db:diff": "supabase db diff --use-migra -f diff"
+    "supabase:db:diff": "supabase db diff --use-migra -f diff",
+    "supabase:db:pullremote": "supabase db diff --use-migra --linked -f remote"
   },
   "dependencies": {
     "@emotion/react": "^11.7.1",

@@ -3,12 +3,7 @@ import { Navigate } from 'react-router-dom'
 import { RootState } from '../../redux'
 import { UserService } from '../../redux/session/reducers'
 import { useSelector } from 'react-redux'
-
-// #TODO: FIX THIS! :(((
-const isAdmin = (userService: UserService): boolean => true
-// userService.user && userService.user.role && userService.user.role === 'admin'
-//   ? true
-//   : false
+import { auth } from '../../services/auth'
 
 export default function AdminRoute(props: {
   path: string
@@ -20,10 +15,10 @@ export default function AdminRoute(props: {
 
   console.log(
     'fuck isAdmin(userService):',
-    isAdmin(userService),
-    userService?.user?.role
+    auth.isAdmin(userService?.user),
+    userService
   )
-  return isAdmin(userService) ? (
+  return auth.isAdmin(userService?.user) ? (
     props.element || <></>
   ) : (
     <Navigate

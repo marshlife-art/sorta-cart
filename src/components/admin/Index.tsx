@@ -38,6 +38,7 @@ import WholesaleOrders from './wholesaleorders/WholesaleOrders'
 import clsx from 'clsx'
 import { mainListItems } from './listItems' // secondaryListItems
 import { supabase } from '../../lib/supabaseClient'
+import { auth } from '../../services/auth'
 
 const drawerWidth = 240
 
@@ -168,13 +169,15 @@ export default function AdminIndex() {
       ? darkTheme
       : lightTheme
 
+  const isAdmin = auth.isAdmin(userService?.user)
+
   return (
     // <ThemeProvider theme={theme}>
     // <CssBaseline />
 
     // <Router basename={process.env.PUBLIC_URL}>
     <div className={classes.root}>
-      {userService && userService.user && userService.user.role === 'admin' && (
+      {isAdmin && (
         <div className={classes.nav}>
           <Fab
             color="secondary"
@@ -186,7 +189,7 @@ export default function AdminIndex() {
         </div>
       )}
 
-      {userService && userService.user && userService.user.role === 'admin' && (
+      {isAdmin && (
         <Drawer
           classes={{
             paper: clsx(classes.drawerPaper)

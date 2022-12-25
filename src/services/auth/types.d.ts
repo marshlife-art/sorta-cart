@@ -1,4 +1,5 @@
 import { Session, User, ApiError } from '@supabase/supabase-js'
+import { SupaUser } from '../../types/SupaTypes'
 
 export interface GetSession {
   (): Promise<Session | null>
@@ -18,8 +19,13 @@ export interface SingOut {
   }>
 }
 
+export interface IsAdmin {
+  (user?: SupaUser): boolean
+}
+
 export interface Auth {
   getSession: GetSession
   signIn: SignIn
   signOut: SingOut
+  isAdmin: IsAdmin
 }

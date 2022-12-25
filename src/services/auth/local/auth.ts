@@ -1,4 +1,5 @@
-import { Auth, GetSession, SignIn, SingOut } from '../types'
+import { SupaUser } from '../../../types/SupaTypes'
+import { Auth, GetSession, SignIn, SingOut, IsAdmin } from '../types'
 
 // admin party!
 const user = {
@@ -32,8 +33,11 @@ const signOut: SingOut = () => {
   return Promise.resolve({ error: null })
 }
 
+const isAdmin: IsAdmin = (user?: SupaUser) => true
+
 export const localAuth: Auth = {
   getSession,
   signIn,
-  signOut
+  signOut,
+  isAdmin
 }
