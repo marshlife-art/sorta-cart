@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { corsHeaders } from '../_shared/cors.ts'
-import { createPayment } from '../_shared/square/payments.ts'
+import { corsHeaders, jsonCorsHeaders } from '../_shared/cors.ts'
+import { completePayment } from '../_shared/square/payments.ts'
 import { supabaseServiceRoleClient } from '../_shared/supabase-admin.ts'
 import { SupaMember } from '../_shared/types/SupaTypes.ts'
 
@@ -30,13 +30,27 @@ serve(async (req) => {
   const { member: newMember, user: newUser, sourceId } = await req.json()
 
   try {
-    const amountCents = Math.round(newMember.fees_paid * 100)
-    const paymentResponse = await createPayment({
-      sourceId,
-      amountCents
-    })
-    console.log('[register] square payment result:', paymentResponse)
-
+    const completePaymentResponse = await completePayment(sourceId)
+    console.log(
+      '[register] square complete payment result:',
+      completePaymentResponse
+    )
+    if (completePaymentResponse.error) {
+      console.warn(
+        '[register] completePaymentResponse error:',
+        completePaymentResponse.error
+      )
+      return new Response(
+        JSON.stringify({
+          error: completePaymentResponse.error,
+          msg: 'payment error!'
+        }),
+        {
+          headers: jsonCorsHeaders,
+          status: 500
+        }
+      )
+    }
     const { data, error } =
       await supabaseServiceRoleClient.auth.admin.createUser({
         email: newUser.email
@@ -48,7 +62,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ member: null, msg: 'unable to create member!' }),
         {
-          headers: { 'Content-Type': 'application/json' },
+          headers: jsonCorsHeaders,
           status: 200
         }
       )
@@ -60,19 +74,20 @@ serve(async (req) => {
 
     const { member, msg } = await insertMember({
       ...newMember,
+      registration_email: newUser.email,
       UserId: user.id
     })
     console.log('[register] insertMember msg, member:', msg, member, user)
 
     if (member) {
       return new Response(JSON.stringify({ member, msg: 'ok', user }), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: jsonCorsHeaders
       })
     } else {
       return new Response(
         JSON.stringify({ member: null, msg: 'unable to create member!' }),
         {
-          headers: { 'Content-Type': 'application/json' },
+          headers: jsonCorsHeaders,
           status: 200
         }
       )
@@ -80,7 +95,7 @@ serve(async (req) => {
   } catch (e) {
     console.warn('[register] caught error:', e)
     return new Response(JSON.stringify({ error: 'register error' }), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: jsonCorsHeaders,
       status: 500
     })
   }

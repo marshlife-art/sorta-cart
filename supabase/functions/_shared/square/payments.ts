@@ -1,4 +1,7 @@
-import { CreatePaymentRequest } from 'https://esm.sh/square@25.0.0'
+import {
+  CompletePaymentRequest,
+  CreatePaymentRequest
+} from 'https://esm.sh/square@25.0.0'
 import { randomUUID } from 'https://deno.land/std@0.168.0/node/crypto.ts'
 import { client } from './client.ts'
 
@@ -60,5 +63,17 @@ export async function createPayment(props: {
       orderId: undefined,
       error
     }
+  }
+}
+
+export async function completePayment(paymentId: string) {
+  try {
+    const { result, statusCode } = await paymentsApi.completePayment(
+      paymentId,
+      {}
+    )
+    return { result, statusCode }
+  } catch (e) {
+    return { result: null, statusCode: null, error: e }
   }
 }

@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { corsHeaders } from '../_shared/cors.ts'
+import { corsHeaders, jsonCorsHeaders } from '../_shared/cors.ts'
 import { createPayment } from '../_shared/square/payments.ts'
 
 serve(async (req) => {
@@ -7,11 +7,11 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  const { order, nonce } = await req.json()
+  const { sourceId, amountCents, autocomplete, note } = await req.json()
 
-  if (!order || !order.name || !order.email || !order.total || !nonce) {
+  if (!sourceId || !amountCents) {
     return new Response(JSON.stringify({ error: 'missing required fields!' }), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: jsonCorsHeaders,
       status: 500
     })
   }
@@ -19,9 +19,10 @@ serve(async (req) => {
   let paymentResponse = undefined
   try {
     paymentResponse = await createPayment({
-      sourceId: nonce,
-      amountCents: order.total * 100,
-      note: `Order Payment ${order.name} ${order.email}`
+      sourceId,
+      amountCents,
+      autocomplete: !!autocomplete,
+      note
     })
     console.log('[square-payment] order paymentResponse:', paymentResponse)
   } catch (e) {
@@ -31,12 +32,15 @@ serve(async (req) => {
       JSON.stringify(e)
     )
     return new Response(JSON.stringify({ error: 'payment error' }), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: jsonCorsHeaders,
       status: 500
     })
   }
 
-  return new Response(JSON.stringify({ success: true, msg: 'ok' }), {
-    headers: { 'Content-Type': 'application/json' }
-  })
+  return new Response(
+    JSON.stringify({ success: true, msg: 'ok', paymentResponse }),
+    {
+      headers: jsonCorsHeaders
+    }
+  )
 })
