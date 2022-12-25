@@ -9,6 +9,7 @@ import {
   SQUARE_PAYMENT_JS
 } from '../../../constants'
 import Loading from '../../Loading'
+import { supabase } from '../../../lib/supabaseClient'
 
 declare const Square: any
 
@@ -17,10 +18,12 @@ interface SquarePaymentFormProps {
   handleNext: (sourceId: string) => void
   amount: number
   loading: boolean
+  autocompletePayment?: boolean
 }
 
 function SquarePaymentForm(props: SquarePaymentFormProps) {
-  const { paymentForm, amount, loading, handleNext } = props
+  const { paymentForm, amount, loading, handleNext, autocompletePayment } =
+    props
 
   const appId = SQUARE_APP_ID
   const locationId = SQUARE_LOCATION_ID
@@ -33,25 +36,27 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
   }
 
   async function createPayment(token: string) {
-    const body = JSON.stringify({
-      locationId,
-      sourceId: token
+    // sourceId, amountCents, note
+
+    const { data, error } = await supabase.functions.invoke('square-payment', {
+      body: {
+        sourceId: token,
+        amountCents: amount,
+        autocomplete: !!autocompletePayment
+      }
     })
 
-    const paymentResponse = await fetch(`${API_HOST}/square/payment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body
-    })
+    console.log('zomg square-payment error,data:', error, data)
 
-    if (paymentResponse.ok) {
-      return paymentResponse.json()
+    if (error) {
+      throw new Error(error)
     }
 
-    const errorBody = await paymentResponse.text()
-    throw new Error(errorBody)
+    if (data.success) {
+      return data.paymentResponse
+    }
+
+    throw new Error(data.error)
   }
 
   async function tokenize(paymentMethod: any) {
@@ -125,13 +130,16 @@ function SquarePaymentForm(props: SquarePaymentFormProps) {
         }
 
         const token = await tokenize(paymentMethod)
-        const paymentResults = await createPayment(token)
+        console.log('zomg gonna try to createPayment')
+        const paymentResponse = await createPayment(token)
 
-        // console.log('zomg handlenext gonna get a sourceId??', token)
-        handleNext(token)
+        console.log(
+          'zomg createPayment done, gonna handleNext token, paymentResponse:',
+          token,
+          paymentResponse
+        )
+        handleNext(paymentResponse.id)
         // displayPaymentResults('SUCCESS')
-
-        // console.log('Payment Success', paymentResults)
       } catch (e: any) {
         cardButton.disabled = false
         displayPaymentFailResults()
@@ -179,6 +187,7 @@ interface SquarePaymentProps {
   handleNext: (sourceId: string) => void
   amount: number
   loading: boolean
+  autocompletePayment?: boolean
 }
 
 export default function SquarePayment(props: SquarePaymentProps) {
@@ -199,6 +208,7 @@ export default function SquarePayment(props: SquarePaymentProps) {
       handleNext={props.handleNext}
       amount={props.amount || 0}
       loading={props.loading}
+      autocompletePayment={props.autocompletePayment}
     />
   ) : (
     <Loading />

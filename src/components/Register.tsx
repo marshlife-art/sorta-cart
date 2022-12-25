@@ -10,7 +10,6 @@ import FormGroup from '@material-ui/core/FormGroup'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import FormLabel from '@material-ui/core/FormLabel'
 import Loading from './Loading'
-// import { Member } from '../types/Member'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import { RootState } from '../redux'
@@ -18,7 +17,6 @@ import { Slider } from '@material-ui/core'
 import SquarePayment from './store/square/SquarePayment'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
-// import { User } from '../types/User'
 import { UserService } from '../redux/session/reducers'
 import { checkIfEamilExists } from '../services/memberService'
 import { makeStyles } from '@material-ui/core/styles'
@@ -113,18 +111,18 @@ export default function Register() {
   const [loading, setLoading] = useState(false)
 
   const doRegister = (sourceId: string) => {
-    // console.log(
-    //   'doRegister understandBylaws:',
-    //   understandBylaws,
-    //   ' userData:',
-    //   userData,
-    //   ' menber:',
-    //   member,
-    //   ' memberData:',
-    //   memberData,
-    //   ' sourceId:',
-    //   sourceId
-    // )
+    console.log(
+      'doRegister understandBylaws:',
+      understandBylaws,
+      ' userData:',
+      userData,
+      ' menber:',
+      member,
+      ' memberData:',
+      memberData,
+      ' sourceId:',
+      sourceId
+    )
 
     setLoading(true)
     dispatch(
@@ -492,6 +490,7 @@ export default function Register() {
                 handleNext={doRegister}
                 amount={registrationFee * 100}
                 loading={userService.isFetching}
+                autocompletePayment={false}
               />
             ) : (
               <Box color="error.main" className={classes.natValid}>

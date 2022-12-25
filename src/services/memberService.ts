@@ -11,18 +11,6 @@ export async function checkIfEamilExists(email: string): Promise<boolean> {
 
     if (error) return false
     return data.ok
-
-    // const r = await fetch(`${API_HOST}/members/email-available`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({
-    //     email
-    //   })
-    // })
-    // const response = await r.json()
-    // return response.ok
   } catch (err) {
     console.warn('onoz! register/check err:', err)
     return false
@@ -42,15 +30,18 @@ export function registerMember(props: {
 }): Promise<RegisterMemberResponse> {
   return new Promise(async (resolve, reject) => {
     try {
-      const r = await fetch(`${API_HOST}/members/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(props)
+      console.log('zomg gonna registerMember! props:', props)
+      const { data, error } = await supabase.functions.invoke('register', {
+        body: props
       })
-      const response = await r.json()
-      resolve(response as RegisterMemberResponse)
+
+      console.log('register fn error, data:', error, data)
+
+      if (error || !data) {
+        reject(error)
+      }
+
+      resolve(data as RegisterMemberResponse)
     } catch (e) {
       reject(e)
     }
