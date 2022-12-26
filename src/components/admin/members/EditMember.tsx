@@ -141,8 +141,7 @@ export default function EditMember() {
       ...member,
       id: memberId === -1 ? undefined : memberId,
       createdAt: memberId === -1 ? undefined : member.createdAt,
-      updatedAt: null,
-      fts: undefined
+      updatedAt: null
     })
 
     if (error) {

@@ -1,3 +1,5 @@
+// import 'https://deno.land/x/dotenv/load.ts'
+
 import {
   BatchRetrieveInventoryCountsResponse,
   BatchUpsertCatalogObjectsRequest,
@@ -644,7 +646,7 @@ export async function addProductToCatalog(product: SupaProduct) {
   const measurementUnitId = await getMeasurementUnitId(product)
   const categoryId = await getCategoryId(product.category, product.sub_category)
   const name = `${product.name} -- ${product.description}`
-  const amount = BigInt(Number(product.u_price) * 100)
+  const amount = toCents(product.u_price)
   const sku = product.plu ? product.plu : product.upc_code
 
   /*
@@ -726,27 +728,38 @@ export async function addInventory(variationId: string, qty: number) {
 
   const quantity = `${qty}`
 
-  console.log('gonna batchChangeInventory!!!')
-  try {
-    return await inventoryApi.batchChangeInventory({
-      ignoreUnchangedCounts: true,
-      changes: [
-        {
-          type: 'ADJUSTMENT',
-          adjustment: {
-            catalogObjectId: variationId,
-            quantity,
-            fromState: 'NONE',
-            toState: 'IN_STOCK',
-            locationId,
-            occurredAt: new Date().toISOString()
-          }
+  const body = {
+    ignoreUnchangedCounts: true,
+    changes: [
+      {
+        type: 'ADJUSTMENT',
+        adjustment: {
+          catalogObjectId: variationId,
+          quantity,
+          fromState: 'NONE',
+          toState: 'IN_STOCK',
+          locationId,
+          occurredAt: new Date().toISOString()
         }
-      ],
-      idempotencyKey: randomUUID()
-    })
+      }
+    ],
+    idempotencyKey: randomUUID()
+  }
+  console.log('gonna batchChangeInventory!!! body:', body)
+  try {
+    return await inventoryApi.batchChangeInventory(body)
   } catch (e) {
     console.warn('zomg batchChangeInventory caught error:', e)
     return undefined
   }
+}
+
+function toMoney(input: any) {
+  if (isNaN(parseFloat(input))) {
+    return 0
+  }
+  return +parseFloat(input).toFixed(2)
+}
+function toCents(input: any) {
+  return BigInt(Math.round(toMoney(input) * 100))
 }

@@ -50,6 +50,20 @@ export interface CatmapFetcher {
     count: number | null
   }>
 }
+
+export interface SquareImportFetcher {
+  (id: string): Promise<{
+    data: SupaSquareImport | null
+    error: PostgrestError | null
+  }>
+}
+export interface SquareImportsFetcher {
+  (): Promise<{
+    data: SupaSquareImport[] | null
+    error: PostgrestError | null
+    count: number | null
+  }>
+}
 export interface MemberOption {
   name: string
   member: SupaMemberWithUser

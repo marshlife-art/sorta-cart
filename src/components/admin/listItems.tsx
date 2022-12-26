@@ -56,6 +56,13 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Store Credits" />
     </ListItem>
+
+    <ListItem button component={Link} to="/admin/squareimport">
+      <ListItemIcon>
+        <Icon>square</Icon>
+      </ListItemIcon>
+      <ListItemText primary="Square Import" />
+    </ListItem>
     <ListItem button component={Link} to="/">
       <ListItemIcon>
         <Icon>arrow_back</Icon>

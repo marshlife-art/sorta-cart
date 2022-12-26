@@ -533,10 +533,6 @@ export default function ProductGrid() {
         .limit(1000)
 
       if (q) {
-        // query = query.textSearch('fts', q, {
-        //   type: 'websearch',
-        //   config: 'english',
-        // })
         query = query.or(
           ['name', 'description'].map((f) => `${f}.ilike."%${q}%"`).join(',')
         )

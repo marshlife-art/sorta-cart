@@ -1,6 +1,7 @@
 import {
   SupaCatmap,
   SupaProduct,
+  SupaSquareImport,
   SupaWholesaleOrder
 } from '../../types/SupaTypes'
 import { PostgrestError } from '@supabase/supabase-js'
@@ -121,6 +122,16 @@ export interface InsertOrderLineItem {
   }>
 }
 
+/*
+ * squareImport
+ */
+
+export interface UpsertSquareImport {
+  (squareImport: Partial<SupaSquareImport>): Promise<{
+    data: SupaSquareImport | null
+    error: PostgrestError | null
+  }>
+}
 // hmm, it might be useful to implement an entire object to say like, a flavour
 // (like local or supabase) needs to implement these functions.
 // export type ServiceMutations = UpdateNoBackorder | UpsertProducts

@@ -25,35 +25,36 @@ export interface Database {
       }
       events: {
         Row: {
+          id: number
+          created_at: string | null
           level: string | null
           tag: string | null
           message: string | null
           data: Json | null
           env: string | null
-          created_at: string | null
-          id: number
         }
         Insert: {
+          id?: number
+          created_at?: string | null
           level?: string | null
           tag?: string | null
           message?: string | null
           data?: Json | null
           env?: string | null
-          created_at?: string | null
-          id?: number
         }
         Update: {
+          id?: number
+          created_at?: string | null
           level?: string | null
           tag?: string | null
           message?: string | null
           data?: Json | null
           env?: string | null
-          created_at?: string | null
-          id?: number
         }
       }
       legacyMembers: {
         Row: {
+          id: number
           UserId: number | null
           registration_email: string | null
           name: string | null
@@ -61,16 +62,16 @@ export interface Database {
           address: string | null
           discount: number | null
           discount_type: string | null
-          member_type: string | null
           fees_paid: number | null
           store_credit: number | null
           shares: number | null
+          member_type: string | null
           data: Json | null
           createdAt: string
           updatedAt: string
-          id: number
         }
         Insert: {
+          id?: number
           UserId?: number | null
           registration_email?: string | null
           name?: string | null
@@ -78,16 +79,16 @@ export interface Database {
           address?: string | null
           discount?: number | null
           discount_type?: string | null
-          member_type?: string | null
           fees_paid?: number | null
           store_credit?: number | null
           shares?: number | null
+          member_type?: string | null
           data?: Json | null
           createdAt?: string
           updatedAt?: string
-          id?: number
         }
         Update: {
+          id?: number
           UserId?: number | null
           registration_email?: string | null
           name?: string | null
@@ -95,18 +96,18 @@ export interface Database {
           address?: string | null
           discount?: number | null
           discount_type?: string | null
-          member_type?: string | null
           fees_paid?: number | null
           store_credit?: number | null
           shares?: number | null
+          member_type?: string | null
           data?: Json | null
           createdAt?: string
           updatedAt?: string
-          id?: number
         }
       }
       legacyOrderLineItems: {
         Row: {
+          id: number
           OrderId: number | null
           WholesaleOrderId: number | null
           price: number | null
@@ -117,12 +118,12 @@ export interface Database {
           vendor: string | null
           selected_unit: string | null
           data: Json | null
-          status: string | null
           createdAt: string
           updatedAt: string
-          id: number
+          status: string | null
         }
         Insert: {
+          id?: number
           OrderId?: number | null
           WholesaleOrderId?: number | null
           price?: number | null
@@ -133,12 +134,12 @@ export interface Database {
           vendor?: string | null
           selected_unit?: string | null
           data?: Json | null
-          status?: string | null
           createdAt?: string
           updatedAt?: string
-          id?: number
+          status?: string | null
         }
         Update: {
+          id?: number
           OrderId?: number | null
           WholesaleOrderId?: number | null
           price?: number | null
@@ -149,99 +150,99 @@ export interface Database {
           vendor?: string | null
           selected_unit?: string | null
           data?: Json | null
-          status?: string | null
           createdAt?: string
           updatedAt?: string
-          id?: number
+          status?: string | null
         }
       }
       legacyOrders: {
         Row: {
+          id: number
           UserId: number | null
           status: string | null
           payment_status: string | null
           shipment_status: string | null
+          total: number | null
+          subtotal: number | null
           name: string
           email: string
           phone: string | null
           address: string | null
           notes: string | null
           email_sent: boolean | null
-          history: Json | null
-          MemberId: number | null
-          total: number | null
-          subtotal: number | null
           item_count: number | null
+          history: Json | null
           createdAt: string
           updatedAt: string
-          id: number
+          MemberId: number | null
         }
         Insert: {
+          id?: number
           UserId?: number | null
           status?: string | null
           payment_status?: string | null
           shipment_status?: string | null
+          total?: number | null
+          subtotal?: number | null
           name: string
           email: string
           phone?: string | null
           address?: string | null
           notes?: string | null
           email_sent?: boolean | null
-          history?: Json | null
-          MemberId?: number | null
-          total?: number | null
-          subtotal?: number | null
           item_count?: number | null
+          history?: Json | null
           createdAt?: string
           updatedAt?: string
-          id?: number
+          MemberId?: number | null
         }
         Update: {
+          id?: number
           UserId?: number | null
           status?: string | null
           payment_status?: string | null
           shipment_status?: string | null
+          total?: number | null
+          subtotal?: number | null
           name?: string
           email?: string
           phone?: string | null
           address?: string | null
           notes?: string | null
           email_sent?: boolean | null
-          history?: Json | null
-          MemberId?: number | null
-          total?: number | null
-          subtotal?: number | null
           item_count?: number | null
+          history?: Json | null
           createdAt?: string
           updatedAt?: string
-          id?: number
+          MemberId?: number | null
         }
       }
       legacyPages: {
         Row: {
+          id: number
           slug: string | null
           content: string | null
           createdAt: string
           updatedAt: string
-          id: number
         }
         Insert: {
+          id?: number
           slug?: string | null
           content?: string | null
           createdAt?: string
           updatedAt?: string
-          id?: number
         }
         Update: {
+          id?: number
           slug?: string | null
           content?: string | null
           createdAt?: string
           updatedAt?: string
-          id?: number
         }
       }
       legacyProducts: {
         Row: {
+          id: number
           unf: string | null
           upc_code: string | null
           category: string | null
@@ -258,13 +259,13 @@ export interface Database {
           codes: string | null
           vendor: string | null
           import_tag: string | null
-          count_on_hand: number | null
-          no_backorder: boolean | null
           createdAt: string
           updatedAt: string
-          id: number
+          count_on_hand: number | null
+          no_backorder: boolean | null
         }
         Insert: {
+          id?: number
           unf?: string | null
           upc_code?: string | null
           category?: string | null
@@ -281,13 +282,13 @@ export interface Database {
           codes?: string | null
           vendor?: string | null
           import_tag?: string | null
-          count_on_hand?: number | null
-          no_backorder?: boolean | null
           createdAt?: string
           updatedAt?: string
-          id?: number
+          count_on_hand?: number | null
+          no_backorder?: boolean | null
         }
         Update: {
+          id?: number
           unf?: string | null
           upc_code?: string | null
           category?: string | null
@@ -304,15 +305,15 @@ export interface Database {
           codes?: string | null
           vendor?: string | null
           import_tag?: string | null
-          count_on_hand?: number | null
-          no_backorder?: boolean | null
           createdAt?: string
           updatedAt?: string
-          id?: number
+          count_on_hand?: number | null
+          no_backorder?: boolean | null
         }
       }
       legacyWholesaleOrders: {
         Row: {
+          id: number
           vendor: string | null
           notes: string | null
           status: string | null
@@ -320,9 +321,9 @@ export interface Database {
           shipment_status: string | null
           createdAt: string
           updatedAt: string
-          id: number
         }
         Insert: {
+          id?: number
           vendor?: string | null
           notes?: string | null
           status?: string | null
@@ -330,9 +331,9 @@ export interface Database {
           shipment_status?: string | null
           createdAt?: string
           updatedAt?: string
-          id?: number
         }
         Update: {
+          id?: number
           vendor?: string | null
           notes?: string | null
           status?: string | null
@@ -340,11 +341,11 @@ export interface Database {
           shipment_status?: string | null
           createdAt?: string
           updatedAt?: string
-          id?: number
         }
       }
       Members: {
         Row: {
+          id: number
           UserId: string | null
           registration_email: string | null
           name: string | null
@@ -360,9 +361,9 @@ export interface Database {
           createdAt: string | null
           updatedAt: string | null
           is_admin: boolean
-          id: number
         }
         Insert: {
+          id?: number
           UserId?: string | null
           registration_email?: string | null
           name?: string | null
@@ -378,9 +379,9 @@ export interface Database {
           createdAt?: string | null
           updatedAt?: string | null
           is_admin?: boolean
-          id?: number
         }
         Update: {
+          id?: number
           UserId?: string | null
           registration_email?: string | null
           name?: string | null
@@ -396,11 +397,11 @@ export interface Database {
           createdAt?: string | null
           updatedAt?: string | null
           is_admin?: boolean
-          id?: number
         }
       }
       OrderLineItems: {
         Row: {
+          id: number
           OrderId: number | null
           WholesaleOrderId: number | null
           price: number | null
@@ -411,13 +412,13 @@ export interface Database {
           vendor: string | null
           selected_unit: string | null
           data: Json | null
-          status: string | null
-          invalid: string | null
           createdAt: string | null
           updatedAt: string | null
-          id: number
+          status: string | null
+          invalid: string | null
         }
         Insert: {
+          id?: number
           OrderId?: number | null
           WholesaleOrderId?: number | null
           price?: number | null
@@ -428,13 +429,13 @@ export interface Database {
           vendor?: string | null
           selected_unit?: string | null
           data?: Json | null
-          status?: string | null
-          invalid?: string | null
           createdAt?: string | null
           updatedAt?: string | null
-          id?: number
+          status?: string | null
+          invalid?: string | null
         }
         Update: {
+          id?: number
           OrderId?: number | null
           WholesaleOrderId?: number | null
           price?: number | null
@@ -445,15 +446,15 @@ export interface Database {
           vendor?: string | null
           selected_unit?: string | null
           data?: Json | null
-          status?: string | null
-          invalid?: string | null
           createdAt?: string | null
           updatedAt?: string | null
-          id?: number
+          status?: string | null
+          invalid?: string | null
         }
       }
       Orders: {
         Row: {
+          id: number
           UserId: string | null
           status: string | null
           payment_status: string | null
@@ -468,13 +469,13 @@ export interface Database {
           email_sent: boolean | null
           item_count: number | null
           history: Json | null
-          MemberId: number | null
           createdAt: string | null
           updatedAt: string | null
+          MemberId: number | null
           api_key: string | null
-          id: number
         }
         Insert: {
+          id?: number
           UserId?: string | null
           status?: string | null
           payment_status?: string | null
@@ -489,13 +490,13 @@ export interface Database {
           email_sent?: boolean | null
           item_count?: number | null
           history?: Json | null
-          MemberId?: number | null
           createdAt?: string | null
           updatedAt?: string | null
+          MemberId?: number | null
           api_key?: string | null
-          id?: number
         }
         Update: {
+          id?: number
           UserId?: string | null
           status?: string | null
           payment_status?: string | null
@@ -510,11 +511,10 @@ export interface Database {
           email_sent?: boolean | null
           item_count?: number | null
           history?: Json | null
-          MemberId?: number | null
           createdAt?: string | null
           updatedAt?: string | null
+          MemberId?: number | null
           api_key?: string | null
-          id?: number
         }
       }
       products: {
@@ -534,17 +534,17 @@ export interface Database {
           codes: string | null
           vendor: string | null
           import_tag: string | null
+          createdAt: string | null
+          updatedAt: string | null
           count_on_hand: number | null
           no_backorder: boolean | null
           plu: string | null
           id: string
           description_orig: string | null
           description_edit: string | null
-          sq_variation_id: string | null
-          createdAt: string | null
-          updatedAt: string | null
           description: string | null
           featured: boolean | null
+          sq_variation_id: string | null
         }
         Insert: {
           unf?: string | null
@@ -562,92 +562,115 @@ export interface Database {
           codes?: string | null
           vendor?: string | null
           import_tag?: string | null
-          count_on_hand?: number | null
-          no_backorder?: boolean | null
-          plu?: string | null
-          id: string
-          description_orig?: string | null
-          description_edit?: string | null
-          sq_variation_id?: string | null
           createdAt?: string | null
           updatedAt?: string | null
-          description?: string | null
-          featured?: boolean | null
-        }
-        Update: {
-          unf?: string | null
-          upc_code?: string | null
-          category?: string | null
-          sub_category?: string | null
-          name?: string | null
-          pk?: number | null
-          size?: string | null
-          unit_type?: string | null
-          ws_price?: number | null
-          u_price?: number | null
-          ws_price_cost?: number | null
-          u_price_cost?: number | null
-          codes?: string | null
-          vendor?: string | null
-          import_tag?: string | null
           count_on_hand?: number | null
           no_backorder?: boolean | null
           plu?: string | null
           id?: string
           description_orig?: string | null
           description_edit?: string | null
-          sq_variation_id?: string | null
-          createdAt?: string | null
-          updatedAt?: string | null
           description?: string | null
           featured?: boolean | null
+          sq_variation_id?: string | null
+        }
+        Update: {
+          unf?: string | null
+          upc_code?: string | null
+          category?: string | null
+          sub_category?: string | null
+          name?: string | null
+          pk?: number | null
+          size?: string | null
+          unit_type?: string | null
+          ws_price?: number | null
+          u_price?: number | null
+          ws_price_cost?: number | null
+          u_price_cost?: number | null
+          codes?: string | null
+          vendor?: string | null
+          import_tag?: string | null
+          createdAt?: string | null
+          updatedAt?: string | null
+          count_on_hand?: number | null
+          no_backorder?: boolean | null
+          plu?: string | null
+          id?: string
+          description_orig?: string | null
+          description_edit?: string | null
+          description?: string | null
+          featured?: boolean | null
+          sq_variation_id?: string | null
+        }
+      }
+      squareImport: {
+        Row: {
+          id: string
+          createdAt: string | null
+          data: Json | null
+          status: string | null
+          notes: string | null
+        }
+        Insert: {
+          id?: string
+          createdAt?: string | null
+          data?: Json | null
+          status?: string | null
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          createdAt?: string | null
+          data?: Json | null
+          status?: string | null
+          notes?: string | null
         }
       }
       WholesaleOrders: {
         Row: {
+          id: number
           vendor: string | null
           notes: string | null
           status: string | null
           payment_status: string | null
           shipment_status: string | null
+          createdAt: string | null
+          updatedAt: string | null
           calc_adjustments: boolean | null
           square_status: string | null
           square_loaded_at: string | null
           data: Json | null
-          createdAt: string | null
-          updatedAt: string | null
           api_key: string
-          id: number
         }
         Insert: {
+          id?: number
           vendor?: string | null
           notes?: string | null
           status?: string | null
           payment_status?: string | null
           shipment_status?: string | null
+          createdAt?: string | null
+          updatedAt?: string | null
           calc_adjustments?: boolean | null
           square_status?: string | null
           square_loaded_at?: string | null
           data?: Json | null
-          createdAt?: string | null
-          updatedAt?: string | null
           api_key?: string
-          id?: number
         }
         Update: {
+          id?: number
           vendor?: string | null
           notes?: string | null
           status?: string | null
           payment_status?: string | null
           shipment_status?: string | null
+          createdAt?: string | null
+          updatedAt?: string | null
           calc_adjustments?: boolean | null
           square_status?: string | null
           square_loaded_at?: string | null
           data?: Json | null
-          createdAt?: string | null
-          updatedAt?: string | null
           api_key?: string
-          id?: number
         }
       }
     }
@@ -685,4 +708,3 @@ export interface Database {
     }
   }
 }
-

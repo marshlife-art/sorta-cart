@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders, jsonCorsHeaders } from '../_shared/cors.ts'
-import { completePayment, createPayment } from '../_shared/square/payments.ts'
+import { createPayment } from '../_shared/square/payments.ts'
 import { createOrder, mapLineItems } from '../_shared/square/orders.ts'
 import { supabaseServiceRoleClient } from '../_shared/supabase-admin.ts'
 import {

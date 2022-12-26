@@ -8,6 +8,8 @@ import {
   distinctProductSubCategories as supaDistinctProductSubCategories
 } from './supabase/products'
 import { catmapFetcher as supaCatmapFetcher } from './supabase/catmap'
+import { squareImportsFetcher as supaSquareImportsFetcher } from './supabase/squareimport'
+import { squareImportFetcher as supaSquareImportFetcher } from './supabase/squareimport'
 import {
   membersAutocompleteFetcher as supaMembersAutocompleteFetcher,
   membersFetcher as supaMembersFetcher,
@@ -38,6 +40,10 @@ import {
   distinctProductSubCategories as localDistinctProductSubCategories
 } from './local/products'
 import { catmapFetcher as localCatmapFetcher } from './local/catmap'
+
+import { squareImportsFetcher as localSquareImportsFetcher } from './local/squareimport'
+import { squareImportFetcher as localSquareImportFetcher } from './local/squareimport'
+
 import {
   membersAutocompleteFetcher as localMembersAutocompleteFetcher,
   membersFetcher as localMembersFetcher,
@@ -105,6 +111,16 @@ export const productsAutocompleteFetcher = process.env.USE_LOCAL_SERVICES
 export const catmapFetcher = process.env.USE_LOCAL_SERVICES
   ? localCatmapFetcher
   : supaCatmapFetcher
+
+/*
+ * SquareImport
+ */
+export const squareImportsFetcher = process.env.USE_LOCAL_SERVICES
+  ? localSquareImportsFetcher
+  : supaSquareImportsFetcher
+export const squareImportFetcher = process.env.USE_LOCAL_SERVICES
+  ? localSquareImportFetcher
+  : supaSquareImportFetcher
 
 /*
  * Members

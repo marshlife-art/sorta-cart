@@ -55,3 +55,6 @@ export type SupaWholesaleOrder = Omit<WholesaleOrder, 'id' | 'api_key'> & {
 }
 
 export type SupaCatmap = Database['public']['Tables']['catmap']['Row']
+
+export type SupaSquareImport =
+  Database['public']['Tables']['squareImport']['Row']

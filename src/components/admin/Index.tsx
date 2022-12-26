@@ -39,6 +39,7 @@ import clsx from 'clsx'
 import { mainListItems } from './listItems' // secondaryListItems
 import { supabase } from '../../lib/supabaseClient'
 import { auth } from '../../services/auth'
+import SquareImport from './squareimport/SquareImport'
 
 const drawerWidth = 240
 
@@ -297,6 +298,10 @@ export default function AdminIndex() {
             <Route
               path="/storecredits"
               element={<AdminRoute path="/" element={<StoreCredits />} />}
+            />
+            <Route
+              path="/squareimport"
+              element={<AdminRoute path="/" element={<SquareImport />} />}
             />
             <Route
               index

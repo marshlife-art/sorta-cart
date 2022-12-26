@@ -26,6 +26,7 @@ import {
   updateOrderLineItems as supaUpdateOrderLineItems,
   insertOrderLineItem as supaInsertOrderLineItem
 } from './supabase/orderlineitems'
+import { upsertSquareImport as supaUpsertSquareImport } from './supabase/squareimport'
 
 import {
   updateNoBackorder as localUpdateNoBackorder,
@@ -55,6 +56,7 @@ import {
   updateOrderLineItems as localUpdateOrderLineItems,
   insertOrderLineItem as localInsertOrderLineItem
 } from './local/orderlineitems'
+import { upsertSquareImport as localUpsertSquareImport } from './local/squareimport'
 
 /*
  * Products
@@ -137,3 +139,11 @@ export const updateOrderLineItems = process.env.USE_LOCAL_SERVICES
 export const insertOrderLineItem = process.env.USE_LOCAL_SERVICES
   ? localInsertOrderLineItem
   : supaInsertOrderLineItem
+
+/*
+ * squareImport
+ */
+
+export const upsertSquareImport = process.env.USE_LOCAL_SERVICES
+  ? localUpsertSquareImport
+  : supaUpsertSquareImport
